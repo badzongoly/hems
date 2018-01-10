@@ -22,7 +22,7 @@ class MySQL
 	private $db_host    = "localhost"; // server name
 	private $db_user    = "root";          // user name
 	private $db_pass    = "";          // password
-	private $db_dbname  = "term";          // database name
+	private $db_dbname  = "hems";          // database name
 	private $db_charset = "";          // optional character set (i.e. utf8)
 	private $db_pcon    = false;      // use persistent connection?
 
@@ -2057,59 +2057,6 @@ function mean($aValues){return $fMean = array_sum($aValues) / count($aValues);}
             header('Location:../index.php');
 
         }
-
-    }
-
-
-    function getLecturerFullname($staffid){
-
-        $sid = $staffid;
-        $this->Query("SELECT title,fname,lname FROM staff_employee_pdetail WHERE empID = $sid");
-        $staffRow = $this->Row();
-        $myFullname = $staffRow->title.' '.$staffRow->fname.' '.$staffRow->lname;
-        return $myFullname;
-
-    }
-
-    function getCourseRegisteredCount($headerid){
-
-        $ghid = $headerid;
-        $this->Query("SELECT IFNULL(COUNT(gb_main.id),0) as regstd FROM gb_main WHERE gb_header_id = $ghid");
-        $crow = $this->Row();
-        $numreg = $crow->regstd;
-
-        return $numreg;
-
-
-    }
-
-    function checkHeaderRegStatus($headerid){
-
-        $this->Query("SELECT registration_status FROM gb_header WHERE id = $headerid");
-        $ghsrow = $this->Row();
-        $gottenStatus = trim($ghsrow->registration_status);
-
-        return $gottenStatus;
-
-    }
-
-    function checkGradHeaderRegStatus($headerid){
-
-        $this->Query("SELECT registration_status FROM gs_gb_header WHERE id = $headerid");
-        $ghsrow = $this->Row();
-        $gottenStatus = trim($ghsrow->registration_status);
-
-        return $gottenStatus;
-
-    }
-
-    function getProgTiedGradingSystem($tiedProg){
-
-        $program = trim($tiedProg);
-        $this->Query("SELECT grading_sys_used FROM programs WHERE code = '$tiedProg'");
-        $tgsrow = $this->Row();
-
-        return $tgsrow->grading_sys_used;
 
     }
 
