@@ -1841,78 +1841,85 @@ class MySQL
   } 
   return $isValid; 
 }
+    /*
+     * This function checks login session existence and redirects when check fails
+     * */
+    function checkLogin()
+    {
 
-	function checkLogin(){
-		
-	if (!isset($_SESSION)) {session_start();}
-	$MM_authorizedUsers = "2,3,4,5,7,8,9,10,11,12,13,14,15";
-	$MM_donotCheckaccess = "false";
-	
-	$MM_restrictGoTo = "../index.php";
-	if (!((isset($_SESSION['term_Username'])) && ($this->isAuthorized("",$MM_authorizedUsers, 
-	$_SESSION['term_Username'], $_SESSION['term_UserGroup'])))) {   
-	  $MM_qsChar = "?";
-	  $MM_referrer = $_SERVER['PHP_SELF'];
-	  if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
-	  if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING']) > 0) 
-	  $MM_referrer .= "?" . $_SERVER['QUERY_STRING'];
-	  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
-	  header("Location: ". $MM_restrictGoTo); 
-	  exit;
-	}	
-	}
-	
-	function upload($file_id, $folder="", $types="") {
-    if(!$_FILES[$file_id]['name']) 
-	return array('','No file specified');
+        if (!isset($_SESSION)) {
+            session_start();
+        }
+        $MM_authorizedUsers = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20";
+        $MM_donotCheckaccess = "false";
 
-    $file_title = $_FILES[$file_id]['name'];
-    //Get file extension
-    $ext_arr = @split("\.",basename($file_title));
-    $ext = strtolower($ext_arr[count($ext_arr)-1]); //Get the last extension
-
-    //Not really uniqe - but for all practical reasons, it is
-    $uniqer = substr(md5(uniqid(rand(),1)),0,5);
-    $file_name = $uniqer . '_' . $file_title;//Get Unique Name
-
-    $all_types = explode(",",strtolower($types));
-    if($types) {
-        if(in_array($ext,$all_types));
-        else {
-            $result = "'".$_FILES[$file_id]['name']."' is not a valid file."; //Show error if any.
-            return array('',$result);
+        $MM_restrictGoTo = "../../index.php";
+        if (!((isset($_SESSION['hems_User']['username'])) && ($this->isAuthorized("", $MM_authorizedUsers,
+                $_SESSION['hems_User']['username'], $_SESSION['hems_User']['user_cat'])))
+        ) {
+            $MM_qsChar = "?";
+            $MM_referrer = $_SERVER['PHP_SELF'];
+            if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
+            if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING']) > 0)
+                $MM_referrer .= "?" . $_SERVER['QUERY_STRING'];
+            $MM_restrictGoTo = $MM_restrictGoTo . $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
+            header("Location: " . $MM_restrictGoTo);
+            exit;
         }
     }
 
-    //Where the file must be uploaded to
-    if($folder) $folder .= '/';//Add a '/' at the end of the folder
-    $uploadfile = $folder . $file_name;
+    function upload($file_id, $folder = "", $types = "")
+    {
+        if (!$_FILES[$file_id]['name'])
+            return array('', 'No file specified');
 
-    $result = '';
-    //Move the file from the stored location to the new location
-    if (!move_uploaded_file($_FILES[$file_id]['tmp_name'], $uploadfile)) {
-        $result = "Cannot upload the file '".$_FILES[$file_id]['name']."'"; //Show error if any.
-        if(!file_exists($folder)) {
-            $result .= " : Folder don't exist.";
-        } elseif(!is_writable($folder)) {
-            $result .= " : Folder not writable.";
-        } elseif(!is_writable($uploadfile)) {
-            $result .= " : File not writable.";
+        $file_title = $_FILES[$file_id]['name'];
+        //Get file extension
+        $ext_arr = @split("\.", basename($file_title));
+        $ext = strtolower($ext_arr[count($ext_arr) - 1]); //Get the last extension
+
+        //Not really uniqe - but for all practical reasons, it is
+        $uniqer = substr(md5(uniqid(rand(), 1)), 0, 5);
+        $file_name = $uniqer . '_' . $file_title;//Get Unique Name
+
+        $all_types = explode(",", strtolower($types));
+        if ($types) {
+            if (in_array($ext, $all_types)) ;
+            else {
+                $result = "'" . $_FILES[$file_id]['name'] . "' is not a valid file."; //Show error if any.
+                return array('', $result);
+            }
         }
-        $file_name = '';
-        
-    } else {
-        if(!$_FILES[$file_id]['size']) { //Check if the file is made
-            @unlink($uploadfile);//Delete the Empty file
+
+        //Where the file must be uploaded to
+        if ($folder) $folder .= '/';//Add a '/' at the end of the folder
+        $uploadfile = $folder . $file_name;
+
+        $result = '';
+        //Move the file from the stored location to the new location
+        if (!move_uploaded_file($_FILES[$file_id]['tmp_name'], $uploadfile)) {
+            $result = "Cannot upload the file '" . $_FILES[$file_id]['name'] . "'"; //Show error if any.
+            if (!file_exists($folder)) {
+                $result .= " : Folder don't exist.";
+            } elseif (!is_writable($folder)) {
+                $result .= " : Folder not writable.";
+            } elseif (!is_writable($uploadfile)) {
+                $result .= " : File not writable.";
+            }
             $file_name = '';
-            $result = "Empty file found - please use a valid file."; //Show the error message
-        } else {
-            chmod($uploadfile,0777);//Make it universally writable.
-        }
-    }
 
-    return array($file_name,$result);
-}
+        } else {
+            if (!$_FILES[$file_id]['size']) { //Check if the file is made
+                @unlink($uploadfile);//Delete the Empty file
+                $file_name = '';
+                $result = "Empty file found - please use a valid file."; //Show the error message
+            } else {
+                chmod($uploadfile, 0777);//Make it universally writable.
+            }
+        }
+
+        return array($file_name, $result);
+    }
 
 function showSemester($semester){
 	$year2 = substr($semester,0,4);	

@@ -1,0 +1,6 @@
+***local db name hems****
+created usr_users table
+created usr_cat table
+created usr_cat_links table
+created usr_links table
+created usr_user_login_log table
