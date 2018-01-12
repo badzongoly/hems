@@ -1,5 +1,7 @@
 <?php
+if(!isset($_SESSION)){
     session_start();
+}
     require_once('../../classes/mysql.class.php');
 
     $security = new MySQL();
