@@ -51,9 +51,13 @@
             </div>
             <!-- end brand -->
             <div class="login-content">
-                <form action="http://seantheme.com/color-admin-v1.7/admin/html/index.html" method="POST" class="margin-bottom-0">
+                <div id="result"></div><br>
+                <div>
+                    <p align="center" style="display: none; color: limegreen;" id="wait"><img src="images/495.gif" > resetting password. Please wait....</p>
+                </div>
+                <form action="" method="POST" class="margin-bottom-0" id="forgotForm">
                     <div class="form-group m-b-20">
-                        <input type="text" class="form-control input-lg" placeholder="Email Address" />
+                        <input type="text" name="email" id="email" class="form-control input-lg" placeholder="Email Address" />
                     </div>
 <!--                    <div class="form-group m-b-20">-->
 <!--                        <input type="text" class="form-control input-lg" placeholder="Password" />-->
@@ -64,7 +68,7 @@
 <!--                        </label>-->
 <!--                    </div>-->
                     <div class="login-buttons">
-                        <button type="submit" class="btn btn-success btn-block btn-lg">Reset Password</button>
+                        <button type="submit" id="res" class="btn btn-success btn-block btn-lg">Reset Password</button>
                     </div>
                     <div class="m-t-20">
                         <a href="index.php">Back to Login</a>
@@ -187,6 +191,71 @@
 			LoginV2.init();
 		});
 	</script>
+    <script type="text/javascript">
+        $(function () {
+
+            var $btns = $("#res");
+            $btns.click(function (e) {
+                e.preventDefault();
+
+                var email = $.trim($("#email").val());
+
+                if(email.length == 0){
+
+                    $("#emailerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                    $("html, body").animate({ scrollTop: 0 }, "slow");
+
+                }
+
+                if(email.length != 0){
+
+                    $("#res").attr("disabled", "disabled");
+                    $("#wait").css("display","block");
+
+                    $.ajax({
+                        type: "POST",
+                        url: "controllers/auth/forget_pwd.php",
+                        data: $('#forgotForm').serialize(),
+                        success: function(e) {
+
+
+                            if(e=="success"){
+
+                                $("#wait").css("display","none");
+                                $("#res").removeAttr('disabled');
+
+                                $("#result").html("<br><div align='center' class='alert alert-success'>Password reset successful. A mail has been sent to the provided email containing your new password! </div>");
+                                $("#result").hide().fadeIn(2000);
+                                $("#email").val("");
+
+                            }else if(e=="unknown_email"){
+
+                                $("#wait").css("display","none");
+                                $("#res").removeAttr('disabled');
+
+                                $("#result").html("<br><div align='center' class='alert alert-danger'>The email provided doesnot exist in this system.</div>");
+                                $("#result").hide().fadeIn(2000);
+
+                            }else if(e=="failed"){
+
+                                $("#wait").css("display","none");
+                                $("#res").removeAttr('disabled');
+
+                                $("#result").html("<br><div align='center' class='alert alert-danger'>Password reset failed</div>");
+                                $("#result").hide().fadeIn(2000);
+                            }
+
+
+
+                        }
+                    });
+                    return false;
+                }
+
+            });
+
+        });
+    </script>
 	<script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

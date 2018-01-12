@@ -1,7 +1,12 @@
 <?php
+<<<<<<< HEAD
 if(!isset($_SESSION)){
     session_start();
 }
+=======
+    if(!isset($_SESSION)){session_start();}
+
+>>>>>>> 4b7077e0fd0ffbcfc312ac8b3773b5c40dc5ff40
     require_once('../../classes/mysql.class.php');
 
     $security = new MySQL();
@@ -104,8 +109,8 @@ if(!isset($_SESSION)){
                 </a>
                 <ul class="dropdown-menu animated fadeInLeft">
                     <li class="arrow"></li>
-                    <li><a href="javascript:;">Edit Profile</a></li>
-                    <li><a href="javascript:;">Change Password</a></li>
+                    <li><a href="../users/user_profile.php">User Profile</a></li>
+                    <li><a href="../auth/change_password.php">Change Password</a></li>
                     <li><a href="../../controllers/auth/logout.php">Log Out</a></li>
                 </ul>
             </li>
