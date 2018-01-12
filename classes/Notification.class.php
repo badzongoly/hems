@@ -13,6 +13,13 @@ class Notification extends  MySQL{
 
     }
 
+     /*
+      * This function sends mails to specified emails
+      * @param $subject is the subject of the email
+      * @param $message is the message to be sent in the email
+      * @param $recepientEmail is the email address of the recepient
+      * @return 'ok' if sent successfully and 'email_failed when email fails
+      * */
     function sendEmail($subject,$message,$recepientEmail){
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n".'From: no-reply@unicef.org'. "\r\n";
