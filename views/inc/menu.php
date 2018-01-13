@@ -42,7 +42,7 @@ foreach($links as $row_links){
 <ul class="nav">
     <li class="nav-header"></li>
     <li class="<?php if($page == "dash"){echo "active";}?>">
-        <a href="../inc/dashboard.php">
+        <a href="../../views/dashboard/dashboard.php">
             <strong><i class="fa fa-home"></i>
                 <span>Home</span></strong>
         </a>
