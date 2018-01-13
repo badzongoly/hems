@@ -27,7 +27,7 @@ if(isset($_POST['current']) && isset($_POST['newpass']) && isset($_POST['confpas
     $userEmail = trim($_SESSION['hems_User']['email']);
 
     if($new == $conf){
-
+        //if the new password is the same as the confirmation
         $check = new MySQL();
         $check->Query("SELECT * FROM usr_users WHERE user_id = $up_id");
         $recordset = $check->Row();
