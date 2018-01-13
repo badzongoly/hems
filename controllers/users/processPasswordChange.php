@@ -33,6 +33,7 @@ if(isset($_POST['current']) && isset($_POST['newpass']) && isset($_POST['confpas
         $recordset = $check->Row();
         $dbpass = $recordset->password;
 
+        //if current is equal to what is stored in the database
         if($current == $dbpass){
 
             $validate = new Password(array(
