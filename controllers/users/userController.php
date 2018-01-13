@@ -53,5 +53,10 @@ if(isset($_POST['id']) && isset($_POST['act']) && $_POST['act'] == "delete" ){
     echo $object->deleteUserCat($_POST['id']);exit;
 }
 if(isset($_POST['do']) && $_POST['do']=="set_password" ){
-    echo $object->setPassword($_POST['username'],$_POST['password']);exit;
+    if($_POST['password'] == $_POST['confpassword']) {
+        echo $object->setPassword($_POST['username'], $_POST['password']);
+        exit;
+    }else{
+        echo "mismatch";exit;
+    }
 }

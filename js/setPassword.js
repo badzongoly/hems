@@ -49,7 +49,13 @@ $(function () {
 
                 if(msg==="ok"){
                     window.location.replace("index.php");
-                }else{
+                }
+                else if(msg === "mismatch"){
+                    $("#ack").html("Password mismatch with confirmation password");
+                    $("#lgwait").css("display","none");
+                    $("#loginMeIn").removeAttr("disabled");
+                }
+                else{
                     $("#ack").html(msg);
                     $("#lgwait").css("display","none");
                     $("#loginMeIn").removeAttr("disabled");
