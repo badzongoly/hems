@@ -5,6 +5,7 @@
     $sub_page_name = "user_profile";
 
     $userId = $_SESSION['hems_User']['user_id'];
+    //get user details
     $getUserDetails = new MySQL();
     $getUserDetails->Query("SELECT first_name,last_name,username,email,phone FROM usr_users WHERE user_id = $userId");
 
