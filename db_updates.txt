@@ -4,3 +4,7 @@ created usr_cat table
 created usr_cat_links table
 created usr_links table
 created usr_user_login_log table
+created country_office table
+created implementing_partners table
+created programmes table
+created programmes_partners table

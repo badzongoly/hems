@@ -6,11 +6,11 @@
  * Time: 06:13 PM
  */
 require_once('../../classes/mysql.class.php');
-$page = "user";
-$sub_page_name = "usr_category";
+$page = "settings";
+$sub_page_name = "implementing_partners";
 $pull_ucat = new MySQL();
 $pull_ucat->checkLogin();
-$pull_ucat->Query("SELECT * FROM usr_cat");
+$pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -21,7 +21,7 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | ADD USER</title>
+    <title>HEMS | IMPLEMENTING PARTNERS</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -61,12 +61,12 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">User Managerment</a></li>
-            <li class="active">User Category</li>
+            <li><a href="javascript:;">Settings</a></li>
+            <li class="active">Implementing Partners</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">User Management <small>user category...</small></h1>
+        <h1 class="page-header">Settings <small>implementing partners...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -82,7 +82,7 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">User Category</h4>
+                        <h4 class="panel-title">Implementing Partners</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -101,8 +101,18 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
 
 
                                     <tr>
-                                        <td><label>Category Name:</label></td>
-                                        <td><input type="text" name="cat_name" id="cat_name" class="form-control"><p id="cname_error"></p></td>
+                                        <td><label>Partner Name:</label></td>
+                                        <td><input type="text" name="name" id="name"  placeholder="Name" class="form-control"><p id="cname_error"></p></td>
+                                        <td><label>Contact Person:</label></td>
+                                        <td><input type="text" name="contact_person" placeholder="Contact Person" id="contact_person" class="form-control"><p id="cp_error"></p></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Email:</label></td>
+                                        <td><input type="email" name="email" id="email"  placeholder="name@domain.com"class="form-control"><p id="email_error"></p></td>
+                                        <td><label>Phone Number:</label></td>
+                                        <td><input type="text" name="phone" id="phone" placeholder="Phone Number" class="form-control"><p id="phone_error"></p></td>
+                                    </tr>
+                                    <tr>
                                         <td><label>Status:</label></td>
                                         <td>
                                             <select class="form-control" id="status" name="status" style="height: 35px;">
@@ -110,28 +120,36 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
                                                 <option value="Active">Inactive</option>
                                             </select>
                                         </td>
+                                        <td><label>Location:</label></td>
+                                        <td><textarea class="form-control" placeholder="Location" id="location" name="location" rows="5"></textarea><p id="location_error"></p></td>
+                                    </tr>
+                                    <tr>
 
-                                        <td><input  type="submit" name="save" id="save" class="btn btn-primary" value="Save"></td>
+                                        <td colspan="4"><input  type="submit" name="save" id="save" class="btn btn-primary" value="Save"></td>
                                     </tr>
 
                                     </tbody>
 
-                                    <input type="hidden" name="do" value="CreateUserCat">
+                                    <input type="hidden" name="do" value="CreateImplementingPartners">
 
                                 </table>
                                 <hr>
                             </form>
                             <div>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding user category. Please wait....</p>
+                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding programmes. Please wait....</p>
                             </div>
                             <div id="uc_response"></div>
                         </div>
 
                         <div id="uclisted">
-                            <table class="table table-striped table-hover table-email table-bordered" style="width: 400px;" align="center">
+                            <table class="table table-striped table-hover table-email table-bordered" style="width: 80%;" align="center">
                                 <thead>
                                 <tr>
-                                    <th>Category Name</th>
+                                    <th> Name</th>
+                                    <th>Contact Person</th>
+                                    <th>Phone Number</th>
+                                    <th>Email</th>
+                                    <th>Location</th>
                                     <th>Status</th>
                                     <th></th>
                                 </tr>
@@ -139,9 +157,13 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
                                 <tbody>
                                 <?php while(!$pull_ucat->EndOfSeek()){ $ucrow = $pull_ucat->Row();?>
                                     <tr>
-                                        <td><?php echo $ucrow->cat_name;?></td>
+                                        <td><?php echo $ucrow->name;?></td>
+                                        <td><?php echo $ucrow->contact_person;?></td>
+                                        <td><?php echo $ucrow->phone;?></td>
+                                        <td><?php echo $ucrow->email;?></td>
+                                        <td><?php echo $ucrow->location;?></td>
                                         <td><?php echo $ucrow->status;?></td>
-                                        <td><a href="#" id="delete" data-id="<?php echo $ucrow->cat_id;?>" class="btn btn-danger"><i class="fa fa-times"></i> Delete</a> </td>
+                                        <td><a href="#" id="delete" data-id="<?php echo $ucrow->id;?>" class="btn btn-danger"><i class="fa fa-times"></i> Delete</a> </td>
                                     </tr>
                                 <?php } ?>
 
@@ -199,9 +221,16 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
 
             e.preventDefault();
             $("#uc_response").empty();
-
-            var cname = $.trim($("#cat_name").val());
-
+            $("#cname_error").empty();
+            $("#location_error").empty();
+            $('#email_error').empty();
+            $("#phone_error").empty();
+            $("#cp_error").empty();
+            var cname = $.trim($("#name").val());
+            var location = $.trim($("#location").val());
+            var email = $.trim($("#email").val());
+            var phone = $.trim($("#phone").val());
+            var cp = $.trim($("#contact_person").val());
 
             if(cname.length == 0){
 
@@ -209,9 +238,27 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
                 $("html, body").animate({ scrollTop: 0 }, "slow");
 
             }
+            if(location.length == 0){
+                $("#location_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+             if(validateEmail(email) == false){
+
+                            $("#email_error").html('<p><small style="color:red;">enter a valid email.</small><p/>');
+                            $("html, body").animate({ scrollTop: 0 }, "slow");
+
+                        }
+                        if(phone.length == 0){
+                            $("#phone_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                            $("html, body").animate({ scrollTop: 0 }, "slow");
+                        }
+if(cp.length == 0){
+                            $("#cp_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                            $("html, body").animate({ scrollTop: 0 }, "slow");
+                        }
 
 
-            if(cname.length != 0){
+            if(cname.length != 0 && location.length != 0&& cp.length != 0&& validateEmail(email) != false && phone.length != 0){
 
                 $("#save").attr("disabled", "disabled");
                 $("#wait").css("display","block");
@@ -219,7 +266,7 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
 
                 $.ajax({
                     type: "POST",
-                    url: "../../controllers/users/userController.php",
+                    url: "../../controllers/settings/settingsController.php",
                     data: $form.serialize(),
                     success: function(e) {
 
@@ -227,28 +274,32 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
                         if(e=="error"){
 
 
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save user category.</span></div><br>").hide().fadeIn(1000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save implementing partner.</span></div><br>").hide().fadeIn(1000);
                             $("#wait").css("display","none");
                             $("#save").removeAttr('disabled');
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save user category.</span></div><br>").fadeOut(6000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save implementing partner.</span></div><br>").fadeOut(6000);
 
                         }else if(e=="exists"){
 
 
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This user category already exists.</span></div><br>").hide().fadeIn(1000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This implementing partner already exists.</span></div><br>").hide().fadeIn(1000);
                             $("#wait").css("display","none");
                             $("#save").removeAttr('disabled');
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This user category already exists.</span></div><br>").fadeOut(6000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This implementing partner already exists.</span></div><br>").fadeOut(6000);
 
                         }else {
 
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>User category saved successfully.</span></div><br>").hide().fadeIn(1000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Implementing partner saved successfully.</span></div><br>").hide().fadeIn(1000);
                             $('#uclisted').empty();
                             $('#uclisted').html(e);
                             $("#wait").css("display","none");
-                            $("#cat_name").val("");
+                            $("#name").val("");
+                            $("#location").val("");
+                            $("#contact_person").val("");
+                            $("#phone").val("");
+                            $("#email").val("");
                             $("#save").removeAttr('disabled');
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>User category saved successfully.</span></div><br>").fadeOut(6000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Implementing partner saved successfully.</span></div><br>").fadeOut(6000);
                         }
 
 
@@ -264,22 +315,22 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
             var action = "delete";
             $.ajax({
                 type:"POST",
-                data:{id:id,act:action},
-                url:"../../controllers/users/userController.php",
+                data:{id:id,do_action:action},
+                url:"../../controllers/settings/settingsController.php",
                 success:function (data) {
                     if(e=="error"){
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save user category.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to implementing partner.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
 
 
                     }else {
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>User category deleted successfully.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Implementing partner deleted successfully.</span></div><br>").hide().fadeIn(1000);
 
                         $('#uclisted').html(data);
                         $("#wait").css("display","none");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>User category deleted successfully.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Implementing partner deleted successfully.</span></div><br>").fadeOut(6000);
 
                     }
 
@@ -289,6 +340,15 @@ $pull_ucat->Query("SELECT * FROM usr_cat");
         })
 
     });
+    function validateEmail(sEmail) {
+        var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+        if (filter.test(sEmail)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 </script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
