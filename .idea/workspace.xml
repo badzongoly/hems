@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4075cbeb-7b36-4479-8f8f-f86ebbb1f09f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classes/Notification.class.php" afterPath="$PROJECT_DIR$/classes/Notification.class.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/inc/header.php" afterPath="$PROJECT_DIR$/views/inc/header.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/users/user_profile.php" afterPath="$PROJECT_DIR$/views/users/user_profile.php" />
     </list>
     <ignored path="hems.iws" />
-    <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -52,95 +50,29 @@
       <file leaf-file-name="change_password.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/auth/change_password.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.0" vertical-offset="5157" max-vertical-offset="6494">
+            <state vertical-scroll-proportion="0.0" vertical-offset="5287" max-vertical-offset="6494">
               <caret line="311" column="41" selection-start-line="311" selection-start-column="41" selection-end-line="311" selection-end-column="41" />
               <folding>
-                <element signature="n#style#0;n#p#0;n#div#1;n#div#1;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#div#1;n#div#0;n#div#1;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#ul#0;n#div#1;n#div#0;n#div#1;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <marker date="1515760740924" expanded="true" signature="14842:14852" placeholder="..." />
-                <marker date="1515760740924" expanded="true" signature="15087:15097" placeholder="..." />
-                <marker date="1515760740924" expanded="true" signature="15334:15344" placeholder="..." />
-                <marker date="1515760740924" expanded="true" signature="16278:16297" placeholder="..." />
-                <marker date="1515760740924" expanded="true" signature="16701:16720" placeholder="..." />
-                <marker date="1515760740924" expanded="true" signature="17119:17138" placeholder="..." />
-                <marker date="1515760740924" expanded="true" signature="18061:18071" placeholder="..." />
+                <marker date="1515760740924" expanded="false" signature="14842:14852" placeholder="..." />
+                <marker date="1515760740924" expanded="false" signature="15087:15097" placeholder="..." />
+                <marker date="1515760740924" expanded="false" signature="15334:15344" placeholder="..." />
+                <marker date="1515760740924" expanded="false" signature="16278:16297" placeholder="..." />
+                <marker date="1515760740924" expanded="false" signature="16701:16720" placeholder="..." />
+                <marker date="1515760740924" expanded="false" signature="17119:17138" placeholder="..." />
+                <marker date="1515760740924" expanded="false" signature="18061:18071" placeholder="..." />
               </folding>
             </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Notification.class.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/classes/Notification.class.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.1923075" vertical-offset="0" max-vertical-offset="833">
-              <caret line="16" column="53" selection-start-line="16" selection-start-column="53" selection-end-line="16" selection-end-column="53" />
-              <folding>
-                <element signature="e#39#121#0#PHP" expanded="false" />
-                <marker date="1515761535924" expanded="true" signature="794:1243" placeholder="..." />
-                <marker date="1515761535924" expanded="true" signature="841:970" placeholder="..." />
-                <marker date="1515761535924" expanded="true" signature="1017:1195" placeholder="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="processPasswordChange.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/controllers/users/processPasswordChange.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-6.5740743" vertical-offset="1379" max-vertical-offset="1938">
-              <caret line="102" column="39" selection-start-line="102" selection-start-column="39" selection-end-line="102" selection-end-column="39" />
-              <folding>
-                <marker date="1515760862172" expanded="true" signature="982:1022" placeholder="SELECT * FRO..usr_users..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="hems.usr_users" pinned="false" current-in-tab="false">
-        <entry file="dbDummy://dbtable:/f640c54/7c4f8a21-3408-4921-b1d9-b0672fbde4dc/hems..usr_users">
-          <provider editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-          <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-            <state />
           </provider>
         </entry>
       </file>
       <file leaf-file-name="user_profile.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/views/users/user_profile.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.8947368" vertical-offset="2091" max-vertical-offset="4913">
-              <caret line="151" column="18" selection-start-line="151" selection-start-column="18" selection-end-line="151" selection-end-column="18" />
+            <state vertical-scroll-proportion="0.21441442" vertical-offset="0" max-vertical-offset="4930">
+              <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
               <folding>
-                <marker date="1515763802698" expanded="true" signature="248:325" placeholder="SELECT first..usr_users..." />
-                <marker date="1515763802698" expanded="true" signature="248:328" placeholder="SELECT first..usr_users..." />
+                <marker date="1515839709999" expanded="true" signature="271:351" placeholder="SELECT first..usr_users..." />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="login.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/controllers/auth/login.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.65384614" vertical-offset="1037" max-vertical-offset="1683">
-              <caret line="60" column="62" selection-start-line="60" selection-start-column="62" selection-end-line="60" selection-end-column="62" />
-              <folding>
-                <marker date="1515679094856" expanded="true" signature="1796:2112" placeholder="SELECT usr_u..usr_users..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="header.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/inc/header.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.3076923" vertical-offset="0" max-vertical-offset="2023">
-              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -174,9 +106,9 @@
         <option value="$PROJECT_DIR$/controllers/auth/forget_pwd.php" />
         <option value="$PROJECT_DIR$/forgot_password.php" />
         <option value="$PROJECT_DIR$/views/auth/change_password.php" />
-        <option value="$PROJECT_DIR$/controllers/users/processPasswordChange.php" />
         <option value="$PROJECT_DIR$/classes/Notification.class.php" />
         <option value="$PROJECT_DIR$/views/inc/header.php" />
+        <option value="$PROJECT_DIR$/controllers/users/processPasswordChange.php" />
         <option value="$PROJECT_DIR$/views/users/user_profile.php" />
       </list>
     </option>
@@ -214,7 +146,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -246,42 +177,6 @@
               <option name="myItemId" value="views" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="users" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="views" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="views" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="inc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -312,47 +207,12 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="controllers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="users" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="controllers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="auth" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hems" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="classes" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -370,17 +230,20 @@
     <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
       <method />
     </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
-      <method />
-    </configuration>
     <configuration default="true" type="com.intellij.database.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
       <option name="VM_PARAMETERS" value="" />
       <option name="USER_CFG_CLASS" />
       <option name="CONTEXT_PROVIDER" />
       <method />
     </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
     <configuration default="true" type="PhpBehatConfigurationType" factoryName="Behat">
       <BehatRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
       <method />
     </configuration>
     <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
@@ -389,9 +252,6 @@
       <tasks />
       <pass-parent-env-vars>false</pass-parent-env-vars>
       <envs />
-      <method />
-    </configuration>
-    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
       <method />
     </configuration>
     <list size="0" />
@@ -419,7 +279,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32980332" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25340393" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2647504" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -457,6 +317,99 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/views/auth/change_password.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5287" max-vertical-offset="6494">
+          <caret line="311" column="41" selection-start-line="311" selection-start-column="41" selection-end-line="311" selection-end-column="41" />
+          <folding>
+            <marker date="1515760740924" expanded="false" signature="14842:14852" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="15087:15097" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="15334:15344" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="16278:16297" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="16701:16720" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="17119:17138" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="18061:18071" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/users/user_profile.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4913">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1515839709999" expanded="true" signature="271:351" placeholder="SELECT first..usr_users..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/auth/change_password.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5157" max-vertical-offset="6494">
+          <caret line="311" column="41" selection-start-line="311" selection-start-column="41" selection-end-line="311" selection-end-column="41" />
+          <folding>
+            <marker date="1515760740924" expanded="false" signature="14842:14852" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="15087:15097" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="15334:15344" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="16278:16297" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="16701:16720" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="17119:17138" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="18061:18071" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classes/Notification.class.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="833">
+          <caret line="16" column="53" selection-start-line="16" selection-start-column="53" selection-end-line="16" selection-end-column="53" />
+          <folding>
+            <element signature="e#39#121#0#PHP" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controllers/users/processPasswordChange.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1379" max-vertical-offset="1938">
+          <caret line="102" column="39" selection-start-line="102" selection-start-column="39" selection-end-line="102" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbtable:/f640c54/7c4f8a21-3408-4921-b1d9-b0672fbde4dc/hems..usr_users">
+      <provider editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/users/user_profile.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4913">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1515839709999" expanded="true" signature="271:351" placeholder="SELECT first..usr_users..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controllers/auth/login.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1037" max-vertical-offset="1683">
+          <caret line="60" column="62" selection-start-line="60" selection-start-column="62" selection-end-line="60" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/inc/header.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="34" max-vertical-offset="2023">
+          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/controllers/auth/logout.php">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.35915494" vertical-offset="0" max-vertical-offset="568">
@@ -540,10 +493,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.23423423" vertical-offset="720" max-vertical-offset="4709">
           <caret line="50" column="18" selection-start-line="50" selection-start-column="18" selection-end-line="50" selection-end-column="18" />
-          <folding>
-            <element signature="n#style#0;n#p#0;n#div#1;n#div#1;n#div#0;n#div#2;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <marker date="1515753813624" expanded="true" signature="-1:-1" placeholder="..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -553,8 +503,6 @@
           <caret line="52" column="31" selection-start-line="52" selection-start-column="20" selection-end-line="52" selection-end-column="31" />
           <folding>
             <element signature="e#39#120#0#PHP" expanded="false" />
-            <marker date="1515752753488" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..usr_users..." />
-            <marker date="1515752753488" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..usr_users..." />
           </folding>
         </state>
       </provider>
@@ -563,7 +511,6 @@
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
       <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
@@ -574,7 +521,6 @@
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
       <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
@@ -585,77 +531,62 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-13.730769" vertical-offset="459" max-vertical-offset="1258">
           <caret line="48" column="72" selection-start-line="48" selection-start-column="72" selection-end-line="48" selection-end-column="72" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/auth/change_password.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.0" vertical-offset="5157" max-vertical-offset="6494">
-          <caret line="311" column="41" selection-start-line="311" selection-start-column="41" selection-end-line="311" selection-end-column="41" />
-          <folding>
-            <element signature="n#style#0;n#p#0;n#div#1;n#div#1;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#1;n#div#0;n#div#1;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#ul#0;n#div#1;n#div#0;n#div#1;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <marker date="1515760740924" expanded="true" signature="14842:14852" placeholder="..." />
-            <marker date="1515760740924" expanded="true" signature="15087:15097" placeholder="..." />
-            <marker date="1515760740924" expanded="true" signature="15334:15344" placeholder="..." />
-            <marker date="1515760740924" expanded="true" signature="16278:16297" placeholder="..." />
-            <marker date="1515760740924" expanded="true" signature="16701:16720" placeholder="..." />
-            <marker date="1515760740924" expanded="true" signature="17119:17138" placeholder="..." />
-            <marker date="1515760740924" expanded="true" signature="18061:18071" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/classes/Notification.class.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.1923075" vertical-offset="0" max-vertical-offset="833">
-          <caret line="16" column="53" selection-start-line="16" selection-start-column="53" selection-end-line="16" selection-end-column="53" />
-          <folding>
-            <element signature="e#39#121#0#PHP" expanded="false" />
-            <marker date="1515761535924" expanded="true" signature="794:1243" placeholder="..." />
-            <marker date="1515761535924" expanded="true" signature="841:970" placeholder="..." />
-            <marker date="1515761535924" expanded="true" signature="1017:1195" placeholder="..." />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/controllers/users/processPasswordChange.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-6.5740743" vertical-offset="1379" max-vertical-offset="1938">
-          <caret line="102" column="39" selection-start-line="102" selection-start-column="39" selection-end-line="102" selection-end-column="39" />
-          <folding>
-            <marker date="1515760862172" expanded="true" signature="982:1022" placeholder="SELECT * FRO..usr_users..." />
-          </folding>
+        <state vertical-scroll-proportion="0.6584507" vertical-offset="187" max-vertical-offset="1955">
+          <caret line="33" column="39" selection-start-line="33" selection-start-column="39" selection-end-line="33" selection-end-column="39" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/inc/header.php">
+    <entry file="file://$PROJECT_DIR$/classes/Notification.class.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.3076923" vertical-offset="0" max-vertical-offset="2023">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="187" max-vertical-offset="833">
+          <caret line="16" column="53" selection-start-line="16" selection-start-column="53" selection-end-line="16" selection-end-column="53" />
+          <folding>
+            <element signature="e#39#121#0#PHP" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/controllers/auth/login.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65384614" vertical-offset="1037" max-vertical-offset="1683">
+        <state vertical-scroll-proportion="-0.030630631" vertical-offset="1037" max-vertical-offset="1683">
           <caret line="60" column="62" selection-start-line="60" selection-start-column="62" selection-end-line="60" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/inc/header.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="34" max-vertical-offset="2023">
+          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/auth/change_password.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5287" max-vertical-offset="6494">
+          <caret line="311" column="41" selection-start-line="311" selection-start-column="41" selection-end-line="311" selection-end-column="41" />
           <folding>
-            <marker date="1515679094856" expanded="true" signature="1796:2112" placeholder="SELECT usr_u..usr_users..." />
+            <marker date="1515760740924" expanded="false" signature="14842:14852" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="15087:15097" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="15334:15344" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="16278:16297" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="16701:16720" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="17119:17138" placeholder="..." />
+            <marker date="1515760740924" expanded="false" signature="18061:18071" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/users/user_profile.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8947368" vertical-offset="2091" max-vertical-offset="4913">
-          <caret line="151" column="18" selection-start-line="151" selection-start-column="18" selection-end-line="151" selection-end-column="18" />
+        <state vertical-scroll-proportion="0.21441442" vertical-offset="0" max-vertical-offset="4930">
+          <caret line="7" column="22" selection-start-line="7" selection-start-column="22" selection-end-line="7" selection-end-column="22" />
           <folding>
-            <marker date="1515763802698" expanded="true" signature="248:325" placeholder="SELECT first..usr_users..." />
-            <marker date="1515763802698" expanded="true" signature="248:328" placeholder="SELECT first..usr_users..." />
+            <marker date="1515839709999" expanded="true" signature="271:351" placeholder="SELECT first..usr_users..." />
           </folding>
         </state>
       </provider>
