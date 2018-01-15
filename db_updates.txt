@@ -8,3 +8,4 @@ created country_office table
 created implementing_partners table
 created programmes table
 created programmes_partners table
+created project table
