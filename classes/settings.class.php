@@ -50,6 +50,39 @@ class Settings extends MySQL
         else{
             return "error";
         }
+    }
+    public function setOutcomes($name,$description,$status){
+
+        $valuesArray['name'] = MySQL::SQLValue($name);
+        $valuesArray['description'] = MySQL::SQLValue($description);
+        $valuesArray['status'] = MySQL::SQLValue($status);
+        $valuesArray['created_by'] = MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+
+        $sql = MySQL::BuildSQLInsert('outcomes',$valuesArray);
+        $check = $this->Query($sql);
+        if($check){
+            return "ok";
+        }
+        else{
+            return "error";
+        }
+    }
+    public function setOutput($name,$description,$outcome_id){
+
+        $valuesArray['name'] = MySQL::SQLValue($name);
+        $valuesArray['description'] = MySQL::SQLValue($description);
+        $valuesArray['outcome_id'] = MySQL::SQLValue($outcome_id);
+        $valuesArray['created_by'] = MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+
+        $sql = MySQL::BuildSQLInsert('output',$valuesArray);
+
+        $check = $this->Query($sql);
+        if($check){
+            return "ok";
+        }
+        else{
+            return "error";
+        }
     }    public function setImplementingPartners($name,$location,$status,$contactPerson,$phone,$email){
 
         $valuesArray['name'] = MySQL::SQLValue($name);
@@ -116,6 +149,52 @@ class Settings extends MySQL
         }
         return $output;
     }
+    public function getOutcomes(){
+        $this->Query('Select * from outcomes WHERE status = "Active"');
+        $output = '<table class="table table-striped table-hover table-email table-bordered" style="width: 700px;" align="center">
+                                <thead>
+                                <tr>
+                                    <th> Name</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>';
+        while(!$this->EndOfSeek()){
+            $row = $this->Row();
+            $output.='<tr>
+                                        <td>'.$row->name.'</td>
+                                        <td>'.$row->description.'</td>
+                                        <td>'.$row->status.'</td>
+                                        <td><a href="#" id="delete" data-id="'.$row->id.'" class="btn btn-danger"><i class="fa fa-times"></i> Delete</a> </td>
+                                    </tr>';
+        }
+        return $output;
+    }
+    public function getOutput(){
+        $this->Query('SELECT p.id,p.name,p.description,c.`name`AS outcome FROM output p INNER JOIN outcomes c ON c.id = p.outcome_id');
+        $output = '<table class="table table-striped table-hover table-email table-bordered" style="width: 700px;" align="center">
+                                <thead>
+                                <tr>
+                                    <th> Name</th>
+                                    <th>Description</th>
+                                    <th>Outcome</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>';
+        while(!$this->EndOfSeek()){
+            $row = $this->Row();
+            $output.='<tr>
+                                        <td>'.$row->name.'</td>
+                                        <td>'.$row->description.'</td>
+                                        <td>'.$row->outcome.'</td>
+                                        <td><a href="#" id="delete" data-id="'.$row->id.'" class="btn btn-danger"><i class="fa fa-times"></i> Delete</a> </td>
+                                    </tr>';
+        }
+        return $output;
+    }
     public function getImplementingPartners(){
         $this->Query('Select * from implementing_partners WHERE status = "Active"');
         $output = '<table class="table table-striped table-hover table-email table-bordered" style="width: 80%;" align="center">
@@ -163,6 +242,25 @@ class Settings extends MySQL
         $check = $this->Query($sql);
         if($check){
             return $this->getProgrammes();
+        }else{
+            return "error";
+        }
+    }
+    public function deleteOutcome($id){
+        $whereArray['id'] = $id;
+        $sql = MySQL::BuildSQLDelete('outcomes',$whereArray);
+        $check = $this->Query($sql);
+        if($check){
+            return $this->getOutcomes();
+        }else{
+            return "error";
+        }
+    }public function deleteOutput($id){
+        $whereArray['id'] = $id;
+        $sql = MySQL::BuildSQLDelete('output',$whereArray);
+        $check = $this->Query($sql);
+        if($check){
+            return $this->getOutput();
         }else{
             return "error";
         }

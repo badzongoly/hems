@@ -23,6 +23,21 @@ if(isset($_POST['do']) && $_POST['do'] == "CreateProgrammes"){
         echo "error";
     }
 }
+if(isset($_POST['do']) && $_POST['do'] == "CreateOutcomes"){
+    $check = $object->setOutcomes($_POST['name'],$_POST['description'],$_POST['status']);
+    if($check == "ok"){
+        echo $object->getOutcomes();exit;
+    }else{
+        echo "error";
+    }
+}if(isset($_POST['do']) && $_POST['do'] == "CreateOutput"){
+    $check = $object->setOutput($_POST['name'],$_POST['description'],$_POST['outcome_id']);
+    if($check == "ok"){
+        echo $object->getOutput();exit;
+    }else{
+        echo "error";
+    }
+}
 if(isset($_POST['do']) && $_POST['do'] == "CreateImplementingPartners"){
     $check = $object->setImplementingPartners($_POST['name'],$_POST['location'],$_POST['status'],$_POST['contact_person'],$_POST['phone'],$_POST['email']);
     if($check == "ok"){
@@ -35,6 +50,9 @@ if(isset($_POST['id']) && isset($_POST['act']) && $_POST['act'] == "delete" ){
     echo $object->deleteCountryOffice($_POST['id']);exit;
 }
 if(isset($_POST['id']) && isset($_POST['do_act']) && $_POST['do_act'] == "delete" ){
+    echo $object->deleteProgrammes($_POST['id']);exit;
+}
+if(isset($_POST['id']) && isset($_POST['do_outcomes']) && $_POST['do_outcomes'] == "delete" ){
     echo $object->deleteProgrammes($_POST['id']);exit;
 }if(isset($_POST['id']) && isset($_POST['do_action']) && $_POST['do_action'] == "delete" ){
     echo $object->deleteImplementingPartners($_POST['id']);exit;
