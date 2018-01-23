@@ -165,9 +165,9 @@ class User extends MySQL
         }
 
 
+    }
 
-
-    }function editUser($firstname,$lastname,$phone,$email,$status,$category,$id){
+    function editUser($firstname,$lastname,$phone,$email,$status,$category,$id){
 
 
         $usercat = $category;
@@ -194,6 +194,7 @@ class User extends MySQL
             }
 
     }
+
     public function getStaffEmail($id_fullname){
 
         $name_sid = explode(':', $id_fullname);
@@ -219,6 +220,7 @@ class User extends MySQL
         }
 
     }
+
     function findUser($uid){
 
 
@@ -258,9 +260,6 @@ class User extends MySQL
             return "zero";
 
         }
-
-
-
 
     }
 

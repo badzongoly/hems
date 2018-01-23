@@ -13,7 +13,7 @@ class Notifications
 
         $uname = trim($userlogin);
 
-$headers_info = "From:erp@gtuc.edu.gh \r\n";
+$headers_info = "From:noreply@hems.com \r\n";
 $headers_info .= "Reply-To: noreply@hems.com \r\n";
 $headers_info .= "MIME-Version: 1.0\r\n";
 $headers_info .= "Content-Type: text/html; charset=ISO-8859-1\r\n";

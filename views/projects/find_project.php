@@ -1,16 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jerome
- * Date: 11/01/2018
- * Time: 06:13 PM
- */
 require_once('../../classes/mysql.class.php');
 $page = "project";
 $sub_page_name = "project";
-$pull_ucat = new MySQL();
-$pull_ucat->checkLogin();
-$pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
+$chekLogin = new MySQL();
+$chekLogin->checkLogin();
+
+$dbConnect = new MySQL();
+$dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -21,7 +17,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | ADD PROJECT</title>
+    <title>HEMS | Find Project</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -52,6 +48,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
     <!-- ================== BEGIN BASE JS ================== -->
     <script src="../../assets/plugins/pace/pace.min.js"></script>
+    <link href="../../assets/plugins/DataTables/css/data-table.css" rel="stylesheet" />
     <!-- ================== END BASE JS ================== -->
 </head>
 <body>
@@ -75,11 +72,11 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
             <li><a href="javascript:;">Projects</a></li>
-            <li class="active">Add Projects</li>
+            <li class="active">Find Project</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Project <small>add project...</small></h1>
+        <h1 class="page-header">Project <small>find project...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -95,80 +92,39 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Add Project</h4>
+                        <h4 class="panel-title">Find Project</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
                             <form id="createUserCatForm" method="post" action="">
 
-                                <table class="table table-responsive table-striped table-bordered" align="center">
+                                <table class="table table-responsive table-striped" align="center">
 
-                                    <thead>
-
-                                    <tr>
-                                        <td colspan="5"><p id="confirmation" style="text-align:center"></p></td>
-                                    </tr>
-
-                                    </thead>
                                     <tbody>
 
-
-                                    <tr>
-                                        <td><label>Name:</label></td>
-                                        <td><input type="text" name="name" id="name"  placeholder="Name" class="form-control"><p id="cname_error"></p></td>
-                                        <td><label>Description:</label></td>
-                                        <td><textarea class="form-control" placeholder="Description" id="description" name="description" rows="5"></textarea><p id="description_error"></p></td>
-                                    </tr>
                                     <tr>
                                         <td><label>Implementing Partner:</label></td>
                                         <td>
                                             <select class="default-select2 form-control" id="partner_id" name="partner_id" style="height: 35px;">
-                                                <?php while(!$pull_ucat->EndOfSeek()){ $ucrow = $pull_ucat->Row();?>
+                                                <option value="" selected disabled>--SELECT OPTION--</option>
+                                                <?php while(!$dbConnect->EndOfSeek()){ $ucrow = $dbConnect->Row();?>
                                                 <option value="<?php echo $ucrow->id;?>"><?php echo $ucrow->name;?></option>
                                                <?php }?>
-                                            </select>
+                                            </select><div id="parterror"></div>
                                         </td>
                                         <td><label>Programme:</label></td>
                                         <td>
                                             <select class="default-select2 form-control" id="programme_id" name="programme_id" style="height: 35px;">
+                                                <option value="" selected disabled>--SELECT OPTION--</option>
                                                 <?php
-                                                $pull_ucat->Query('Select * from programmes WHERE  status = "Active"');
-                                                while(!$pull_ucat->EndOfSeek()){ $ucrow = $pull_ucat->Row();?>
+                                                $dbConnect->Query("SELECT * FROM programmes WHERE  status ='Active'");
+                                                while(!$dbConnect->EndOfSeek()){ $ucrow = $dbConnect->Row();?>
                                                     <option value="<?php echo $ucrow->id;?>"><?php echo $ucrow->name;?></option>
                                                 <?php }?>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><label>Number of PMV:</label></td>
-                                        <td><input type="number" name="pmv" id="pmv"  class="form-control" style="width: 100px;"><p id="pmv_error"></p></td>
-                                        <td><label>Number of Spot checks:</label></td>
-                                        <td><input type="number" name="spot_check" id="spotcheck" class="form-control" style="width: 100px;"><p id="spotcheck_error"></p></td>
-                                    </tr>
-                                    <tr>
-                                        <td><label>Number of Audit:</label></td>
-                                        <td><input type="number" name="audit" id="audit" class="form-control" style="width: 100px;"><p id="audit_error"></p></td>
-                                        <td><label>Start Date:</label></td>
-                                        <td>
-                                            <input type="text" name="start_date" class="form-control" id="datepicker-default" placeholder="Select Date" /> <span id="startdate_error"></span>
-
+                                            </select><div id="progerror"></div>
                                         </td>
 
-                                    </tr><tr>
-                                        <td><label>Duration (Number of Months):</label></td>
-                                        <td><input type="number" name="duration" id="duration" class="form-control" style="width: 100px;"><p id="duration_error"></p></td>
-                                        <td><label>Status:</label></td>
-                                        <td>
-                                            <select class="default-select2 form-control" id="status" name="status" style="height: 35px;">
-                                                <option value="Active">Active</option>
-                                                <option value="Active">Inactive</option>
-                                            </select>
-                                        </td>
-
-                                    </tr>
-                                    <tr>
-
-                                        <td colspan="4"><input  type="submit" name="save" id="save" class="btn btn-primary" value="Save"></td>
+                                        <td colspan="4"><input  type="submit" name="save" id="save" class="btn btn-primary" value="Search"></td>
                                     </tr>
 
                                     </tbody>
@@ -179,7 +135,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                                 <hr>
                             </form>
                             <div>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding project. Please wait....</p>
+                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
                             </div>
                             <div id="uc_response"></div>
                         </div>
@@ -235,16 +191,20 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- ================== END BASE JS ================== -->
 
 <!-- ================== BEGIN PAGE LEVEL JS ================== -->
+
+<script src="../../assets/plugins/DataTables/js/jquery.dataTables.js"></script>
+<script src="../../assets/js/table-manage-default.demo.min.js"></script>
 <script src="../../assets/js/apps.min.js"></script>
 <!-- ================== END PAGE LEVEL JS ================== -->
 
 <script>
     $(document).ready(function() {
         App.init();
+        TableManageDefault.init();
         FormPlugins.init();
     });
 </script>
-<script>
+<script type="text/javascript">
     $(function () {
 
         var $buttons = $("#save");
@@ -254,55 +214,24 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
             e.preventDefault();
             $("#uc_response").empty();
-            $("#cname_error").empty();
-            $("#description_error").empty();
-            $('#pmv_error').empty();
-            $("#spotcheck_error").empty();
-            $("#audit_error").empty();
-            $("#startdate_error").empty();
-            $("#duration_error").empty();
-            var cname = $.trim($("#name").val());
-            var location = $.trim($("#description").val());
-            var pmv = $.trim($("#pmv").val());
-            var spotcheck = $.trim($("#spotcheck").val());
-            var audit = $.trim($("#audit").val());
-            var startdate = $.trim($("#datepicker-default").val());
-            var duration = $.trim($("#duration").val());
+            $("#progerror").empty();
+            $("#parterror").empty();
 
-            if(cname.length == 0){
+            var partner = $.trim($("#partner_id").val());
+            var program = $.trim($("#programme_id").val());
 
-                $("#cname_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            if(partner.length == 0){
+
+                $("#parterror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
 
             }
-            if(location.length == 0){
-                $("#duration_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            if(program.length == 0){
+                $("#progerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
             }
-             if(pmv.length == 0){
 
-                            $("#pmv_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
-                            $("html, body").animate({ scrollTop: 0 }, "slow");
-
-                        }
-                        if(audit.length == 0){
-                            $("#audit_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
-                            $("html, body").animate({ scrollTop: 0 }, "slow");
-                        }
-if(spotcheck.length == 0){
-                            $("#spotcheck_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
-                            $("html, body").animate({ scrollTop: 0 }, "slow");
-                        }     if(startdate.length == 0){
-                            $("#startdate_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
-                            $("html, body").animate({ scrollTop: 0 }, "slow");
-                        }
-if(duration.length == 0){
-                            $("#duration_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
-                            $("html, body").animate({ scrollTop: 0 }, "slow");
-                        }
-
-
-            if(cname.length != 0 && location.length != 0&& pmv.length != 0 &&  audit.length != 0 &&  startdate.length != 0 &&  duration.length != 0 &&  spotcheck.length != 0){
+            if(partner.length != 0 && program.length != 0){
 
                 $("#save").attr("disabled", "disabled");
                 $("#wait").css("display","block");
@@ -310,89 +239,31 @@ if(duration.length == 0){
 
                 $.ajax({
                     type: "POST",
-                    url: "../../controllers/project/projectsController.php",
+                    url: "../../controllers/project/fetchProjects.php",
                     data: $form.serialize(),
                     success: function(e) {
 
+                         if(e=="zero"){
 
-                        if(e=="error"){
-
-
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save project.</span></div><br>").hide().fadeIn(1000);
+                            $('#uclisted').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>No results found.</span></div><br>").hide().fadeIn(1000);
                             $("#wait").css("display","none");
                             $("#save").removeAttr('disabled');
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save project.</span></div><br>").fadeOut(6000);
-
-                        }else if(e=="exists"){
-
-
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").hide().fadeIn(1000);
-                            $("#wait").css("display","none");
-                            $("#save").removeAttr('disabled');
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").fadeOut(6000);
 
                         }else {
 
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project saved successfully.</span></div><br>").hide().fadeIn(1000);
-                            $('#uclisted').empty();
-                            $('#uclisted').html(e);
-                            $("#wait").css("display","none");
-                            $("#name").val("");
-                            $("#location").val("");
-                            $("#contact_person").val("");
-                            $("#phone").val("");
-                            $("#email").val("");
-                            $("#save").removeAttr('disabled');
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project saved successfully.</span></div><br>").fadeOut(6000);
+                             $('#uclisted').html(e);
+                             $("#wait").css("display","none");
+                             $("#save").removeAttr('disabled');
                         }
-
 
                     }
                 });
                 return false;
             }
         });
-        
-        $(document).on('click','#delete',function (e) {
-            e.preventDefault();
-            var id = $(this).data('id');
-            var action = "delete";
-            $.ajax({
-                type:"POST",
-                data:{id:id,do_action:action},
-                url:"../../controllers/project/projectsController.php",
-                success:function (data) {
-                    if(e=="error"){
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to project.</span></div><br>").hide().fadeIn(1000);
-                        $("#wait").css("display","none");
-                        $("#save").removeAttr('disabled');
-
-
-                    }else {
-
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project deleted successfully.</span></div><br>").hide().fadeIn(1000);
-
-                        $('#uclisted').html(data);
-                        $("#wait").css("display","none");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project deleted successfully.</span></div><br>").fadeOut(6000);
-
-                    }
-
-                }
-                
-            })
-        })
 
     });
-    function validateEmail(sEmail) {
-        var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
-        if (filter.test(sEmail)) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+
 </script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
