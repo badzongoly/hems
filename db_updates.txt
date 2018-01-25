@@ -10,3 +10,4 @@ created programmes table
 created programmes_partners table
 add lattitude and longitude fields to implementing partner table
 created activities_trans table to hold the interim the the uploaded excel data until it's is finally moved into the activities table
+the activities_trans is a mirror of the actual activities table
