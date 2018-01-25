@@ -10,7 +10,7 @@ $page = "settings";
 $sub_page_name = "outcome";
 $pull_ucat = new MySQL();
 $pull_ucat->checkLogin();
-$pull_ucat->Query("SELECT * FROM outcomes WHERE status= 'Active'");
+$pull_ucat->Query("SELECT o.id,o.name,o.description,p.name AS programme FROM outcomes o INNER JOIN programmes p ON  p.id = o.programme_id");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -103,11 +103,14 @@ $pull_ucat->Query("SELECT * FROM outcomes WHERE status= 'Active'");
                                     <tr>
                                         <td><label>Name:</label></td>
                                         <td><input type="text" name="name" id="name" class="form-control"><p id="cname_error"></p></td>
-                                        <td><label>Status:</label></td>
+                                        <td><label>Programmes:</label></td>
                                         <td>
-                                            <select class="form-control" id="status" name="status" style="height: 35px;">
-                                                <option value="Active">Active</option>
-                                                <option value="Active">Inactive</option>
+                                            <select class="form-control" id="programme_id" name="programme_id" style="height: 35px;">
+                                                <?php $security = new MySQL();$security->Query('Select * from programmes WHERE status  = "Active"'); while(!$security->EndOfSeek()){
+                                                    $row = $security->Row();
+                                                ?>
+                                                <option value="<?php echo $row->id; ?>"><?php echo $row->name;?></option>
+                                                <?php }?>
                                             </select>
                                         </td>
 
@@ -137,7 +140,7 @@ $pull_ucat->Query("SELECT * FROM outcomes WHERE status= 'Active'");
                                 <tr>
                                     <th> Name</th>
                                     <th>Description</th>
-                                    <th>Status</th>
+                                    <th>Programme</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -146,7 +149,7 @@ $pull_ucat->Query("SELECT * FROM outcomes WHERE status= 'Active'");
                                     <tr>
                                         <td><?php echo $ucrow->name;?></td>
                                         <td><?php echo $ucrow->description;?></td>
-                                        <td><?php echo $ucrow->status;?></td>
+                                        <td><?php echo $ucrow->programme;?></td>
                                         <td><a href="#" id="delete" data-id="<?php echo $ucrow->id;?>" class="btn btn-danger"><i class="fa fa-times"></i> Delete</a> </td>
                                     </tr>
                                 <?php } ?>

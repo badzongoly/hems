@@ -5,8 +5,21 @@
  * Date: 13/01/2018
  * Time: 03:47 PM
  */
+
+//setting up data directory
+$MainDir['DataDir'] = '../../upload';
+//setting up sub folder it create automatically
+$MainDir['subfolder'] = 'PMVEXCEL';
+
 require_once('../../classes/projects.class.php');
+//require_once('../../classes/PHPExcel.php');
+require_once('../../classes/Files.php');
+/** Include PHPExcel_IOFactory */
+require_once('../../vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php');
+
+$excel = new PHPExcel();
 $object = new Project();
+$file = new Files();
 if(isset($_POST['do']) && $_POST['do'] == "CreateProject"){
     $check = $object->setProject($_POST['name'],$_POST['description'],$_POST['status'],$_POST['partner_id'],$_POST['programme_id'],$_POST['pmv'],$_POST['spot_check'],$_POST['audit'],$_POST['start_date'],$_POST['duration']);
     if($check == "ok"){
@@ -18,4 +31,72 @@ if(isset($_POST['do']) && $_POST['do'] == "CreateProject"){
 
 if(isset($_POST['id']) && isset($_POST['do_action']) && $_POST['do_action'] == "delete" ){
     echo $object->deleteProject($_POST['id']);exit;
+}
+if(isset($_FILES["file"]["type"]) && isset($_POST['do']) && $_POST['do'] == "excelUpload"){
+    $date = date('Y-m-d');
+    $sql ='';
+    $path = $file->FileUpload(['file'=>$_FILES['file'],'target'=>'../../upload/excel/'.$date,'filetype'=>'docs']);
+    //echo $path;
+    $file_tmp = $_FILES['file']['tmp_name'];
+
+    $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+    $objPHPExcel = $objReader->load($file_tmp);
+    $excelRows = array();
+
+    //var_dump($objPHPExcel);
+
+    foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
+
+        foreach ($worksheet->getRowIterator(10) as $row) {
+           // echo '    Row number - ' , $row->getRowIndex();
+
+            $cellIterator = $row->getCellIterator();
+            $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
+            foreach ($cellIterator as $cell) {
+                if (!is_null($cell) && ($cell->getCoordinate() === 'A'.$row->getRowIndex() ||$cell->getCoordinate() === 'G'.$row->getRowIndex() ||$cell->getCoordinate() === 'H'.$row->getRowIndex() ||$cell->getCoordinate() === 'K'.$row->getRowIndex())) {
+
+                    if(substr($cell->getCoordinate(),0,1) === 'A'){
+                        $excelRows['A'][$row->getRowIndex()] = $cell->getCalculatedValue();
+                    } elseif(substr($cell->getCoordinate(),0,1) === 'G'){
+                        $excelRows['G'][$row->getRowIndex()] = $object->getPMV($cell->getCalculatedValue());
+                    } if(substr($cell->getCoordinate(),0,1) === 'H'){
+                        $excelRows['H'][$row->getRowIndex()] = $object->getPMV($cell->getCalculatedValue());
+                    } if(substr($cell->getCoordinate(),0,1) === 'K'){
+                        $excelRows['K'][$row->getRowIndex()] = $cell->getCalculatedValue();
+                    }
+                    //echo '        Cell - ' , $cell->getCoordinate() , ' - ' , $cell->getCalculatedValue();
+                }
+            }
+        }
+    }
+
+    $table = 'activities_trans';
+    for($x = 10 ;$x<sizeof($excelRows['A']);$x++){
+        $valuesArray['partner_id'] = MySQL::SQLValue($excelRows['A'][$x]);
+        //$valuesArray['pmv'] = MySQL::SQLValue($excelRows['G'][$x]);
+        if(empty($excelRows['G'][$x])){$valuesArray['pmv'] = 0;}else{$valuesArray['pmv']= MySQL::SQLValue($excelRows['G'][$x]);}
+        if(empty($excelRows['H'][$x])){ $valuesArray['spot_check'] =0;}else{  $valuesArray['spot_check'] =MySQL::SQLValue($excelRows['H'][$x]);}
+        $valuesArray['audit'] = MySQL::SQLValue($excelRows['K'][$x]);
+        $valuesArray['status'] = MySQL::SQLValue('New');
+        $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+        if(empty($sql)) {
+            $sql = MySQL::BuildSQLInsert($table, $valuesArray);
+        }else{
+            $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),107);
+        }
+    }
+    $check = $object->Query($sql);
+    if($check){
+        echo "success";exit;
+    }else{
+        echo "error";exit;
+    }
+}
+if(isset($_POST['do']) && $_POST['do'] == "getNewList"){
+    echo $object->getConfirmation();exit;
+}
+if(isset($_POST['do']) && $_POST['do'] == "cancel"){
+        echo $object->deleteActivities();exit;
+}if(isset($_POST['do']) && $_POST['do'] == "confirm"){
+        echo $object->moveActivities();exit;
 }

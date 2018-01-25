@@ -55,7 +55,7 @@ class Settings extends MySQL
 
         $valuesArray['name'] = MySQL::SQLValue($name);
         $valuesArray['description'] = MySQL::SQLValue($description);
-        $valuesArray['status'] = MySQL::SQLValue($status);
+        $valuesArray['programme_id'] = MySQL::SQLValue($status);
         $valuesArray['created_by'] = MySQL::SQLValue($_SESSION['hems_User']['user_id']);
 
         $sql = MySQL::BuildSQLInsert('outcomes',$valuesArray);
@@ -150,13 +150,13 @@ class Settings extends MySQL
         return $output;
     }
     public function getOutcomes(){
-        $this->Query('Select * from outcomes WHERE status = "Active"');
+        $this->Query('SELECT o.id,o.name,o.description,p.name AS programme FROM outcomes o INNER JOIN programmes p ON  p.id = o.programme_id');
         $output = '<table class="table table-striped table-hover table-email table-bordered" style="width: 700px;" align="center">
                                 <thead>
                                 <tr>
                                     <th> Name</th>
                                     <th>Description</th>
-                                    <th>Status</th>
+                                    <th>Programme</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -166,7 +166,7 @@ class Settings extends MySQL
             $output.='<tr>
                                         <td>'.$row->name.'</td>
                                         <td>'.$row->description.'</td>
-                                        <td>'.$row->status.'</td>
+                                        <td>'.$row->programme.'</td>
                                         <td><a href="#" id="delete" data-id="'.$row->id.'" class="btn btn-danger"><i class="fa fa-times"></i> Delete</a> </td>
                                     </tr>';
         }
