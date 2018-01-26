@@ -40,5 +40,55 @@ class Pmv extends  MySQL{
         return $finalCount;
 
     }
+
+    function getAccessServiceComment($pmvid,$accessServId){
+
+        $this->Query("SELECT comment FROM pmv_access_services WHERE pmv_id = $pmvid AND access_service_id = $accessServId");
+        $asrow = $this->Row();
+        $thecomment = trim($asrow->comment);
+
+        return $thecomment;
+
+    }
+
+    function getQualityServiceComment($pmvid,$accessServId){
+
+        $this->Query("SELECT comment FROM pmv_quality_services WHERE pmv_id = $pmvid AND quality_service_id = $accessServId");
+        $asrow = $this->Row();
+        $thecomment = trim($asrow->comment);
+
+        return $thecomment;
+
+    }
+
+    function getUtilServiceComment($pmvid,$utilId){
+
+        $this->Query("SELECT comment FROM pmv_util_services WHERE pmv_id = $pmvid AND util_service_id = $utilId");
+        $asrow = $this->Row();
+        $thecomment = trim($asrow->comment);
+
+        return $thecomment;
+
+    }
+
+    function getEnabEnvComment($pmvid,$enabEnvId){
+
+        $this->Query("SELECT comment FROM pmv_enabling_env WHERE pmv_id = $pmvid AND enab_env_id = $enabEnvId");
+        $asrow = $this->Row();
+        $thecomment = trim($asrow->comment);
+
+        return $thecomment;
+
+    }
+
+    function getStatRecords($pmvid,$enabEnvId){
+
+        $this->Query("SELECT comment FROM pmv_statistics_records WHERE pmv_id = $pmvid AND stat_rec_id = $enabEnvId");
+        $asrow = $this->Row();
+        $thecomment = trim($asrow->comment);
+
+        return $thecomment;
+
+    }
 }
 ?>

@@ -1,9 +1,24 @@
 <?php
 require_once('../../classes/mysql.class.php');
+require_once('../../classes/Pmv.class.php');
 $page = "project";
 $sub_page_name = "add_pmv";
+
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
+
+$getAservComment = new Pmv();
+
+if(isset($_SESSION['hems_active_pmv']) && !empty($_SESSION['hems_active_pmv']) && $_SESSION['hems_active_pmv'] > 0){
+
+    $pmvid = $_SESSION['hems_active_pmv'];
+
+}else{
+
+    $_SESSION['hems_active_pmv'] = 0;
+    $pmvid = $_SESSION['hems_active_pmv'];
+
+}
 
 if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
@@ -27,17 +42,82 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
     $getAccessServices = new MySQL();
     $getAccessServices->Query("SELECT * FROM access_to_services");
 
+    $getSelections = new MySQL();
+    $getSelections->Query("SELECT * FROM pmv_access_services WHERE pmv_id = $pmvid");
+    $selCount = $getSelections->RowCount();
+
+    $selArray = array();
+
+    if($selCount){
+        while(!$getSelections->EndOfSeek()){
+            $srow = $getSelections->Row();
+            $selArray[] = $srow->access_service_id;
+        }
+    }
+
     $getQualityServices = new MySQL();
     $getQualityServices->Query("SELECT * FROM quality_of_services");
+
+    $getQSelections = new MySQL();
+    $getQSelections->Query("SELECT * FROM pmv_quality_services WHERE pmv_id = $pmvid");
+    $selQCount = $getQSelections->RowCount();
+
+    $qselArray = array();
+
+    if($selQCount){
+        while(!$getQSelections->EndOfSeek()){
+            $sqrow = $getQSelections->Row();
+            $qselArray[] = $sqrow->quality_service_id;
+        }
+    }
 
     $getUtilServices = new MySQL();
     $getUtilServices->Query("SELECT * FROM utilisation_of_services");
 
+    $getUSelections = new MySQL();
+    $getUSelections->Query("SELECT * FROM pmv_util_services WHERE pmv_id = $pmvid");
+    $selUCount = $getUSelections->RowCount();
+
+    $uselArray = array();
+
+    if($selUCount){
+        while(!$getUSelections->EndOfSeek()){
+            $uqrow = $getUSelections->Row();
+            $uselArray[] = $uqrow->util_service_id;
+        }
+    }
+
     $getEnablingEnv = new MySQL();
     $getEnablingEnv->Query("SELECT * FROM enabling_env");
 
+    $getESelections = new MySQL();
+    $getESelections->Query("SELECT * FROM pmv_enabling_env WHERE pmv_id = $pmvid");
+    $selECount = $getESelections->RowCount();
+
+    $eselArray = array();
+
+    if($selECount){
+        while(!$getESelections->EndOfSeek()){
+            $eqrow = $getESelections->Row();
+            $eselArray[] = $eqrow->enab_env_id;
+        }
+    }
+
     $getStatRec = new MySQL();
     $getStatRec->Query("SELECT * FROM statistics_and_records");
+
+    $getSRSelections = new MySQL();
+    $getSRSelections->Query("SELECT * FROM pmv_statistics_records WHERE pmv_id = $pmvid");
+    $selSRCount = $getSRSelections->RowCount();
+
+    $srselArray = array();
+
+    if($selSRCount){
+        while(!$getSRSelections->EndOfSeek()){
+            $strrow = $getSRSelections->Row();
+            $srselArray[] = $strrow->stat_rec_id;
+        }
+    }
 
 }else{
     header('Location:');
@@ -322,10 +402,17 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                         </table>
                                             </form>
                                         <form method="POST" action="" id="followupForm">
+
                                             <table class="table">
                                                 <tbody>
                                                     <tr>
                                                         <td colspan="5"><div class="alert alert-info" style="text-align: center;"><h5>Status of Previous Recommendations and Follow-up Actions (List all recommendations from the previous Field Trip Report and indicate status of follow-up/action taken)</h5></div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="5"><div id="followupResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="fu_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
                                                     </tr>
                                                     <tr>
                                                         <td class="col-lg-2"><h5>Date of Visit</h5></td>
@@ -335,7 +422,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         <td></td>
                                                     </tr>
                                                 <tr>
-                                                    <td><input type="text" name="v_date"  class="form-control v_date" id="datepicker-default" placeholder="Date of Visit" /><span id="v_error"></span></td>
+                                                    <td><input type="text" name="v_date"  class="form-control v_date" id="datepicker-default2" placeholder="Date of Visit" /><span id="v_error"></span></td>
                                                     <td><select style="width: 350px;" class="multiple-select2 form-control" multiple="multiple" name="rec_officers[]" id="rec_officers">
                                                             <?php $getStaff->MoveFirst(); while(!$getStaff->EndOfSeek()){$stfRow = $getStaff->Row();?>
                                                                 <option value="<?php echo $stfRow->empID;?>"><?php echo $stfRow->first_name.' '.$stfRow->last_name;?></option>
@@ -348,6 +435,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                 </tbody>
                                             </table>
                                         </form>
+                                        <div id="followupList">
+
+                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -362,8 +452,15 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                         </div>
                                         <div class="panel-body">
                                             <div class="row">
+                                                <form method="POST" action="" id="accessServiceForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="asResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="aserv_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                         <tr>
                                                             <td>&nbsp;</td>
                                                             <td><div class="alert alert-info">Access To Services</div></td>
@@ -371,9 +468,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         </tr>
                                                     <?php while(!$getAccessServices->EndOfSeek()){ $asrow = $getAccessServices->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="aserv" id="aserv" value="<?php echo $asrow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $asrow->access_to_services?></td>
-                                                            <td><textarea name="comment" id="comment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="aserv[]" id="aserv" value="<?php echo $asrow->id;?>" <?php if(in_array($asrow->id,$selArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $asrow->access_to_services;?></td>
+                                                            <td><textarea name="comment[<?php echo $asrow->id;?>]" id="comment" class="form-control"><?php if(in_array($asrow->id,$selArray)){echo $getAservComment->getAccessServiceComment($pmvid,$asrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -381,8 +478,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <form method="POST" action="" id="qualityServiceForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="qsResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="qserv_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Quality Of Services</div></td>
@@ -390,9 +495,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getQualityServices->EndOfSeek()){ $qsrow = $getQualityServices->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="qserv" id="qserv" value="<?php echo $qsrow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $qsrow->quality_of_services?></td>
-                                                            <td><textarea name="qcomment" id="qcomment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="qserv[]" id="qserv" value="<?php echo $qsrow->id;?>" <?php if(in_array($qsrow->id,$qselArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $qsrow->quality_of_services;?></td>
+                                                            <td><textarea name="qcomment[<?php echo $qsrow->id;?>]" id="qcomment" class="form-control"><?php if(in_array($qsrow->id,$qselArray)){echo $getAservComment->getQualityServiceComment($pmvid,$qsrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -400,8 +505,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <form method="POST" action="" id="utilServiceForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="usResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="userv_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Utilisation Of Services</div></td>
@@ -409,9 +522,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getUtilServices->EndOfSeek()){ $usrow = $getUtilServices->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="userv" id="userv" value="<?php echo $usrow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $usrow->utilisation_of_services?></td>
-                                                            <td><textarea name="ucomment" id="ucomment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="userv[]" id="userv" value="<?php echo $usrow->id;?>" <?php if(in_array($usrow->id,$uselArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $usrow->utilisation_of_services;?></td>
+                                                            <td><textarea name="ucomment[<?php echo $usrow->id;?>]" id="ucomment" class="form-control"><?php if(in_array($usrow->id,$uselArray)){echo $getAservComment->getUtilServiceComment($pmvid,$usrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -419,8 +532,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <form method="POST" action="" id="enabEnvForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="evResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="ev_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Enabling Environment for Intervention</div></td>
@@ -428,9 +549,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getEnablingEnv->EndOfSeek()){ $eerow = $getEnablingEnv->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="enab" id="enab" value="<?php echo $eerow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $eerow->enabling_env_interv?></td>
-                                                            <td><textarea name="encomment" id="encomment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="enab[]" id="enab" value="<?php echo $eerow->id;?>" <?php if(in_array($eerow->id,$eselArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $eerow->enabling_env_interv;?></td>
+                                                            <td><textarea name="encomment[<?php echo $eerow->id;?>]" id="encomment" class="form-control"><?php if(in_array($eerow->id,$eselArray)){echo $getAservComment->getEnabEnvComment($pmvid,$eerow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -438,9 +559,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
-
+                                            </form>
+                                                <form method="POST" action="" id="statRecForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="srResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="sr_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Statistics and Records</div></td>
@@ -448,16 +576,17 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getStatRec->EndOfSeek()){ $srrow = $getStatRec->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="statRec" id="statRec" value="<?php echo $srrow->id;?>"></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="statRec[]" id="statRec" value="<?php echo $srrow->id;?>" <?php if(in_array($srrow->id,$srselArray)){echo "checked";}?>></td>
                                                             <td style="width: 300px;"><?php echo $srrow->statistics_records;?></td>
-                                                            <td><textarea name="srcomment" id="srcomment" class="form-control"></textarea></td>
+                                                            <td><textarea name="srcomment[<?php echo $srrow->id;?>]" id="srcomment" class="form-control"><?php if(in_array($srrow->id,$srselArray)){echo $getAservComment->getStatRecords($pmvid,$srrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
-                                                        <td colspan="3"><input style="float: right;" type="submit" name="statRec" id="statRec" value="Statistics and Records" class="btn btn-sm btn-success"></td>
+                                                        <td colspan="3"><input style="float: right;" type="submit" name="saveStatRec" id="saveStatRec" value="Statistics and Records" class="btn btn-sm btn-success"></td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -471,14 +600,68 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                         </div>
                                         <div class="panel-body">
                                             <div class="row">
-                                                <table class="table table-bordered">
+                                                <table class="table table-responsive">
                                                     <tbody>
                                                         <tr>
-                                                            <td><div class="alert alert-info" style="text-align: center;"><h5>A. Progress Reporting</h5></div></td>
+                                                            <td colspan="2"><div class="alert alert-info" style="text-align: center;"><h5>A. Progress Reporting</h5></div></td>
                                                             </tr>
                                                         <tr>
-                                                            <td><textarea name="prog_reporting" id="prog_reporting" class="form-control"></textarea></td>
+                                                            <td class="col-lg-10"><textarea name="prog_reporting" id="prog_reporting" class="form-control"></textarea></td>
+                                                            <td class="col-lg-12"><input type="submit"  name="savePrep" id="savePrep" class="btn btn-success btn-sm" value="Save Progress Report"></td>
                                                         </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table table-responsive">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="3"><div class="alert alert-info" style="text-align: center;"><h5>B. Status of Indicators</h5></div></td>
+                                                        </tr>
+                                                    <tr>
+                                                        <td><h5>Indicators (Baselines and Targets)</h5></td>
+                                                        <td><h5>Progress on Indicators/Targets</h5></td>
+                                                        <td>&nbsp;</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><textarea name="indicators" id="indicators" class="form-control"></textarea></td>
+                                                        <td><textarea name="progress" id="progress" class="form-control"></textarea></td>
+                                                        <td><input type="submit" name="saveIndi" id="saveIndi" value="Save Indicator" class="btn btn-success btn-sm"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table table-responsive">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>C. Constraints/Challenges/Opportunities- (Related to this Project/intervention implementation and achievement of results)</h5></div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><h5>Constraints/Challenges</h5></td>
+                                                        <td><h5>Lessons Learned</h5></td>
+                                                        <td><h5>Opportunities</h5></td>
+                                                        <td>&nbsp;</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><textarea name="constraints" id="constraints" class="form-control"></textarea></td>
+                                                        <td><textarea name="less_learned" id="less_learned" class="form-control"></textarea></td>
+                                                        <td><textarea name="opportunity" id="opportunity" class="form-control"></textarea></td>
+                                                        <td><input type="submit" name="saveConst" id="saveConst" value="Save Constraint" class="btn btn-success btn-sm"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table table-responsive">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div class="alert alert-info" style="text-align: center;"><h5>D. Recommendations/Follow-up/Planned Actions</h5></div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><h5>Recommendation Name</h5></td>
+                                                        <td><h5>Description</h5></td>
+                                                        <td>&nbsp;</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><input type="text" name="recname" id="recname" class="form-control"></td>
+                                                        <td><textarea name="recdesc" id="recdesc" class="form-control"></textarea></td>
+                                                        <td><input type="submit" name="saveReco" id="saveReco" value="Save Recommendation" class="btn btn-success btn-sm"></td>
+                                                    </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -565,6 +748,10 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
     });
 
     $('#datepicker-default').datepicker({
+        format: 'yyyy-mm-dd'
+    });
+
+    $('#datepicker-default2').datepicker({
         format: 'yyyy-mm-dd'
     });
 </script>
@@ -719,6 +906,418 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                 });
                 return false;
             }
+        });
+
+    });
+
+    //Save Followup
+    $(function () {
+
+        var $buttons = $("#savePrev");
+        var $form = $("#followupForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#followupResponse").empty();
+            $("#iperror").empty();
+            $("#iverror").empty();
+
+
+            var vdate = $.trim($(".v_date").val());
+            var vrec = $.trim($("#rec_officers").val());
+
+
+            if(vdate.length == 0){
+
+                $("#v_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+            if(vrec.length == 0){
+                $("#recofficererror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+
+            if(vdate.length != 0 && vrec.length != 0){
+
+                $("#savePrev").attr("disabled", "disabled");
+                $("#fu_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveFollowup.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#followupResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Recommendations and Follow-up Action Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#fu_wait").css("display","none");
+                            $("#savePrev").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#followupResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Recommendations and Follow-up Action Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#fu_wait").css("display","none");
+                            $("#savePrev").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+
+    //Save Access Service
+    $(function () {
+
+        var $buttons = $("#saveAService");
+        var $form = $("#accessServiceForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#asResponse").empty();
+            if($("#accessServiceForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#asResponse").position().top }, "slow");
+                $("#saveAService").attr("disabled", "disabled");
+                $("#aserv_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveAccessServices.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#asResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Access Services Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#aserv_wait").css("display","none");
+                            $("#saveAService").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#asResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Access Services Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#aserv_wait").css("display","none");
+                            $("#saveAService").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Quality Service
+    $(function () {
+
+        var $buttons = $("#saveQService");
+        var $form = $("#qualityServiceForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#qsResponse").empty();
+            if($("#qualityServiceForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#qsResponse").position().top }, "slow");
+                $("#saveQService").attr("disabled", "disabled");
+                $("#qserv_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveQualityServices.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#qsResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Quality Services Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#qserv_wait").css("display","none");
+                            $("#saveQService").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#qsResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Quality Services Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#qserv_wait").css("display","none");
+                            $("#saveQService").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Utilisation Service
+    $(function () {
+
+        var $buttons = $("#saveUService");
+        var $form = $("#utilServiceForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#usResponse").empty();
+            if($("#utilServiceForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#usResponse").position().top }, "slow");
+                $("#saveUService").attr("disabled", "disabled");
+                $("#userv_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveUtilServices.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#usResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Utilisation Services Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#userv_wait").css("display","none");
+                            $("#saveUService").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#usResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Utilisation Services Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#userv_wait").css("display","none");
+                            $("#saveUService").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Enabling Environment
+    $(function () {
+
+        var $buttons = $("#EnabInt");
+        var $form = $("#enabEnvForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#evResponse").empty();
+            if($("#enabEnvForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#evResponse").position().top }, "slow");
+                $("#EnabInt").attr("disabled", "disabled");
+                $("#ev_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveEnablingEnv.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#evResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Enabling Environment Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#ev_wait").css("display","none");
+                            $("#EnabInt").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#evResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Enabling Environment Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#ev_wait").css("display","none");
+                            $("#EnabInt").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Statistic Record
+    $(function () {
+
+        var $buttons = $("#saveStatRec");
+        var $form = $("#statRecForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#srResponse").empty();
+            if($("#statRecForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#srResponse").position().top }, "slow");
+                $("#saveStatRec").attr("disabled", "disabled");
+                $("#sr_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveStatRecord.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#srResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Statistics and Records Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#sr_wait").css("display","none");
+                            $("#saveStatRec").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#srResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Statistics and Records Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#sr_wait").css("display","none");
+                            $("#saveStatRec").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //colour row of access to services pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #aserv:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #aserv:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of quality to services pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #qserv:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #qserv:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of utilisation to services pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #userv:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #userv:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of enabling pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #enab:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #enab:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of enabling pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #statRec:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #statRec:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
         });
 
     });
