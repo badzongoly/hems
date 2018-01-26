@@ -24,7 +24,7 @@ if(isset($_POST['do']) && $_POST['do'] == "CreateProgrammes"){
     }
 }
 if(isset($_POST['do']) && $_POST['do'] == "CreateOutcomes"){
-    $check = $object->setOutcomes($_POST['name'],$_POST['description'],$_POST['status']);
+    $check = $object->setOutcomes($_POST['name'],$_POST['description'],$_POST['programme_id']);
     if($check == "ok"){
         echo $object->getOutcomes();exit;
     }else{

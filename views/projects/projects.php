@@ -21,7 +21,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | ADD PROJECT</title>
+    <title>HEMS | ADD ACTIVITY</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -74,12 +74,12 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Projects</a></li>
-            <li class="active">Add Projects</li>
+            <li><a href="javascript:;">Activity</a></li>
+            <li class="active">Add Activity</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Project <small>add project...</small></h1>
+        <h1 class="page-header">Activity <small>add activty...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -95,7 +95,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Add Project</h4>
+                        <h4 class="panel-title">Add Activity</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -128,11 +128,11 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                                                <?php }?>
                                             </select>
                                         </td>
-                                        <td><label>Programme:</label></td>
+                                        <td><label>Outcome:</label></td>
                                         <td>
-                                            <select class="default-select2 form-control" id="programme_id" name="programme_id" style="height: 35px;">
+                                            <select class="default-select2 form-control" id="outcome_id" name="outcome_id" style="height: 35px;">
                                                 <?php
-                                                $pull_ucat->Query('Select * from programmes WHERE  status = "Active"');
+                                                $pull_ucat->Query('Select * from outcomes');
                                                 while(!$pull_ucat->EndOfSeek()){ $ucrow = $pull_ucat->Row();?>
                                                     <option value="<?php echo $ucrow->id;?>"><?php echo $ucrow->name;?></option>
                                                 <?php }?>
