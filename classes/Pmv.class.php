@@ -90,5 +90,37 @@ class Pmv extends  MySQL{
         return $thecomment;
 
     }
+
+    /*
+    * This function checks required PMV number Vs Added PMVs
+    * @param $projectID is the project id
+    * @return open when there is room to add more and close when its reached its limit
+    * */
+    function checkPMVAdded($projectId){
+
+        $this->Query("SELECT * FROM pmv WHERE project_id = $projectId");
+        $resultCount = $this->RowCount();
+
+        $this->Query("SELECT pmv FROM project WHERE id = $projectId");
+        $pmvRow = $this->Row();
+        $pmvVal = $pmvRow->pmv;
+
+        $diff = $pmvVal - $resultCount;
+
+
+        if($diff >= 0){
+            return "open";
+        }else{
+            return "close";
+        }
+
+    }
+
+    function getPMVDetails($id){
+        $tableName = "pmv";
+        $whereArray['id'] = $id;
+        $this->Query( MySQL::BuildSQLSelect($tableName, $whereArray));
+        return $this->Row();
+    }
 }
 ?>

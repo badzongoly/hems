@@ -24,6 +24,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
     $projectid = base64_decode($_GET['pid']);
 
+    $pmvO = new Pmv();
+    $chkres = $pmvO->checkPMVAdded($projectid);
+
+    if(trim($chkres)=="close"){
+        header('Location:find_project.php');
+    }
+
+    $pmvRecordset = $pmvO->getPMVDetails($pmvid);
+
+
     $getStaff = new MySQL();
     $getStaff->Query("SELECT * FROM staff_pdetail WHERE status = 'active'");
 
@@ -119,8 +129,15 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
         }
     }
 
+    $getList = new MySQL();
+    $getList->Query("SELECT * FROM pmv_status_indicators WHERE pmv_id = $pmvid");
+    $indicount = $getList->RowCount();
+
+    $getListConst = new MySQL();
+    $getListConst->Query("SELECT * FROM pmv_constraints WHERE pmv_id = $pmvid");
+
 }else{
-    header('Location:');
+    header('Location:find_project.php');
 }
 
 
@@ -600,19 +617,34 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                         </div>
                                         <div class="panel-body">
                                             <div class="row">
+                                                <form method="post" action="" id="progRepForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="2"><div id="prpResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="prp_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                         <tr>
                                                             <td colspan="2"><div class="alert alert-info" style="text-align: center;"><h5>A. Progress Reporting</h5></div></td>
                                                             </tr>
                                                         <tr>
-                                                            <td class="col-lg-10"><textarea name="prog_reporting" id="prog_reporting" class="form-control"></textarea></td>
+                                                            <td class="col-lg-10"><textarea name="prog_reporting" id="prog_reporting" class="form-control"><?php if(isset($pmvRecordset->progress_reporting)){ echo $pmvRecordset->progress_reporting;}?></textarea><span id="preperror"></span></td>
                                                             <td class="col-lg-12"><input type="submit"  name="savePrep" id="savePrep" class="btn btn-success btn-sm" value="Save Progress Report"></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                </form>
+                                                <form method="post" action="" id="statusIndicForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="siResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="si_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                         <tr>
                                                             <td colspan="3"><div class="alert alert-info" style="text-align: center;"><h5>B. Status of Indicators</h5></div></td>
                                                         </tr>
@@ -622,14 +654,42 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         <td>&nbsp;</td>
                                                     </tr>
                                                     <tr>
-                                                        <td><textarea name="indicators" id="indicators" class="form-control"></textarea></td>
-                                                        <td><textarea name="progress" id="progress" class="form-control"></textarea></td>
+                                                        <td><textarea name="indicators" id="indicators" class="form-control"></textarea><span id="indierror"></span></td>
+                                                        <td><textarea name="progress" id="progress" class="form-control"></textarea><span id="prgerror"></span></td>
                                                         <td><input type="submit" name="saveIndi" id="saveIndi" value="Save Indicator" class="btn btn-success btn-sm"></td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <div id="indilist">
+                                                    <?php if($indicount){?>
+                                                    <table class="table table-bordered table-responsive table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <td>Indicators</td>
+                                                            <td>Progress</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <?php  while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
+                                                            <tr>
+                                                                <td><?php echo $listItem->indicators;?></td>
+                                                                <td><?php echo $listItem->progress;?></td>
+                                                            </tr>
+                                                        <?php } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php } ?>
+                                                </div>
+                                                <form method="post" action="" id="constForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="4"><div id="conResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="con_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>C. Constraints/Challenges/Opportunities- (Related to this Project/intervention implementation and achievement of results)</h5></div></td>
                                                     </tr>
@@ -640,13 +700,36 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         <td>&nbsp;</td>
                                                     </tr>
                                                     <tr>
-                                                        <td><textarea name="constraints" id="constraints" class="form-control"></textarea></td>
-                                                        <td><textarea name="less_learned" id="less_learned" class="form-control"></textarea></td>
-                                                        <td><textarea name="opportunity" id="opportunity" class="form-control"></textarea></td>
+                                                        <td><textarea name="constraints" id="constraints" class="form-control"></textarea><span id="conerror"></span></td>
+                                                        <td><textarea name="less_learned" id="less_learned" class="form-control"></textarea><span id="llerror"></span></td>
+                                                        <td><textarea name="opportunity" id="opportunity" class="form-control"></textarea><span id="oppoerror"></span></td>
                                                         <td><input type="submit" name="saveConst" id="saveConst" value="Save Constraint" class="btn btn-success btn-sm"></td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <div id="conslist">
+                                                    <?php if($indicount){?>
+                                                        <table class="table table-bordered table-responsive table-striped">
+                                                            <thead>
+                                                            <tr>
+                                                                <td>Constraints</td>
+                                                                <td>Lessons Learned</td>
+                                                                <td>Opportunity</td>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <?php  while(!$getListConst->EndOfSeek()){$listItemConst = $getListConst->Row();?>
+                                                                <tr>
+                                                                    <td><?php echo $listItemConst->constraint;?></td>
+                                                                    <td><?php echo $listItemConst->lesson_learned;?></td>
+                                                                    <td><?php echo $listItemConst->opportunity;?></td>
+                                                                </tr>
+                                                            <?php } ?>
+                                                            </tbody>
+                                                        </table>
+                                                    <?php } ?>
+                                                </div>
                                                 <table class="table table-responsive">
                                                     <tbody>
                                                     <tr>
@@ -1226,6 +1309,212 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
         });
 
     });
+
+    //Save PMV progress report
+    $(function () {
+
+        var $buttons = $("#savePrep");
+        var $form = $("#progRepForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#prpResponse").empty();
+            $("#preperror").empty();
+
+            var prep = $.trim($("#prog_reporting").val());
+
+            if(prep.length == 0){
+
+                $("#preperror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+
+            if(prep.length != 0){
+
+                $("#savePrep").attr("disabled", "disabled");
+                $("#prp_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#prpResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveProgressReport.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#prpResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Progress Reporting Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#prp_wait").css("display","none");
+                            $("#savePrep").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#prpResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Progress Reporting Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#prp_wait").css("display","none");
+                            $("#savePrep").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Save PMV status of indicators
+    $(function () {
+
+        var $buttons = $("#saveIndi");
+        var $form = $("#statusIndicForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#siResponse").empty();
+            $("#prgerror").empty();
+            $("#indierror").empty();
+
+            var prg = $.trim($("#progress").val());
+            var indi = $.trim($("#indicators").val());
+
+            if(prg.length == 0){
+
+                $("#prgerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(indi.length == 0){
+
+                $("#indierror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(prg.length != 0 && indi.length != 0){
+
+                $("#saveIndi").attr("disabled", "disabled");
+                $("#si_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#siResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveStatusIndicator.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#siResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Progress Reporting Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#si_wait").css("display","none");
+                            $("#saveIndi").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#siResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Progress Reporting Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#si_wait").css("display","none");
+                            $("#saveIndi").removeAttr('disabled');
+
+                        }else{
+                            $('#siResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Progress Reporting Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#si_wait").css("display","none");
+                            $("#saveIndi").removeAttr('disabled');
+                            $("#indicators").val("");
+                            $("#progress").val("");
+                            $('#indilist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Save PMV constraints
+    $(function () {
+
+        var $buttons = $("#saveConst");
+        var $form = $("#constForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#conResponse").empty();
+            $("#oppoerror").empty();
+            $("#llerror").empty();
+            $("#conerror").empty();
+
+            var con = $.trim($("#constraints").val());
+            var oppo = $.trim($("#opportunity").val());
+            var ll = $.trim($("#less_learned").val());
+
+            if(con.length == 0){
+
+                $("#conerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(oppo.length == 0){
+
+                $("#oppoerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(ll.length == 0){
+
+                $("#llerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(con.length != 0 && oppo.length != 0 && ll.length != 0){
+
+                $("#saveConst").attr("disabled", "disabled");
+                $("#con_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#conResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveConstraint.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#conResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Constraint Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#con_wait").css("display","none");
+                            $("#saveConst").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#conResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Constraint Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#con_wait").css("display","none");
+                            $("#saveConst").removeAttr('disabled');
+
+                        }else{
+                            $('#conResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Constraint Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#con_wait").css("display","none");
+                            $("#saveConst").removeAttr('disabled');
+                            $("#constraints").val("");
+                            $("#opportunity").val("");
+                            $("#less_learned").val("");
+                            $('#conslist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
 
     //colour row of access to services pink after check is selected
     $("input[type='checkbox']").click(function(){
