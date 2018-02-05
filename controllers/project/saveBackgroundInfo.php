@@ -17,7 +17,7 @@
         $valuesArray['region'] = MySQL::SQLValue($_POST['region']);
         $valuesArray['district'] = MySQL::SQLValue($_POST['district']);
         $valuesArray['sub_district'] = MySQL::SQLValue($_POST['subdistrict']);
-        $valuesArray['community'] = MySQL::SQLValue($_POST['district']);
+        $valuesArray['community'] = MySQL::SQLValue($_POST['community']);
         $valuesArray['status'] = MySQL::SQLValue('active');
         $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
         $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));

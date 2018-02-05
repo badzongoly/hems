@@ -10,7 +10,13 @@ if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
 
     $pmvid = base64_decode($_GET['pmvid']);
     $dbConnect = new MySQL();
-    $dbConnect->Query("SELECT * FROM pmv WHERE id = $pmvid");
+    $dbConnect->Query("SELECT programmes.name as progname,pmv.visit_startdate, pmv.visit_enddate, regions.region_name,
+                       district.name as dname, pmv.sub_district, pmv.community FROM pmv
+                       LEFT JOIN programmes ON pmv.section = programmes.id
+                       LEFT JOIN regions ON pmv.region = regions.id
+                       LEFT JOIN district ON pmv.district = district.name
+                        WHERE pmv.id = $pmvid");
+    $pmvRecRow = $dbConnect->Row();
 }
 
 $pmvObj = new Pmv();
@@ -103,46 +109,51 @@ $pmvObj = new Pmv();
                     </div>
                     <div class="panel-body">
                         <div class="row">
+                            <div><div id="apprResponse"></div>
+                                <div>
+                                    <p align="center" style="display: none; color: limegreen;" id="appr_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                </div></div>
+                            <form method="post" action="" id="approvePmvForm">
                             <table class="table table-responsive">
                                 <tbody>
                                 <tr>
-                                    <td><label>Person(s) Undertaking Visit:</label></td>
-                                    <td colspan="5"><?php echo $pmvObj->fetchOfficers($pmvid);?></td>
+                                    <td colspan="6"><input style="float: right;" type="submit" name="approve" id="approve" value="Approve PMV" class="btn btn-sm btn-success"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><label>Person(s) Undertaking Visit:</label></td>
+                                    <td colspan="4"><?php echo $pmvObj->fetchOfficers($pmvid);?></td>
                                 </tr>
                                 <tr>
                                     <td class="col-lg-1"><label>Section:</label></td>
-                                    <td class="col-lg-3">
-
-                                    </td>
+                                    <td class="col-lg-3"><?php echo $pmvRecRow->progname;?></td>
 
                                     <td class="col-lg-1"><label>Date of Visit:</label></td>
                                     <td class="col-lg-3">
                                         <div>
                                             <div class="input-group input-daterange">
-
-                                                <span class="input-group-addon">to</span>
-
-
+                                                <?php echo $pmvRecRow->visit_startdate.' To '.$pmvRecRow->visit_enddate;?>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="col-lg-1"><label>Region:</label></td>
-                                    <td class="col-lg-3"></td>
+                                    <td class="col-lg-3"><?php echo $pmvRecRow->region_name;?></td>
                                 </tr>
                                 <tr>
 
                                     <td><label>District:</label></td>
-                                    <td></td>
+                                    <td><?php echo $pmvRecRow->region_name;?></td>
 
                                     <td><label>Sub-district:</label></td>
-                                    <td></td>
+                                    <td><?php echo $pmvRecRow->sub_district;?></td>
 
                                     <td><label>Community:</label></td>
-                                    <td></td>
+                                    <td><?php echo $pmvRecRow->community;?></td>
                                 </tr>
 
                                 </tbody>
                             </table>
+                                <input type="hidden" name="pmvid" id="pmvid" value="<?php echo $pmvid;?>">
+                            </form>
                         </div>
 
                     </div>
@@ -205,6 +216,52 @@ $pmvObj = new Pmv();
         TableManageDefault.init();
         FormPlugins.init();
     });
+</script>
+<script type="text/javascript">
+    //Submit pmv
+    $(function () {
+
+        var $buttons = $("#approve");
+        var $pmvid = $("#pmvid").val();
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#apprResponse").empty();
+
+
+            $("#approve").attr("disabled", "disabled");
+            $("#appr_wait").css("display","block");
+            $("html, body").animate({ scrollTop: $("#apprResponse").position().top }, "slow");
+
+            $.ajax({
+                type: "POST",
+                url: "../../controllers/project/savePmvApproval.php",
+                data: {pmvid:$pmvid},
+                success: function(e) {
+
+                    if(e=="fail"){
+
+                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV approval failed.</span></div><br>").hide().fadeIn(1000);
+                        $("#appr_wait").css("display","none");
+                        $("#approve").removeAttr('disabled');
+
+                    }else if(e=="ok"){
+
+                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Approved Successfully.</span></div><br>").hide().fadeIn(1000);
+                        $("#appr_wait").css("display","none");
+                        $("#approve").removeAttr('disabled');
+
+                    }
+                }
+            });
+            return false;
+
+        });
+
+    });
+
+
 </script>
 
 <script>
