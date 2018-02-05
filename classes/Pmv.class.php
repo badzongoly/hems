@@ -100,8 +100,11 @@ class Pmv extends  MySQL{
 
         $this->Query("SELECT * FROM pmv WHERE project_id = $projectId");
         $resultCount = $this->RowCount();
+        if($resultCount==false){
+            $resultCount = 0;
+        }
 
-        $this->Query("SELECT pmv FROM project WHERE id = $projectId");
+        $this->Query("SELECT pmv FROM activities WHERE id = $projectId");
         $pmvRow = $this->Row();
         $pmvVal = $pmvRow->pmv;
 
@@ -121,6 +124,24 @@ class Pmv extends  MySQL{
         $whereArray['id'] = $id;
         $this->Query( MySQL::BuildSQLSelect($tableName, $whereArray));
         return $this->Row();
+    }
+
+    function fetchOfficers($pmvid){
+        $officers = "";
+        $cnt = 0;
+        $this->Query("SELECT * FROM pmv_officers LEFT JOIN staff_pdetail ON pmv_officers.staff_id = staff_pdetail.empID WHERE pmv_id = $pmvid");
+
+        while(!$this->EndOfSeek()){
+            if($cnt > 0){
+                $officers .= ', ';
+            }
+            $ofrow = $this->Row();
+            $officers .= $ofrow->first_name.' '.$ofrow->last_name;
+            $cnt++;
+        }
+
+        return $officers;
+
     }
 }
 ?>

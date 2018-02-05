@@ -1,12 +1,19 @@
 <?php
 require_once('../../classes/mysql.class.php');
-$page = "project";
-$sub_page_name = "project";
+require_once('../../classes/Pmv.class.php');
+$page = "pmv";
+$sub_page_name = "appr_pmv";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-$dbConnect = new MySQL();
-$dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
+if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
+
+    $pmvid = base64_decode($_GET['pmvid']);
+    $dbConnect = new MySQL();
+    $dbConnect->Query("SELECT * FROM pmv WHERE id = $pmvid");
+}
+
+$pmvObj = new Pmv();
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -17,7 +24,7 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Find Project</title>
+    <title>HEMS | Approve PMV</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -71,12 +78,12 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Activity</a></li>
-            <li class="active">Find Activity</li>
+            <li><a href="javascript:;">PMV</a></li>
+            <li class="active">Process PMV Approval</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Activity <small>find activity...</small></h1>
+        <h1 class="page-header">PMV <small>process approval pmv...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -92,44 +99,52 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Find Activity</h4>
+                        <h4 class="panel-title">Process PMV Approval</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <form id="createUserCatForm" method="post" action="">
+                            <table class="table table-responsive">
+                                <tbody>
+                                <tr>
+                                    <td><label>Person(s) Undertaking Visit:</label></td>
+                                    <td colspan="5"><?php echo $pmvObj->fetchOfficers($pmvid);?></td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-1"><label>Section:</label></td>
+                                    <td class="col-lg-3">
 
-                                <table class="table table-responsive table-striped" align="center" style="width: 900px;" align="center">
+                                    </td>
 
-                                    <tbody>
+                                    <td class="col-lg-1"><label>Date of Visit:</label></td>
+                                    <td class="col-lg-3">
+                                        <div>
+                                            <div class="input-group input-daterange">
 
-                                    <tr>
-                                        <td><label>Implementing Partner:</label></td>
-                                        <td>
-                                            <select class="default-select2 form-control" id="partner_id" name="partner_id" style="height: 35px;">
-                                                <option value="" selected disabled>--SELECT OPTION--</option>
-                                                <?php while(!$dbConnect->EndOfSeek()){ $ucrow = $dbConnect->Row();?>
-                                                <option value="<?php echo $ucrow->ip_code;?>"><?php echo $ucrow->name;?></option>
-                                               <?php }?>
-                                            </select><div id="parterror"></div>
-                                        </td>
+                                                <span class="input-group-addon">to</span>
 
-                                        <td><input  type="submit" name="save" id="save" class="btn btn-primary" value="Search"></td>
-                                    </tr>
 
-                                    </tbody>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="col-lg-1"><label>Region:</label></td>
+                                    <td class="col-lg-3"></td>
+                                </tr>
+                                <tr>
 
-                                </table>
-                                <hr>
-                            </form>
-                            <div>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
-                            </div>
-                            <div id="uc_response"></div>
+                                    <td><label>District:</label></td>
+                                    <td></td>
+
+                                    <td><label>Sub-district:</label></td>
+                                    <td></td>
+
+                                    <td><label>Community:</label></td>
+                                    <td></td>
+                                </tr>
+
+                                </tbody>
+                            </table>
                         </div>
 
-                        <div id="uclisted">
-
-                        </div>
                     </div>
                 </div>
                 <!-- end panel -->
@@ -191,62 +206,7 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         FormPlugins.init();
     });
 </script>
-<script type="text/javascript">
-    $(function () {
 
-        var $buttons = $("#save");
-        var $form = $("#createUserCatForm");
-
-        $buttons.click(function (e) {
-
-            e.preventDefault();
-            $("#uc_response").empty();
-
-            $("#parterror").empty();
-
-            var partner = $.trim($("#partner_id").val());
-
-            if(partner.length == 0){
-
-                $("#parterror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
-                $("html, body").animate({ scrollTop: 0 }, "slow");
-
-            }
-
-            if(partner.length != 0){
-
-                $("#save").attr("disabled", "disabled");
-                $("#wait").css("display","block");
-                $("html, body").animate({ scrollTop: 0 }, "slow");
-
-                $.ajax({
-                    type: "POST",
-                    url: "../../controllers/project/fetchProjects.php",
-                    data: $form.serialize(),
-                    success: function(e) {
-
-                         if(e=="zero"){
-
-                            $('#uclisted').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>No results found.</span></div><br>").hide().fadeIn(1000);
-                            $("#wait").css("display","none");
-                            $("#save").removeAttr('disabled');
-
-                        }else {
-
-                             $('#uclisted').html(e);
-                             $("#wait").css("display","none");
-                             $("#save").removeAttr('disabled');
-                        }
-
-                    }
-                });
-                return false;
-            }
-        });
-
-    });
-
-</script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

@@ -38,7 +38,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
     $getStaff->Query("SELECT * FROM staff_pdetail WHERE status = 'active'");
 
     $getSection = new MySQL();
-    $getSection->Query("SELECT * FROM section WHERE status = 'active'");
+    $getSection->Query("SELECT * FROM programmes WHERE status = 'Active'");
 
     $getRegion = new MySQL();
     $getRegion->Query("SELECT * FROM regions ORDER BY region_name ASC");
@@ -135,6 +135,15 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
     $getListConst = new MySQL();
     $getListConst->Query("SELECT * FROM pmv_constraints WHERE pmv_id = $pmvid");
+    $conscount = $getListConst->RowCount();
+
+    $getListR = new MySQL();
+    $getListR->Query("SELECT * FROM pmv_recommendation WHERE pmv_id = $pmvid");
+    $recommcount = $getListR->RowCount();
+
+    $getListFp = new MySQL();
+    $getListFp->Query("SELECT * FROM pmv_followup_actions WHERE pmv_id = $pmvid");
+    $fpcount = $getListFp->RowCount();
 
 }else{
     header('Location:find_project.php');
@@ -205,12 +214,12 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Projects</a></li>
+            <li><a href="javascript:;">Activities</a></li>
             <li class="active">Add PMV</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Project <small>add PMV...</small></h1>
+        <h1 class="page-header">Activities <small>add PMV...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -221,12 +230,17 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                 <div class="panel panel-default" data-sortable-id="form-stuff-1">
                     <div class="panel-heading">
                         <div class="panel-heading-btn">
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>-->
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>-->
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>-->
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>-->
+                            <input style="float:right" type="text" name="submitPmv" id="submitPmv" class="btn btn-primary btn-sm" value="Submit PMV">
                         </div>
                         <h4 class="panel-title">Add PMV</h4>
+                        <div id="submitResponse"></div>
+                        <div>
+                            <p align="center" style="display: none; color: limegreen;" id="submit_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                        </div>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -266,7 +280,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         <select class="default-select2 form-control" name="section" id="section">
                                                             <option selected disabled>--SELECT--</option>
                                                             <?php while(!$getSection->EndOfSeek()){$secRow = $getSection->Row();?>
-                                                                <option value="<?php echo $secRow->id;?>"><?php echo $secRow->section_name;?></option>
+                                                                <option value="<?php echo $secRow->id;?>"><?php echo $secRow->name;?></option>
                                                             <?php } ?>
                                                         </select><span id="sectionerror"></span>
                                                     </td>
@@ -413,7 +427,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                 <td colspan="2"></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="4"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveSectionA" id="saveSectionA" value="Save Background Information"></td>
+                                                <td colspan="4"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveSectionA" id="saveSectionA" value="Save Preparation"></td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -709,7 +723,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                 </table>
                                                     </form>
                                                 <div id="conslist">
-                                                    <?php if($indicount){?>
+                                                    <?php if($conscount){?>
                                                         <table class="table table-bordered table-responsive table-striped">
                                                             <thead>
                                                             <tr>
@@ -730,8 +744,15 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         </table>
                                                     <?php } ?>
                                                 </div>
+                                                <form method="post" action="" id="reccForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="rcResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="rc_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td colspan="3"><div class="alert alert-info" style="text-align: center;"><h5>D. Recommendations/Follow-up/Planned Actions</h5></div></td>
                                                     </tr>
@@ -741,12 +762,87 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         <td>&nbsp;</td>
                                                     </tr>
                                                     <tr>
-                                                        <td><input type="text" name="recname" id="recname" class="form-control"></td>
-                                                        <td><textarea name="recdesc" id="recdesc" class="form-control"></textarea></td>
+                                                        <td><input type="text" name="recname" id="recname" class="form-control"><span id="rnerror"></span></td>
+                                                        <td><textarea name="recdesc" id="recdesc" class="form-control"></textarea><span id="rderror"></span></td>
                                                         <td><input type="submit" name="saveReco" id="saveReco" value="Save Recommendation" class="btn btn-success btn-sm"></td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <div id="recommlist">
+                                                    <?php if($recommcount){?>
+                                                    <table class="table table-bordered table-responsive table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <td>Recommendation Name</td>
+                                                            <td>Description</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <?php while(!$getListR->EndOfSeek()){$listItemR = $getListR->Row();?>
+                                                            <tr>
+                                                                <td><?php echo $listItemR->rec_name;?></td>
+                                                                <td><?php echo $listItemR->rec_desc;?></td>
+                                                            </tr>
+                                                        <?php } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php } ?>
+                                                </div>
+
+                                                <form method="post" action="" id="followPlanForm">
+                                                    <table class="table table-responsive">
+                                                        <tbody>
+                                                        <tr>
+                                                            <td colspan="5"><div id="fpResponse"></div>
+                                                                <div>
+                                                                    <p align="center" style="display: none; color: limegreen;" id="fp_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                                </div></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><div class="alert alert-info" style="text-align: center;"><h5>Follow Up/Planned Actions</h5></div></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><h5>Findings</h5></td>
+                                                            <td><h5>Recommended action & priority (High, Medium, Low)</h5></td>
+                                                            <td><h5>By Whom</h5></td>
+                                                            <td><h5>By When</h5></td>
+                                                            <td>&nbsp;</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><textarea name="findings" id="findings" class="form-control"></textarea><span id="fnderror"></span></td>
+                                                            <td><textarea name="recact" id="recact" class="form-control"></textarea><span id="raerror"></span></td>
+                                                            <td><input type="text" name="by_whom" id="by_whom" class="form-control"><span id="bwhomerror"></span></td>
+                                                            <td><input type="text" name="by_when" id="by_when" class="form-control"><span id="bwhenerror"></span></td>
+                                                            <td><input type="submit" name="saveFp" id="saveFp" value="Save" class="btn btn-success btn-sm"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </form>
+                                                <div id="fplist">
+                                                    <?php if($fpcount){?>
+                                                        <table class="table table-bordered table-responsive table-striped">
+                                                            <thead>
+                                                            <tr>
+                                                                <td>Findings</td>
+                                                                <td>Recommended Action</td>
+                                                                <td>By Whom</td>
+                                                                <td>By When</td>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <?php while(!$getListFp->EndOfSeek()){$listItemFp = $getListFp->Row();?>
+                                                                <tr>
+                                                                    <td><?php echo $listItemFp->findings;?></td>
+                                                                    <td><?php echo $listItemFp->recomm_action;?></td>
+                                                                    <td><?php echo $listItemFp->by_whom;?></td>
+                                                                    <td><?php echo $listItemFp->by_when;?></td>
+                                                                </tr>
+                                                            <?php } ?>
+                                                            </tbody>
+                                                        </table>
+                                                    <?php } ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1511,6 +1607,217 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                 });
                 return false;
             }
+        });
+
+    });
+
+    //Save PMV recommendation
+    $(function () {
+
+        var $buttons = $("#saveReco");
+        var $form = $("#reccForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#rcResponse").empty();
+            $("#rnerror").empty();
+            $("#rderror").empty();
+
+            var rn = $.trim($("#recname").val());
+            var rd = $.trim($("#recdesc").val());
+
+
+            if(rn.length == 0){
+
+                $("#rnerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(rd.length == 0){
+
+                $("#rderror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(rn.length != 0 && rd.length != 0){
+
+                $("#saveReco").attr("disabled", "disabled");
+                $("#rc_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#rcResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveRecommendation.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#rcResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Recommendation Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#rc_wait").css("display","none");
+                            $("#saveReco").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#rcResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Recommendation Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#rc_wait").css("display","none");
+                            $("#saveReco").removeAttr('disabled');
+
+                        }else{
+                            $('#rcResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Recommendation Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#rc_wait").css("display","none");
+                            $("#saveReco").removeAttr('disabled');
+                            $("#recname").val("");
+                            $("#recdesc").val("");
+                            $('#recommlist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Save PMV follow up and planned actions
+    $(function () {
+
+        var $buttons = $("#saveFp");
+        var $form = $("#followPlanForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#fpResponse").empty();
+            $("#fnderror").empty();
+            $("#raerror").empty();
+            $("#bwhomerror").empty();
+            $("#bwhenerror").empty();
+
+            var fnds = $.trim($("#findings").val());
+            var ra = $.trim($("#recact").val());
+            var bwhom = $.trim($("#by_whom").val());
+            var bwhen = $.trim($("#by_when").val());
+
+
+            if(fnds.length == 0){
+
+                $("#fnderror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(ra.length == 0){
+
+                $("#raerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(bwhom.length == 0){
+
+                $("#bwhomerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(bwhen.length == 0){
+
+                $("#bwhenerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(fnds.length != 0 && ra.length != 0 && bwhom.length != 0 && bwhen.length != 0){
+
+                $("#saveFp").attr("disabled", "disabled");
+                $("#fp_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#fpResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveFollowAction.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#fpResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Follow up/Planned Actions Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#fp_wait").css("display","none");
+                            $("#saveFp").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#fpResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Follow up/Planned Actions Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#fp_wait").css("display","none");
+                            $("#saveFp").removeAttr('disabled');
+
+                        }else{
+                            $('#fpResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Follow up/Planned Actions Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#fp_wait").css("display","none");
+                            $("#saveFp").removeAttr('disabled');
+                            $("#findings").val("");
+                            $("#recact").val("");
+                            $("#by_whom").val("");
+                            $("#by_when").val("");
+                            $('#fplist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Submit pmv
+    $(function () {
+
+        var $buttons = $("#submitPmv");
+        var $action = "submitThisForm";
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#submitResponse").empty();
+
+
+                $("#submitPmv").attr("disabled", "disabled");
+                $("#submit_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#submitResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveSubmission.php",
+                    data: {whatToDo:$action},
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#submitResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV submission failed.</span></div><br>").hide().fadeIn(1000);
+                            $("#submit_wait").css("display","none");
+                            $("#submitPmv").removeAttr('disabled');
+
+                        }else if(e=="zero"){
+
+                            $('#submitResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV submission failed. Fill out PMV before submitting.</span></div><br>").hide().fadeIn(1000);
+                            $("#submit_wait").css("display","none");
+                            $("#submitPmv").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#submitResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Submitted Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#submit_wait").css("display","none");
+                            $("#submitPmv").removeAttr('disabled');
+
+                        }
+                    }
+                });
+                return false;
+
         });
 
     });
