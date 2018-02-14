@@ -15,11 +15,11 @@ if(isset($_POST['programme_id']) && isset($_POST['partner_id'])&& !empty($_POST[
     $progId = $_POST['programme_id'];
     $parterId = $_POST['partner_id'];
 
-    $qury = "SELECT project.id, project.name AS proj_name, implementing_partners.name AS part_name, programmes.name AS prog_name,project.spot_check,project.pmv,
-                           project.audit,project.start_date,project.duration,project.status
-                           FROM project LEFT JOIN implementing_partners ON implementing_partners.id = project.partner_id
-                           LEFT JOIN programmes ON  programmes.id = project.programme_id
-                           WHERE project.programme_id = $progId AND project.partner_id = $parterId";
+    $qury = "SELECT a.id, a.name AS proj_name, implementing_partners.name AS part_name, programmes.name AS prog_name,a.spot_check,a.pmv,
+                           a.audit,a.start_date,a.duration,a.status
+                           FROM activities a LEFT JOIN implementing_partners ON implementing_partners.ip_code = a.partner_id
+              
+                           WHERE a.partner_id = $parterId";
 
     $fetchProjects->Query($qury);
     $thecount = $fetchProjects->RowCount();

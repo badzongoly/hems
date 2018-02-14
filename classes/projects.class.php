@@ -139,11 +139,11 @@ class Project extends MySQL
         }
     }
   public function moveActivities(){
+        $object = new MySQL();
         $check = $this->Query("Select * From activities_trans WHERE status ='New'");
         $table = 'activities';
         $sql = '';
-        if($this->RowCount() >0){
-
+        if($check){
             while (!$this->EndOfSeek()){
                 $row = $this->Row();
 
@@ -151,14 +151,17 @@ class Project extends MySQL
                 $valuesArray['pmv'] = MySQL::SQLValue($row->pmv);
                 $valuesArray['spot_check'] =MySQL::SQLValue($row->spot_check);
                 $valuesArray['audit'] = MySQL::SQLValue($row->audit);
+                $valuesArray['value_month'] = MySQL::SQLValue($row->value_month);
+                $valuesArray['value_year'] = MySQL::SQLValue($row->value_year);
                 $valuesArray['status'] = MySQL::SQLValue('Active');
                 $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
                 if(empty($sql)) {
                     $sql = MySQL::BuildSQLInsert($table, $valuesArray);
                 }else{
-                    $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),100);
+                    $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),129);
                 }
             }
+            echo $sql;
             $check = $this->Query($sql);
             if($check){
                 $this->Query("Delete  From activities_trans WHERE status ='New'");

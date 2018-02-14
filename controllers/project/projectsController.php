@@ -76,15 +76,19 @@ if(isset($_FILES["file"]["type"]) && isset($_POST['do']) && $_POST['do'] == "exc
         //$valuesArray['pmv'] = MySQL::SQLValue($excelRows['G'][$x]);
         if(empty($excelRows['G'][$x])){$valuesArray['pmv'] = 0;}else{$valuesArray['pmv']= MySQL::SQLValue($excelRows['G'][$x]);}
         if(empty($excelRows['H'][$x])){ $valuesArray['spot_check'] =0;}else{  $valuesArray['spot_check'] =MySQL::SQLValue($excelRows['H'][$x]);}
+
         $valuesArray['audit'] = MySQL::SQLValue($excelRows['K'][$x]);
         $valuesArray['status'] = MySQL::SQLValue('New');
         $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+        $valuesArray['value_month'] = MySQL::SQLValue($_POST['month']);
+        $valuesArray['value_year'] = MySQL::SQLValue($_POST['year']);
         if(empty($sql)) {
             $sql = MySQL::BuildSQLInsert($table, $valuesArray);
         }else{
-            $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),107);
+            $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),136);
         }
     }
+
     $check = $object->Query($sql);
     if($check){
         echo "success";exit;

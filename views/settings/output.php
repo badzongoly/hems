@@ -283,7 +283,7 @@ $pull_ucat->Query("SELECT p.id,p.name,p.description,c.`name`AS outcome FROM outp
             var action = "delete";
             $.ajax({
                 type:"POST",
-                data:{id:id,do_act:action},
+                data:{id:id,do_output:action},
                 url:"../../controllers/settings/settingsController.php",
                 success:function (data) {
                     if(e=="error"){

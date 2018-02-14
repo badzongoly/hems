@@ -110,7 +110,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
                                     <thead>
                                     <tr>
-                                        <td colspan="2" align="center"><strong>Upload Excel File</strong></td>
+                                        <td colspan="4" align="center"><strong>Upload Excel File</strong></td>
                                     </tr>
 
 
@@ -119,6 +119,20 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
 
                                     <tr>
+                                        <td>
+                                            <select id="month" name="month" class="form-control">
+                                                <?php for($m=1; $m<=12; $m++){ $month = date('M',mktime(0,0,0,$m,1,date('Y')))?>
+                                                    <option value="<?php echo $month; ?>"><?php echo $month; ?></option>
+                                                <?php }?>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select id="year" name="year" class="form-control">
+                                                <?php for($i=date('Y'); $i>=date('Y')-100; $i--){?>
+                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                <?php }?>
+                                            </select>
+                                        </td>
                                         <td nowrap="">
                                             <div class="form-group">
                                                 <div class="col-lg-12 col-xs-12">
@@ -137,7 +151,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                                             <input  type="submit" name="save" id="save" class="btn btn-primary" value="Upload Excel"></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2">
+                                        <td colspan="4">
                                             <div class="col-lg-12 col-xs-12" >
                                                 <div class="alert alert-danger" id="fileerror" style="display: none;"></div><div class="alert alert-success" id="filesuccess" style="display: none;"></div>
                                             </div>
@@ -244,6 +258,8 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         if( file.length != 0){
             var formdata = new FormData;
             formdata.append('file',$('#files')[0].files[0]);
+            formdata.append('month',$("#month").val());
+            formdata.append('year',$("#year").val());
             formdata.append('do',$('#do').val());
             $("#save").attr("disabled", "disabled");
             $("#wait").css("display","block");

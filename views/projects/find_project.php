@@ -108,7 +108,7 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                                             <select class="default-select2 form-control" id="partner_id" name="partner_id" style="height: 35px;">
                                                 <option value="" selected disabled>--SELECT OPTION--</option>
                                                 <?php while(!$dbConnect->EndOfSeek()){ $ucrow = $dbConnect->Row();?>
-                                                <option value="<?php echo $ucrow->id;?>"><?php echo $ucrow->name;?></option>
+                                                <option value="<?php echo $ucrow->ip_code;?>"><?php echo $ucrow->name;?></option>
                                                <?php }?>
                                             </select><div id="parterror"></div>
                                         </td>
