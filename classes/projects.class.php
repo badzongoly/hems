@@ -161,7 +161,7 @@ class Project extends MySQL
                     $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),129);
                 }
             }
-            echo $sql;
+
             $check = $this->Query($sql);
             if($check){
                 $this->Query("Delete  From activities_trans WHERE status ='New'");

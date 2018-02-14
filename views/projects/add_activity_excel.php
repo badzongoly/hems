@@ -169,7 +169,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
                             <div>
                                 <hr/>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding project. Please wait....</p>
+                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding activities. Please wait....</p>
                             </div>
                             <div id="uc_response"></div>
                         </div>
@@ -274,10 +274,10 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                 success: function(e) {
                     if(e=="error"){
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save project.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save activities.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save project.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save activities.</span></div><br>").fadeOut(6000);
 
                     }else if(e=="exists"){
 
@@ -285,7 +285,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                         $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This Activities already exists.</span></div><br>").fadeOut(6000);
 
                     }
                     else if(e ==="success"){
@@ -297,12 +297,12 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                     }
                     else {
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project saved successfully.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities saved successfully.</span></div><br>").hide().fadeIn(1000);
                         $('#uclisted').empty();
                         $('#uclisted').html(e);
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project saved successfully.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities saved successfully.</span></div><br>").fadeOut(6000);
                     }
 
 
@@ -322,18 +322,18 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                 url: "../../controllers/project/projectsController.php",
                 success: function (data) {
                     if (data == "error") {
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to project.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to Activities.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display", "none");
                         $("#save").removeAttr('disabled');
 
 
                     } else {
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project deleted successfully.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities deleted successfully.</span></div><br>").hide().fadeIn(1000);
 
                         $('#uclisted').html(data);
                         $("#wait").css("display", "none");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project deleted successfully.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities deleted successfully.</span></div><br>").fadeOut(6000);
 
                     }
 
