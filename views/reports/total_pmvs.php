@@ -1,19 +1,21 @@
 <?php
 require_once('../../classes/mysql.class.php');
-$page = "pmv";
-$sub_page_name = "val_pmv";
+require_once('../../classes/Pmv.class.php');
+
+$page = "reports";
+$sub_page_name = "total_reports";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-$dbConnect = new MySQL();
-$dbConnect->Query("SELECT pmv.id as pmvid,implementing_partners.name as impname,programmes.name as progname,pmv.visit_startdate, pmv.visit_enddate,
-                    pmv.sub_district,regions.region_name, district.name as  distname FROM pmv
-                   LEFT JOIN activities ON activities.id = pmv.project_id
-                    LEFT JOIN programmes ON programmes.id = pmv.section
-                    LEFT JOIN implementing_partners ON activities.partner_id = implementing_partners.ip_code
-                    LEFT JOIN regions ON regions.id = pmv.region
-                    LEFT JOIN district ON district.id = pmv.district
-                    WHERE pmv.status= 'approved'");
+$fetchProjects =  new MySQL();
+$pmvObj =  new Pmv();
+
+$qury = "SELECT activities.id, activities.partner_id, implementing_partners.name AS part_name,activities.spot_check,activities.pmv,
+                           activities.audit,activities.status, implementing_partners.risk_rating,implementing_partners.ip_code
+                           FROM activities LEFT JOIN implementing_partners ON implementing_partners.ip_code = activities.partner_id";
+
+$fetchProjects->Query($qury);
+
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -24,7 +26,7 @@ $dbConnect->Query("SELECT pmv.id as pmvid,implementing_partners.name as impname,
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Validate PMV</title>
+    <title>HEMS | Total PMVs</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -78,12 +80,12 @@ $dbConnect->Query("SELECT pmv.id as pmvid,implementing_partners.name as impname,
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">PMV</a></li>
-            <li class="active">Validate PMV</li>
+            <li><a href="javascript:;">Reports</a></li>
+            <li class="active">Total PMVs Required</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">PMV <small>validate pmv...</small></h1>
+        <h1 class="page-header">Reports <small>total pmvs required...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -99,35 +101,32 @@ $dbConnect->Query("SELECT pmv.id as pmvid,implementing_partners.name as impname,
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Validate PMV</h4>
+                        <h4 class="panel-title">Total PMVs Required</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
 
                                 <table class="table table-responsive table-striped table-bordered" id="data-table">
                                     <thead>
-                                        <tr>
-                                            <td>Implementing Partner</td>
-                                            <td>Program</td>
-                                            <td>Visit Date</td>
-                                            <td>Region</td>
-                                            <td>District</td>
-                                            <td>Sub-District</td>
-                                            <td>&nbsp;</td>
-                                        </tr>
+                                    <tr>
+                                        <th>Vendor</th>
+                                        <th>Risk Rating</th>
+                                        <th>Total</th>
+                                        <th>Minimum PMVs Required</th>
+                                        <th>PMVs Completed</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                    <?php while(!$dbConnect->EndOfSeek()){ $pmvRow = $dbConnect->Row();?>
-                                    <tr>
-                                        <td><?php echo $pmvRow->impname;?></td>
-                                        <td><?php echo $pmvRow->progname;?></td>
-                                        <td><?php echo $pmvRow->visit_startdate.' to '.$pmvRow->visit_enddate;?></td>
-                                        <td><?php echo $pmvRow->region_name;?></td>
-                                        <td><?php echo $pmvRow->distname;?></td>
-                                        <td><?php echo $pmvRow->sub_district;?></td>
-                                        <td><a href="processPmvValidation.php?pmvid=<?php echo base64_encode($pmvRow->pmvid);?>" class="btn btn-primary btn-sm"><i class="fa fa-cogs"></i> Process PMV Validation</a></td>
-                                    </tr>
+                                    <?php while(!$fetchProjects->EndOfSeek()){ $ucrow = $fetchProjects->Row();?>
+                                        <tr>
+                                            <td><?php echo $ucrow->part_name.' - '.$ucrow->ip_code;?></td>
+                                            <td><?php echo $ucrow->risk_rating;?></td>
+                                            <td><?php echo $ucrow->pmv + $pmvObj->countAddedPMVs($ucrow->id);?></td>
+                                            <td><?php echo $ucrow->pmv;?></td>
+                                            <td><?php echo $pmvObj->countAddedPMVs($ucrow->id);?></td>
+                                        </tr>
                                     <?php } ?>
+
                                     </tbody>
 
                                 </table>

@@ -145,6 +145,12 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
     $getListFp->Query("SELECT * FROM pmv_followup_actions WHERE pmv_id = $pmvid");
     $fpcount = $getListFp->RowCount();
 
+    $pmvfunccall = new Pmv();
+
+    $getPrevRecomm = new MySQL();
+    $getPrevRecomm->Query("SELECT * FROM pmv_prev_recomm WHERE pmv_id = $pmvid");
+    $pvrcount = $getPrevRecomm->RowCount();
+
 }else{
     header('Location:find_project.php');
 }
@@ -253,7 +259,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                             <div class="tab-content">
                                 <div class="tab-pane fade active in" id="default-tab-1">
                             <!--Background info panel begin -->
-                            <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                            <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">Background Information</h4>
                                 </div>
@@ -340,7 +346,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                     </div>
                                 <div class="tab-pane fade in" id="default-tab-2">
                             <!--section a begin -->
-                            <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                            <div class="panel panel-primary" data-sortable-id="form-stuff-2">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">Section A. Preparation - Programme Information</h4>
                                 </div>
@@ -467,7 +473,27 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                             </table>
                                         </form>
                                         <div id="followupList">
-
+                                            <?php if($pvrcount){?>
+                                            <table class="table">
+                                                <tbody>
+                                                <tr>
+                                                    <td class="col-lg-2"><h5>Date of Visit</h5></td>
+                                                    <td class="col-lg-4"><h5>Section/Staff that Undertook Visit</h5></td>
+                                                    <td class="col-lg-3"><h5>Recommendation</h5></td>
+                                                    <td class="col-lg-2"><h5>Status of Implementation</h5></td>
+                                                    <td></td>
+                                                </tr>
+                                                <?php while(!$getPrevRecomm->EndOfSeek()){ $gprrow = $getPrevRecomm->Row();?>
+                                                    <tr>
+                                                        <td><?php echo $gprrow->date_of_visit;?></td>
+                                                        <td><?php echo $pmvfunccall->fetchPrevRecommOfficers($gprrow->id);?></td>
+                                                        <td><?php echo $gprrow->recomm;?></td>
+                                                        <td><?php echo $gprrow->impl;?></td>
+                                                    </tr>
+                                                <?php } ?>
+                                                </tbody>
+                                            </table>
+                                            <?php } ?>
                                         </div>
                                         </div>
                                     </div>
@@ -477,7 +503,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
                                 <div class="tab-pane fade in" id="default-tab-3">
                                     <!--section b begin -->
-                                    <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                                    <div class="panel panel-primary" data-sortable-id="form-stuff-3">
                                         <div class="panel-heading">
                                             <h4 class="panel-title">Section B. Data Collection</h4>
                                         </div>
@@ -625,7 +651,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
                                 <div class="tab-pane fade in" id="default-tab-4">
                                     <!--section b begin -->
-                                    <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                                    <div class="panel panel-primary" data-sortable-id="form-stuff-4">
                                         <div class="panel-heading">
                                             <h4 class="panel-title">Section C. Reporting</h4>
                                         </div>

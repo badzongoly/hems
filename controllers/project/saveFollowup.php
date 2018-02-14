@@ -26,16 +26,17 @@ if(isset($_POST['v_date']) && !empty($_POST['v_date'])){
     }
     $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
     $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
+    $valuesArray['pmv_id'] = MySQL::SQLValue($_SESSION['hems_active_pmv']);
 
     $sql = MySQL::BuildSQLInsert("pmv_prev_recomm", $valuesArray);
 
     $result = $insert->Query($sql);
 
     if($result){
-
+        $recomid = $insert->GetLastInsertID();
         foreach($officerArray as $officer){
 
-            $offArray['pmv_id'] = MySQL::SQLValue($_SESSION['hems_active_pmv']);
+            $offArray['recomm_id'] = MySQL::SQLValue($recomid);
             $offArray['staff_id'] = MySQL::SQLValue($officer);
             $offArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
             $offArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));

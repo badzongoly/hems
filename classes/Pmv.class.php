@@ -33,7 +33,7 @@ class Pmv extends  MySQL{
      * */
     function countAddedPMVs($projectID){
 
-        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM pmv WHERE project_id = $projectID");
+        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM pmv WHERE project_id = $projectID AND status = 'validated'");
         $pmvRow = $this->Row();
         $finalCount = $pmvRow->pmvCount;
 
@@ -141,6 +141,44 @@ class Pmv extends  MySQL{
         }
 
         return $officers;
+
+    }
+
+    function getIPName($ipid){
+
+        $this->Query("SELECT name FROM implementing_partners WHERE id = $ipid");
+        $ipRow = $this->Row();
+        $ipname = $ipRow->name;
+
+        return $ipname;
+
+    }
+
+    function fetchPrevRecommOfficers($rid){
+        $pofficers = "";
+        $cnt = 0;
+        $this->Query("SELECT * FROM pmv_prev_officers LEFT JOIN staff_pdetail ON pmv_prev_officers.staff_id = staff_pdetail.empID WHERE recomm_id = $rid");
+
+        while(!$this->EndOfSeek()){
+            if($cnt > 0){
+                $pofficers .= ', ';
+            }
+            $ofrow = $this->Row();
+            $pofficers .= $ofrow->first_name.' '.$ofrow->last_name;
+            $cnt++;
+        }
+
+        return $pofficers;
+
+    }
+
+    function getProgramName($programId){
+
+        $this->Query("SELECT name FROM programmes WHERE id = $programId");
+        $proww = $this->Row();
+        $proname = $proww->name;
+
+        return $proname;
 
     }
 }

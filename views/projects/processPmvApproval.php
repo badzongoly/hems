@@ -11,7 +11,10 @@ if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
     $pmvid = base64_decode($_GET['pmvid']);
     $dbConnect = new MySQL();
     $dbConnect->Query("SELECT programmes.name as progname,pmv.visit_startdate, pmv.visit_enddate, regions.region_name,
-                       district.name as dname, pmv.sub_district, pmv.community FROM pmv
+                       district.name as dname, pmv.sub_district, pmv.community,pmv.purpose,pmv.related_workplan_act,
+                       pmv.related_workplan_output,pmv.prog_document_out,pmv.prog_document_ref,pmv.baseline,pmv.target,
+                        pmv.verification,pmv.intervention_period_start,pmv.intervention_period_end,pmv.imp_partner,
+                         pmv.persons_to_meet, pmv.last_field_visit, pmv.intervention_value FROM pmv
                        LEFT JOIN programmes ON pmv.section = programmes.id
                        LEFT JOIN regions ON pmv.region = regions.id
                        LEFT JOIN district ON pmv.district = district.name
@@ -20,6 +23,9 @@ if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
 }
 
 $pmvObj = new Pmv();
+
+$getPrevRecomm = new MySQL();
+$getPrevRecomm->Query("SELECT * FROM pmv_prev_recomm WHERE pmv_id = $pmvid");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -154,6 +160,98 @@ $pmvObj = new Pmv();
                             </table>
                                 <input type="hidden" name="pmvid" id="pmvid" value="<?php echo $pmvid;?>">
                             </form>
+                            <div class="panel-heading">
+                                <h4 class="panel-title">Section A. Preparation - Programme Information</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+
+                                        <table class="table table-responsive">
+                                            <tbody>
+                                            <tr>
+                                                <td class="col-lg-2"><label>Purpose</label></td>
+                                                <td colspan="3"><p><?php echo $pmvRecRow->purpose;?></p></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>Programme Reference</h5></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="col-lg-2"><label>Related Work Plan Output(s)</label></td>
+                                                <td class="col-lg-4"><p><?php echo $pmvRecRow->related_workplan_output;?></p></td>
+
+                                                <td class="col-lg-2"><label>Related Work Plan Activities(s)</label></td>
+                                                <td class="col-lg-4"><p><?php echo $pmvRecRow->related_workplan_act;?></p></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Programme Document Name/Reference #:</label></td>
+                                                <td><p><?php echo $pmvRecRow->prog_document_ref;?></p></td>
+
+                                                <td><label>Programme Document Output(s)</label></td>
+                                                <td><p><?php echo $pmvRecRow->prog_document_out;?></p></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>Indicators for Workplan or Program Document</h5></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Baseline</label></td>
+                                                <td><p><?php echo $pmvRecRow->baseline;?></p></td>
+
+                                                <td><label>Target</label></td>
+                                                <td><p><?php echo $pmvRecRow->target;?></p></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Means of Verification</label></td>
+                                                <td><p><?php echo $pmvRecRow->verification;?></p></td>
+
+                                                <td colspan="2"></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>Information Relating To Implementing Partner(Government, Civil Society, UN Agency)</h5></div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Implementing Partner</label></td>
+                                                <td><?php echo $pmvObj->getIPName($pmvRecRow->imp_partner);?></td>
+
+                                                <td><label>Period of Intervention</label></td>
+                                                <td><?php echo $pmvRecRow->intervention_period_start.' To '.$pmvRecRow->intervention_period_end;?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Persons to Meet</label></td>
+                                                <td><p><?php echo $pmvRecRow->persons_to_meet;?></p></td>
+                                                <td><label>Last Field Visit</label></td>
+                                                <td><?php echo $pmvRecRow->last_field_visit;?></td>
+                                            </tr>
+                                            <tr>
+                                                <td><label>Total Value For The Intervention(US$)</label></td>
+                                                <td><?php echo $pmvRecRow->intervention_value;?></td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>Status of Previous Recommendations and Follow-up Actions (List all recommendations from the previous Field Trip Report and indicate status of follow-up/action taken)</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-lg-2"><h5>Date of Visit</h5></td>
+                                            <td class="col-lg-4"><h5>Section/Staff that Undertook Visit</h5></td>
+                                            <td class="col-lg-3"><h5>Recommendation</h5></td>
+                                            <td class="col-lg-2"><h5>Status of Implementation</h5></td>
+                                        </tr>
+                                        <?php while(!$getPrevRecomm->EndOfSeek()){ $gprrow = $getPrevRecomm->Row();?>
+                                            <tr>
+                                                <td><?php echo $gprrow->date_of_visit;?></td>
+                                                <td><?php echo $pmvObj->fetchPrevRecommOfficers($gprrow->id);?></td>
+                                                <td><?php echo $gprrow->recomm;?></td>
+                                                <td><?php echo $gprrow->impl;?></td>
+                                            </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                       </div>
+                                </div>
+
                         </div>
 
                     </div>

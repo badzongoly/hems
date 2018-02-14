@@ -125,7 +125,7 @@ $dbConnect->Query("SELECT pmv.id as pmvid,implementing_partners.name as impname,
                                         <td><?php echo $pmvRow->region_name;?></td>
                                         <td><?php echo $pmvRow->distname;?></td>
                                         <td><?php echo $pmvRow->sub_district;?></td>
-                                        <td><a href="processPmvApproval.php?pmvid=<?php echo base64_encode($pmvRow->pmvid);?>" class="btn btn-success btn-sm">Process PMV</a></td>
+                                        <td><a href="processPmvApproval.php?pmvid=<?php echo base64_encode($pmvRow->pmvid);?>" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> Process PMV Approval</a></td>
                                     </tr>
                                     <?php } ?>
                                     </tbody>
