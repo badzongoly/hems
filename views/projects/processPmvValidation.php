@@ -1,12 +1,25 @@
 <?php
 require_once('../../classes/mysql.class.php');
-$page = "project";
-$sub_page_name = "project";
+require_once('../../classes/Pmv.class.php');
+$page = "pmv";
+$sub_page_name = "appr_pmv";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-$dbConnect = new MySQL();
-$dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
+if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
+
+    $pmvid = base64_decode($_GET['pmvid']);
+    $dbConnect = new MySQL();
+    $dbConnect->Query("SELECT programmes.name as progname,pmv.visit_startdate, pmv.visit_enddate, regions.region_name,
+                       district.name as dname, pmv.sub_district, pmv.community FROM pmv
+                       LEFT JOIN programmes ON pmv.section = programmes.id
+                       LEFT JOIN regions ON pmv.region = regions.id
+                       LEFT JOIN district ON pmv.district = district.name
+                        WHERE pmv.id = $pmvid");
+    $pmvRecRow = $dbConnect->Row();
+}
+
+$pmvObj = new Pmv();
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -17,7 +30,7 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Find Project</title>
+    <title>HEMS | Validate PMV</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -71,12 +84,12 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Activity</a></li>
-            <li class="active">Find Activity</li>
+            <li><a href="javascript:;">PMV</a></li>
+            <li class="active">Process PMV Validation</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Activity <small>find activity...</small></h1>
+        <h1 class="page-header">PMV <small>process pmv validation...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -92,44 +105,57 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Find Activity</h4>
+                        <h4 class="panel-title">Process PMV Validation</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <form id="createUserCatForm" method="post" action="">
+                            <div><div id="apprResponse"></div>
+                                <div>
+                                    <p align="center" style="display: none; color: limegreen;" id="appr_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                </div></div>
+                            <form method="post" action="" id="approvePmvForm">
+                            <table class="table table-responsive">
+                                <tbody>
+                                <tr>
+                                    <td colspan="6"><input style="float: right;" type="submit" name="approve" id="approve" value="Validate PMV" class="btn btn-sm btn-primary"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><label>Person(s) Undertaking Visit:</label></td>
+                                    <td colspan="4"><?php echo $pmvObj->fetchOfficers($pmvid);?></td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-1"><label>Section:</label></td>
+                                    <td class="col-lg-3"><?php echo $pmvRecRow->progname;?></td>
 
-                                <table class="table table-responsive table-striped" align="center" style="width: 900px;" align="center">
+                                    <td class="col-lg-1"><label>Date of Visit:</label></td>
+                                    <td class="col-lg-3">
+                                        <div>
+                                            <div class="input-group input-daterange">
+                                                <?php echo $pmvRecRow->visit_startdate.' To '.$pmvRecRow->visit_enddate;?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="col-lg-1"><label>Region:</label></td>
+                                    <td class="col-lg-3"><?php echo $pmvRecRow->region_name;?></td>
+                                </tr>
+                                <tr>
 
-                                    <tbody>
+                                    <td><label>District:</label></td>
+                                    <td><?php echo $pmvRecRow->region_name;?></td>
 
-                                    <tr>
-                                        <td><label>Implementing Partner:</label></td>
-                                        <td>
-                                            <select class="default-select2 form-control" id="partner_id" name="partner_id" style="height: 35px;">
-                                                <option value="" selected disabled>--SELECT OPTION--</option>
-                                                <?php while(!$dbConnect->EndOfSeek()){ $ucrow = $dbConnect->Row();?>
-                                                <option value="<?php echo $ucrow->ip_code;?>"><?php echo $ucrow->name;?></option>
-                                               <?php }?>
-                                            </select><div id="parterror"></div>
-                                        </td>
+                                    <td><label>Sub-district:</label></td>
+                                    <td><?php echo $pmvRecRow->sub_district;?></td>
 
-                                        <td><input  type="submit" name="save" id="save" class="btn btn-primary" value="Search"></td>
-                                    </tr>
+                                    <td><label>Community:</label></td>
+                                    <td><?php echo $pmvRecRow->community;?></td>
+                                </tr>
 
-                                    </tbody>
-
-                                </table>
-                                <hr>
+                                </tbody>
+                            </table>
+                                <input type="hidden" name="pmvid" id="pmvid" value="<?php echo $pmvid;?>">
                             </form>
-                            <div>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
-                            </div>
-                            <div id="uc_response"></div>
                         </div>
 
-                        <div id="uclisted">
-
-                        </div>
                     </div>
                 </div>
                 <!-- end panel -->
@@ -192,61 +218,52 @@ $dbConnect->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
     });
 </script>
 <script type="text/javascript">
+    //Submit pmv
     $(function () {
 
-        var $buttons = $("#save");
-        var $form = $("#createUserCatForm");
+        var $buttons = $("#approve");
+        var $pmvid = $("#pmvid").val();
 
         $buttons.click(function (e) {
 
             e.preventDefault();
-            $("#uc_response").empty();
+            $("#apprResponse").empty();
 
-            $("#parterror").empty();
 
-            var partner = $.trim($("#partner_id").val());
+            $("#approve").attr("disabled", "disabled");
+            $("#appr_wait").css("display","block");
+            $("html, body").animate({ scrollTop: $("#apprResponse").position().top }, "slow");
 
-            if(partner.length == 0){
+            $.ajax({
+                type: "POST",
+                url: "../../controllers/project/savePmvValidation.php",
+                data: {pmvid:$pmvid},
+                success: function(e) {
 
-                $("#parterror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
-                $("html, body").animate({ scrollTop: 0 }, "slow");
+                    if(e=="fail"){
 
-            }
+                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV validation failed.</span></div><br>").hide().fadeIn(1000);
+                        $("#appr_wait").css("display","none");
+                        $("#approve").removeAttr('disabled');
 
-            if(partner.length != 0){
+                    }else if(e=="ok"){
 
-                $("#save").attr("disabled", "disabled");
-                $("#wait").css("display","block");
-                $("html, body").animate({ scrollTop: 0 }, "slow");
-
-                $.ajax({
-                    type: "POST",
-                    url: "../../controllers/project/fetchProjects.php",
-                    data: $form.serialize(),
-                    success: function(e) {
-
-                         if(e=="zero"){
-
-                            $('#uclisted').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>No results found.</span></div><br>").hide().fadeIn(1000);
-                            $("#wait").css("display","none");
-                            $("#save").removeAttr('disabled');
-
-                        }else {
-
-                             $('#uclisted').html(e);
-                             $("#wait").css("display","none");
-                             $("#save").removeAttr('disabled');
-                        }
+                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Validated Successfully.</span></div><br>").hide().fadeIn(1000);
+                        $("#appr_wait").css("display","none");
+                        $("#approve").removeAttr('disabled');
 
                     }
-                });
-                return false;
-            }
+                }
+            });
+            return false;
+
         });
 
     });
 
+
 </script>
+
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
             (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

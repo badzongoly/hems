@@ -1,19 +1,44 @@
 <?php
 require_once('../../classes/mysql.class.php');
+require_once('../../classes/Pmv.class.php');
 $page = "project";
 $sub_page_name = "add_pmv";
+
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
+
+$getAservComment = new Pmv();
+
+if(isset($_SESSION['hems_active_pmv']) && !empty($_SESSION['hems_active_pmv']) && $_SESSION['hems_active_pmv'] > 0){
+
+    $pmvid = $_SESSION['hems_active_pmv'];
+
+}else{
+
+    $_SESSION['hems_active_pmv'] = 0;
+    $pmvid = $_SESSION['hems_active_pmv'];
+
+}
 
 if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
     $projectid = base64_decode($_GET['pid']);
 
+    $pmvO = new Pmv();
+    $chkres = $pmvO->checkPMVAdded($projectid);
+
+    if(trim($chkres)=="close"){
+        header('Location:find_project.php');
+    }
+
+    $pmvRecordset = $pmvO->getPMVDetails($pmvid);
+
+
     $getStaff = new MySQL();
     $getStaff->Query("SELECT * FROM staff_pdetail WHERE status = 'active'");
 
     $getSection = new MySQL();
-    $getSection->Query("SELECT * FROM section WHERE status = 'active'");
+    $getSection->Query("SELECT * FROM programmes WHERE status = 'Active'");
 
     $getRegion = new MySQL();
     $getRegion->Query("SELECT * FROM regions ORDER BY region_name ASC");
@@ -27,20 +52,107 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
     $getAccessServices = new MySQL();
     $getAccessServices->Query("SELECT * FROM access_to_services");
 
+    $getSelections = new MySQL();
+    $getSelections->Query("SELECT * FROM pmv_access_services WHERE pmv_id = $pmvid");
+    $selCount = $getSelections->RowCount();
+
+    $selArray = array();
+
+    if($selCount){
+        while(!$getSelections->EndOfSeek()){
+            $srow = $getSelections->Row();
+            $selArray[] = $srow->access_service_id;
+        }
+    }
+
     $getQualityServices = new MySQL();
     $getQualityServices->Query("SELECT * FROM quality_of_services");
+
+    $getQSelections = new MySQL();
+    $getQSelections->Query("SELECT * FROM pmv_quality_services WHERE pmv_id = $pmvid");
+    $selQCount = $getQSelections->RowCount();
+
+    $qselArray = array();
+
+    if($selQCount){
+        while(!$getQSelections->EndOfSeek()){
+            $sqrow = $getQSelections->Row();
+            $qselArray[] = $sqrow->quality_service_id;
+        }
+    }
 
     $getUtilServices = new MySQL();
     $getUtilServices->Query("SELECT * FROM utilisation_of_services");
 
+    $getUSelections = new MySQL();
+    $getUSelections->Query("SELECT * FROM pmv_util_services WHERE pmv_id = $pmvid");
+    $selUCount = $getUSelections->RowCount();
+
+    $uselArray = array();
+
+    if($selUCount){
+        while(!$getUSelections->EndOfSeek()){
+            $uqrow = $getUSelections->Row();
+            $uselArray[] = $uqrow->util_service_id;
+        }
+    }
+
     $getEnablingEnv = new MySQL();
     $getEnablingEnv->Query("SELECT * FROM enabling_env");
+
+    $getESelections = new MySQL();
+    $getESelections->Query("SELECT * FROM pmv_enabling_env WHERE pmv_id = $pmvid");
+    $selECount = $getESelections->RowCount();
+
+    $eselArray = array();
+
+    if($selECount){
+        while(!$getESelections->EndOfSeek()){
+            $eqrow = $getESelections->Row();
+            $eselArray[] = $eqrow->enab_env_id;
+        }
+    }
 
     $getStatRec = new MySQL();
     $getStatRec->Query("SELECT * FROM statistics_and_records");
 
+    $getSRSelections = new MySQL();
+    $getSRSelections->Query("SELECT * FROM pmv_statistics_records WHERE pmv_id = $pmvid");
+    $selSRCount = $getSRSelections->RowCount();
+
+    $srselArray = array();
+
+    if($selSRCount){
+        while(!$getSRSelections->EndOfSeek()){
+            $strrow = $getSRSelections->Row();
+            $srselArray[] = $strrow->stat_rec_id;
+        }
+    }
+
+    $getList = new MySQL();
+    $getList->Query("SELECT * FROM pmv_status_indicators WHERE pmv_id = $pmvid");
+    $indicount = $getList->RowCount();
+
+    $getListConst = new MySQL();
+    $getListConst->Query("SELECT * FROM pmv_constraints WHERE pmv_id = $pmvid");
+    $conscount = $getListConst->RowCount();
+
+    $getListR = new MySQL();
+    $getListR->Query("SELECT * FROM pmv_recommendation WHERE pmv_id = $pmvid");
+    $recommcount = $getListR->RowCount();
+
+    $getListFp = new MySQL();
+    $getListFp->Query("SELECT * FROM pmv_followup_actions WHERE pmv_id = $pmvid");
+    $fpcount = $getListFp->RowCount();
+
+    $pmvfunccall = new Pmv();
+
+    $getPrevRecomm = new MySQL();
+    $getPrevRecomm->Query("SELECT * FROM pmv_prev_recomm WHERE pmv_id = $pmvid");
+    $pvrcount = $getPrevRecomm->RowCount();
+
 }else{
-    header('Location:');
+    header('Location:find_project.php');
 }
 
 
@@ -108,12 +220,12 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Projects</a></li>
+            <li><a href="javascript:;">Activities</a></li>
             <li class="active">Add PMV</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Project <small>add PMV...</small></h1>
+        <h1 class="page-header">Activities <small>add PMV...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -124,12 +236,17 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                 <div class="panel panel-default" data-sortable-id="form-stuff-1">
                     <div class="panel-heading">
                         <div class="panel-heading-btn">
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
-                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>-->
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>-->
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>-->
+<!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>-->
+                            <input style="float:right" type="text" name="submitPmv" id="submitPmv" class="btn btn-primary btn-sm" value="Submit PMV">
                         </div>
                         <h4 class="panel-title">Add PMV</h4>
+                        <div id="submitResponse"></div>
+                        <div>
+                            <p align="center" style="display: none; color: limegreen;" id="submit_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                        </div>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -142,7 +259,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                             <div class="tab-content">
                                 <div class="tab-pane fade active in" id="default-tab-1">
                             <!--Background info panel begin -->
-                            <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                            <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">Background Information</h4>
                                 </div>
@@ -169,7 +286,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         <select class="default-select2 form-control" name="section" id="section">
                                                             <option selected disabled>--SELECT--</option>
                                                             <?php while(!$getSection->EndOfSeek()){$secRow = $getSection->Row();?>
-                                                                <option value="<?php echo $secRow->id;?>"><?php echo $secRow->section_name;?></option>
+                                                                <option value="<?php echo $secRow->id;?>"><?php echo $secRow->name;?></option>
                                                             <?php } ?>
                                                         </select><span id="sectionerror"></span>
                                                     </td>
@@ -229,7 +346,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                     </div>
                                 <div class="tab-pane fade in" id="default-tab-2">
                             <!--section a begin -->
-                            <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                            <div class="panel panel-primary" data-sortable-id="form-stuff-2">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">Section A. Preparation - Programme Information</h4>
                                 </div>
@@ -316,16 +433,23 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                 <td colspan="2"></td>
                                             </tr>
                                             <tr>
-                                                <td colspan="4"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveSectionA" id="saveSectionA" value="Save Background Information"></td>
+                                                <td colspan="4"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveSectionA" id="saveSectionA" value="Save Preparation"></td>
                                             </tr>
                                             </tbody>
                                         </table>
                                             </form>
                                         <form method="POST" action="" id="followupForm">
+
                                             <table class="table">
                                                 <tbody>
                                                     <tr>
                                                         <td colspan="5"><div class="alert alert-info" style="text-align: center;"><h5>Status of Previous Recommendations and Follow-up Actions (List all recommendations from the previous Field Trip Report and indicate status of follow-up/action taken)</h5></div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="5"><div id="followupResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="fu_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
                                                     </tr>
                                                     <tr>
                                                         <td class="col-lg-2"><h5>Date of Visit</h5></td>
@@ -335,7 +459,7 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         <td></td>
                                                     </tr>
                                                 <tr>
-                                                    <td><input type="text" name="v_date"  class="form-control v_date" id="datepicker-default" placeholder="Date of Visit" /><span id="v_error"></span></td>
+                                                    <td><input type="text" name="v_date"  class="form-control v_date" id="datepicker-default2" placeholder="Date of Visit" /><span id="v_error"></span></td>
                                                     <td><select style="width: 350px;" class="multiple-select2 form-control" multiple="multiple" name="rec_officers[]" id="rec_officers">
                                                             <?php $getStaff->MoveFirst(); while(!$getStaff->EndOfSeek()){$stfRow = $getStaff->Row();?>
                                                                 <option value="<?php echo $stfRow->empID;?>"><?php echo $stfRow->first_name.' '.$stfRow->last_name;?></option>
@@ -348,6 +472,29 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                 </tbody>
                                             </table>
                                         </form>
+                                        <div id="followupList">
+                                            <?php if($pvrcount){?>
+                                            <table class="table">
+                                                <tbody>
+                                                <tr>
+                                                    <td class="col-lg-2"><h5>Date of Visit</h5></td>
+                                                    <td class="col-lg-4"><h5>Section/Staff that Undertook Visit</h5></td>
+                                                    <td class="col-lg-3"><h5>Recommendation</h5></td>
+                                                    <td class="col-lg-2"><h5>Status of Implementation</h5></td>
+                                                    <td></td>
+                                                </tr>
+                                                <?php while(!$getPrevRecomm->EndOfSeek()){ $gprrow = $getPrevRecomm->Row();?>
+                                                    <tr>
+                                                        <td><?php echo $gprrow->date_of_visit;?></td>
+                                                        <td><?php echo $pmvfunccall->fetchPrevRecommOfficers($gprrow->id);?></td>
+                                                        <td><?php echo $gprrow->recomm;?></td>
+                                                        <td><?php echo $gprrow->impl;?></td>
+                                                    </tr>
+                                                <?php } ?>
+                                                </tbody>
+                                            </table>
+                                            <?php } ?>
+                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -356,14 +503,21 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
                                 <div class="tab-pane fade in" id="default-tab-3">
                                     <!--section b begin -->
-                                    <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                                    <div class="panel panel-primary" data-sortable-id="form-stuff-3">
                                         <div class="panel-heading">
                                             <h4 class="panel-title">Section B. Data Collection</h4>
                                         </div>
                                         <div class="panel-body">
                                             <div class="row">
+                                                <form method="POST" action="" id="accessServiceForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="asResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="aserv_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                         <tr>
                                                             <td>&nbsp;</td>
                                                             <td><div class="alert alert-info">Access To Services</div></td>
@@ -371,9 +525,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                         </tr>
                                                     <?php while(!$getAccessServices->EndOfSeek()){ $asrow = $getAccessServices->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="aserv" id="aserv" value="<?php echo $asrow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $asrow->access_to_services?></td>
-                                                            <td><textarea name="comment" id="comment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="aserv[]" id="aserv" value="<?php echo $asrow->id;?>" <?php if(in_array($asrow->id,$selArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $asrow->access_to_services;?></td>
+                                                            <td><textarea name="comment[<?php echo $asrow->id;?>]" id="comment" class="form-control"><?php if(in_array($asrow->id,$selArray)){echo $getAservComment->getAccessServiceComment($pmvid,$asrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -381,8 +535,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <form method="POST" action="" id="qualityServiceForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="qsResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="qserv_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Quality Of Services</div></td>
@@ -390,9 +552,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getQualityServices->EndOfSeek()){ $qsrow = $getQualityServices->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="qserv" id="qserv" value="<?php echo $qsrow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $qsrow->quality_of_services?></td>
-                                                            <td><textarea name="qcomment" id="qcomment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="qserv[]" id="qserv" value="<?php echo $qsrow->id;?>" <?php if(in_array($qsrow->id,$qselArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $qsrow->quality_of_services;?></td>
+                                                            <td><textarea name="qcomment[<?php echo $qsrow->id;?>]" id="qcomment" class="form-control"><?php if(in_array($qsrow->id,$qselArray)){echo $getAservComment->getQualityServiceComment($pmvid,$qsrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -400,8 +562,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <form method="POST" action="" id="utilServiceForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="usResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="userv_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Utilisation Of Services</div></td>
@@ -409,9 +579,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getUtilServices->EndOfSeek()){ $usrow = $getUtilServices->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="userv" id="userv" value="<?php echo $usrow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $usrow->utilisation_of_services?></td>
-                                                            <td><textarea name="ucomment" id="ucomment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="userv[]" id="userv" value="<?php echo $usrow->id;?>" <?php if(in_array($usrow->id,$uselArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $usrow->utilisation_of_services;?></td>
+                                                            <td><textarea name="ucomment[<?php echo $usrow->id;?>]" id="ucomment" class="form-control"><?php if(in_array($usrow->id,$uselArray)){echo $getAservComment->getUtilServiceComment($pmvid,$usrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -419,8 +589,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
+                                                <form method="POST" action="" id="enabEnvForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="evResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="ev_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Enabling Environment for Intervention</div></td>
@@ -428,9 +606,9 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getEnablingEnv->EndOfSeek()){ $eerow = $getEnablingEnv->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="enab" id="enab" value="<?php echo $eerow->id;?>"></td>
-                                                            <td style="width: 300px;"><?php echo $eerow->enabling_env_interv?></td>
-                                                            <td><textarea name="encomment" id="encomment" class="form-control"></textarea></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="enab[]" id="enab" value="<?php echo $eerow->id;?>" <?php if(in_array($eerow->id,$eselArray)){echo "checked";}?>></td>
+                                                            <td style="width: 300px;"><?php echo $eerow->enabling_env_interv;?></td>
+                                                            <td><textarea name="encomment[<?php echo $eerow->id;?>]" id="encomment" class="form-control"><?php if(in_array($eerow->id,$eselArray)){echo $getAservComment->getEnabEnvComment($pmvid,$eerow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
@@ -438,9 +616,16 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     </tbody>
                                                 </table>
-
+                                            </form>
+                                                <form method="POST" action="" id="statRecForm">
                                                 <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="srResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="sr_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>&nbsp;</td>
                                                         <td><div class="alert alert-info">Statistics and Records</div></td>
@@ -448,16 +633,17 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                                                     </tr>
                                                     <?php while(!$getStatRec->EndOfSeek()){ $srrow = $getStatRec->Row();?>
                                                         <tr>
-                                                            <td style="width:35px;"><input type="checkbox" name="statRec" id="statRec" value="<?php echo $srrow->id;?>"></td>
+                                                            <td style="width:35px;"><input type="checkbox" name="statRec[]" id="statRec" value="<?php echo $srrow->id;?>" <?php if(in_array($srrow->id,$srselArray)){echo "checked";}?>></td>
                                                             <td style="width: 300px;"><?php echo $srrow->statistics_records;?></td>
-                                                            <td><textarea name="srcomment" id="srcomment" class="form-control"></textarea></td>
+                                                            <td><textarea name="srcomment[<?php echo $srrow->id;?>]" id="srcomment" class="form-control"><?php if(in_array($srrow->id,$srselArray)){echo $getAservComment->getStatRecords($pmvid,$srrow->id);}?></textarea></td>
                                                         </tr>
                                                     <?php }?>
                                                     <tr>
-                                                        <td colspan="3"><input style="float: right;" type="submit" name="statRec" id="statRec" value="Statistics and Records" class="btn btn-sm btn-success"></td>
+                                                        <td colspan="3"><input style="float: right;" type="submit" name="saveStatRec" id="saveStatRec" value="Statistics and Records" class="btn btn-sm btn-success"></td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -465,22 +651,224 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
                                 <div class="tab-pane fade in" id="default-tab-4">
                                     <!--section b begin -->
-                                    <div class="panel panel-primary" data-sortable-id="form-stuff-1">
+                                    <div class="panel panel-primary" data-sortable-id="form-stuff-4">
                                         <div class="panel-heading">
                                             <h4 class="panel-title">Section C. Reporting</h4>
                                         </div>
                                         <div class="panel-body">
                                             <div class="row">
-                                                <table class="table table-bordered">
+                                                <form method="post" action="" id="progRepForm">
+                                                <table class="table table-responsive">
                                                     <tbody>
+                                                    <tr>
+                                                        <td colspan="2"><div id="prpResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="prp_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
                                                         <tr>
-                                                            <td><div class="alert alert-info" style="text-align: center;"><h5>A. Progress Reporting</h5></div></td>
+                                                            <td colspan="2"><div class="alert alert-info" style="text-align: center;"><h5>A. Progress Reporting</h5></div></td>
                                                             </tr>
                                                         <tr>
-                                                            <td><textarea name="prog_reporting" id="prog_reporting" class="form-control"></textarea></td>
+                                                            <td class="col-lg-10"><textarea name="prog_reporting" id="prog_reporting" class="form-control"><?php if(isset($pmvRecordset->progress_reporting)){ echo $pmvRecordset->progress_reporting;}?></textarea><span id="preperror"></span></td>
+                                                            <td class="col-lg-12"><input type="submit"  name="savePrep" id="savePrep" class="btn btn-success btn-sm" value="Save Progress Report"></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                </form>
+                                                <form method="post" action="" id="statusIndicForm">
+                                                <table class="table table-responsive">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="siResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="si_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
+                                                        <tr>
+                                                            <td colspan="3"><div class="alert alert-info" style="text-align: center;"><h5>B. Status of Indicators</h5></div></td>
+                                                        </tr>
+                                                    <tr>
+                                                        <td><h5>Indicators (Baselines and Targets)</h5></td>
+                                                        <td><h5>Progress on Indicators/Targets</h5></td>
+                                                        <td>&nbsp;</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><textarea name="indicators" id="indicators" class="form-control"></textarea><span id="indierror"></span></td>
+                                                        <td><textarea name="progress" id="progress" class="form-control"></textarea><span id="prgerror"></span></td>
+                                                        <td><input type="submit" name="saveIndi" id="saveIndi" value="Save Indicator" class="btn btn-success btn-sm"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                    </form>
+                                                <div id="indilist">
+                                                    <?php if($indicount){?>
+                                                    <table class="table table-bordered table-responsive table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <td>Indicators</td>
+                                                            <td>Progress</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <?php  while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
+                                                            <tr>
+                                                                <td><?php echo $listItem->indicators;?></td>
+                                                                <td><?php echo $listItem->progress;?></td>
+                                                            </tr>
+                                                        <?php } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php } ?>
+                                                </div>
+                                                <form method="post" action="" id="constForm">
+                                                <table class="table table-responsive">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="4"><div id="conResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="con_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>C. Constraints/Challenges/Opportunities- (Related to this Project/intervention implementation and achievement of results)</h5></div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><h5>Constraints/Challenges</h5></td>
+                                                        <td><h5>Lessons Learned</h5></td>
+                                                        <td><h5>Opportunities</h5></td>
+                                                        <td>&nbsp;</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><textarea name="constraints" id="constraints" class="form-control"></textarea><span id="conerror"></span></td>
+                                                        <td><textarea name="less_learned" id="less_learned" class="form-control"></textarea><span id="llerror"></span></td>
+                                                        <td><textarea name="opportunity" id="opportunity" class="form-control"></textarea><span id="oppoerror"></span></td>
+                                                        <td><input type="submit" name="saveConst" id="saveConst" value="Save Constraint" class="btn btn-success btn-sm"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                    </form>
+                                                <div id="conslist">
+                                                    <?php if($conscount){?>
+                                                        <table class="table table-bordered table-responsive table-striped">
+                                                            <thead>
+                                                            <tr>
+                                                                <td>Constraints</td>
+                                                                <td>Lessons Learned</td>
+                                                                <td>Opportunity</td>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <?php  while(!$getListConst->EndOfSeek()){$listItemConst = $getListConst->Row();?>
+                                                                <tr>
+                                                                    <td><?php echo $listItemConst->constraint;?></td>
+                                                                    <td><?php echo $listItemConst->lesson_learned;?></td>
+                                                                    <td><?php echo $listItemConst->opportunity;?></td>
+                                                                </tr>
+                                                            <?php } ?>
+                                                            </tbody>
+                                                        </table>
+                                                    <?php } ?>
+                                                </div>
+                                                <form method="post" action="" id="reccForm">
+                                                <table class="table table-responsive">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="3"><div id="rcResponse"></div>
+                                                            <div>
+                                                                <p align="center" style="display: none; color: limegreen;" id="rc_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                            </div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3"><div class="alert alert-info" style="text-align: center;"><h5>D. Recommendations/Follow-up/Planned Actions</h5></div></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><h5>Recommendation Name</h5></td>
+                                                        <td><h5>Description</h5></td>
+                                                        <td>&nbsp;</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><input type="text" name="recname" id="recname" class="form-control"><span id="rnerror"></span></td>
+                                                        <td><textarea name="recdesc" id="recdesc" class="form-control"></textarea><span id="rderror"></span></td>
+                                                        <td><input type="submit" name="saveReco" id="saveReco" value="Save Recommendation" class="btn btn-success btn-sm"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                    </form>
+                                                <div id="recommlist">
+                                                    <?php if($recommcount){?>
+                                                    <table class="table table-bordered table-responsive table-striped">
+                                                        <thead>
+                                                        <tr>
+                                                            <td>Recommendation Name</td>
+                                                            <td>Description</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <?php while(!$getListR->EndOfSeek()){$listItemR = $getListR->Row();?>
+                                                            <tr>
+                                                                <td><?php echo $listItemR->rec_name;?></td>
+                                                                <td><?php echo $listItemR->rec_desc;?></td>
+                                                            </tr>
+                                                        <?php } ?>
+                                                        </tbody>
+                                                    </table>
+                                                    <?php } ?>
+                                                </div>
+
+                                                <form method="post" action="" id="followPlanForm">
+                                                    <table class="table table-responsive">
+                                                        <tbody>
+                                                        <tr>
+                                                            <td colspan="5"><div id="fpResponse"></div>
+                                                                <div>
+                                                                    <p align="center" style="display: none; color: limegreen;" id="fp_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                                                </div></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><div class="alert alert-info" style="text-align: center;"><h5>Follow Up/Planned Actions</h5></div></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><h5>Findings</h5></td>
+                                                            <td><h5>Recommended action & priority (High, Medium, Low)</h5></td>
+                                                            <td><h5>By Whom</h5></td>
+                                                            <td><h5>By When</h5></td>
+                                                            <td>&nbsp;</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><textarea name="findings" id="findings" class="form-control"></textarea><span id="fnderror"></span></td>
+                                                            <td><textarea name="recact" id="recact" class="form-control"></textarea><span id="raerror"></span></td>
+                                                            <td><input type="text" name="by_whom" id="by_whom" class="form-control"><span id="bwhomerror"></span></td>
+                                                            <td><input type="text" name="by_when" id="by_when" class="form-control"><span id="bwhenerror"></span></td>
+                                                            <td><input type="submit" name="saveFp" id="saveFp" value="Save" class="btn btn-success btn-sm"></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </form>
+                                                <div id="fplist">
+                                                    <?php if($fpcount){?>
+                                                        <table class="table table-bordered table-responsive table-striped">
+                                                            <thead>
+                                                            <tr>
+                                                                <td>Findings</td>
+                                                                <td>Recommended Action</td>
+                                                                <td>By Whom</td>
+                                                                <td>By When</td>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <?php while(!$getListFp->EndOfSeek()){$listItemFp = $getListFp->Row();?>
+                                                                <tr>
+                                                                    <td><?php echo $listItemFp->findings;?></td>
+                                                                    <td><?php echo $listItemFp->recomm_action;?></td>
+                                                                    <td><?php echo $listItemFp->by_whom;?></td>
+                                                                    <td><?php echo $listItemFp->by_when;?></td>
+                                                                </tr>
+                                                            <?php } ?>
+                                                            </tbody>
+                                                        </table>
+                                                    <?php } ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -565,6 +953,10 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
     });
 
     $('#datepicker-default').datepicker({
+        format: 'yyyy-mm-dd'
+    });
+
+    $('#datepicker-default2').datepicker({
         format: 'yyyy-mm-dd'
     });
 </script>
@@ -719,6 +1111,835 @@ if(isset($_GET['pid']) && !empty($_GET['pid'])){
                 });
                 return false;
             }
+        });
+
+    });
+
+    //Save Followup
+    $(function () {
+
+        var $buttons = $("#savePrev");
+        var $form = $("#followupForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#followupResponse").empty();
+            $("#iperror").empty();
+            $("#iverror").empty();
+
+
+            var vdate = $.trim($(".v_date").val());
+            var vrec = $.trim($("#rec_officers").val());
+
+
+            if(vdate.length == 0){
+
+                $("#v_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+            if(vrec.length == 0){
+                $("#recofficererror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+
+            if(vdate.length != 0 && vrec.length != 0){
+
+                $("#savePrev").attr("disabled", "disabled");
+                $("#fu_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveFollowup.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#followupResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Recommendations and Follow-up Action Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#fu_wait").css("display","none");
+                            $("#savePrev").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#followupResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Recommendations and Follow-up Action Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#fu_wait").css("display","none");
+                            $("#savePrev").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+
+    //Save Access Service
+    $(function () {
+
+        var $buttons = $("#saveAService");
+        var $form = $("#accessServiceForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#asResponse").empty();
+            if($("#accessServiceForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#asResponse").position().top }, "slow");
+                $("#saveAService").attr("disabled", "disabled");
+                $("#aserv_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveAccessServices.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#asResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Access Services Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#aserv_wait").css("display","none");
+                            $("#saveAService").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#asResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Access Services Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#aserv_wait").css("display","none");
+                            $("#saveAService").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Quality Service
+    $(function () {
+
+        var $buttons = $("#saveQService");
+        var $form = $("#qualityServiceForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#qsResponse").empty();
+            if($("#qualityServiceForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#qsResponse").position().top }, "slow");
+                $("#saveQService").attr("disabled", "disabled");
+                $("#qserv_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveQualityServices.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#qsResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Quality Services Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#qserv_wait").css("display","none");
+                            $("#saveQService").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#qsResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Quality Services Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#qserv_wait").css("display","none");
+                            $("#saveQService").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Utilisation Service
+    $(function () {
+
+        var $buttons = $("#saveUService");
+        var $form = $("#utilServiceForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#usResponse").empty();
+            if($("#utilServiceForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#usResponse").position().top }, "slow");
+                $("#saveUService").attr("disabled", "disabled");
+                $("#userv_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveUtilServices.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#usResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Utilisation Services Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#userv_wait").css("display","none");
+                            $("#saveUService").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#usResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Utilisation Services Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#userv_wait").css("display","none");
+                            $("#saveUService").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Enabling Environment
+    $(function () {
+
+        var $buttons = $("#EnabInt");
+        var $form = $("#enabEnvForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#evResponse").empty();
+            if($("#enabEnvForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#evResponse").position().top }, "slow");
+                $("#EnabInt").attr("disabled", "disabled");
+                $("#ev_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveEnablingEnv.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#evResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Enabling Environment Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#ev_wait").css("display","none");
+                            $("#EnabInt").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#evResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Enabling Environment Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#ev_wait").css("display","none");
+                            $("#EnabInt").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save Statistic Record
+    $(function () {
+
+        var $buttons = $("#saveStatRec");
+        var $form = $("#statRecForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#srResponse").empty();
+            if($("#statRecForm input:checkbox:checked").length > 0){
+
+                $("html, body").animate({ scrollTop: $("#srResponse").position().top }, "slow");
+                $("#saveStatRec").attr("disabled", "disabled");
+                $("#sr_wait").css("display","block");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveStatRecord.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#srResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Statistics and Records Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#sr_wait").css("display","none");
+                            $("#saveStatRec").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#srResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Statistics and Records Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#sr_wait").css("display","none");
+                            $("#saveStatRec").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+
+            }else{
+
+                alert("No option has been selected. Always remember to select an option before submitting.");
+
+            }
+
+
+
+        });
+
+    });
+
+    //Save PMV progress report
+    $(function () {
+
+        var $buttons = $("#savePrep");
+        var $form = $("#progRepForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#prpResponse").empty();
+            $("#preperror").empty();
+
+            var prep = $.trim($("#prog_reporting").val());
+
+            if(prep.length == 0){
+
+                $("#preperror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+
+            if(prep.length != 0){
+
+                $("#savePrep").attr("disabled", "disabled");
+                $("#prp_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#prpResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveProgressReport.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#prpResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Progress Reporting Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#prp_wait").css("display","none");
+                            $("#savePrep").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#prpResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Progress Reporting Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#prp_wait").css("display","none");
+                            $("#savePrep").removeAttr('disabled');
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Save PMV status of indicators
+    $(function () {
+
+        var $buttons = $("#saveIndi");
+        var $form = $("#statusIndicForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#siResponse").empty();
+            $("#prgerror").empty();
+            $("#indierror").empty();
+
+            var prg = $.trim($("#progress").val());
+            var indi = $.trim($("#indicators").val());
+
+            if(prg.length == 0){
+
+                $("#prgerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(indi.length == 0){
+
+                $("#indierror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(prg.length != 0 && indi.length != 0){
+
+                $("#saveIndi").attr("disabled", "disabled");
+                $("#si_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#siResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveStatusIndicator.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#siResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Progress Reporting Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#si_wait").css("display","none");
+                            $("#saveIndi").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#siResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Progress Reporting Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#si_wait").css("display","none");
+                            $("#saveIndi").removeAttr('disabled');
+
+                        }else{
+                            $('#siResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Progress Reporting Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#si_wait").css("display","none");
+                            $("#saveIndi").removeAttr('disabled');
+                            $("#indicators").val("");
+                            $("#progress").val("");
+                            $('#indilist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Save PMV constraints
+    $(function () {
+
+        var $buttons = $("#saveConst");
+        var $form = $("#constForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#conResponse").empty();
+            $("#oppoerror").empty();
+            $("#llerror").empty();
+            $("#conerror").empty();
+
+            var con = $.trim($("#constraints").val());
+            var oppo = $.trim($("#opportunity").val());
+            var ll = $.trim($("#less_learned").val());
+
+            if(con.length == 0){
+
+                $("#conerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(oppo.length == 0){
+
+                $("#oppoerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(ll.length == 0){
+
+                $("#llerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(con.length != 0 && oppo.length != 0 && ll.length != 0){
+
+                $("#saveConst").attr("disabled", "disabled");
+                $("#con_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#conResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveConstraint.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#conResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Constraint Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#con_wait").css("display","none");
+                            $("#saveConst").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#conResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Constraint Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#con_wait").css("display","none");
+                            $("#saveConst").removeAttr('disabled');
+
+                        }else{
+                            $('#conResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Constraint Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#con_wait").css("display","none");
+                            $("#saveConst").removeAttr('disabled');
+                            $("#constraints").val("");
+                            $("#opportunity").val("");
+                            $("#less_learned").val("");
+                            $('#conslist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Save PMV recommendation
+    $(function () {
+
+        var $buttons = $("#saveReco");
+        var $form = $("#reccForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#rcResponse").empty();
+            $("#rnerror").empty();
+            $("#rderror").empty();
+
+            var rn = $.trim($("#recname").val());
+            var rd = $.trim($("#recdesc").val());
+
+
+            if(rn.length == 0){
+
+                $("#rnerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(rd.length == 0){
+
+                $("#rderror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(rn.length != 0 && rd.length != 0){
+
+                $("#saveReco").attr("disabled", "disabled");
+                $("#rc_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#rcResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveRecommendation.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#rcResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Recommendation Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#rc_wait").css("display","none");
+                            $("#saveReco").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#rcResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Recommendation Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#rc_wait").css("display","none");
+                            $("#saveReco").removeAttr('disabled');
+
+                        }else{
+                            $('#rcResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Recommendation Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#rc_wait").css("display","none");
+                            $("#saveReco").removeAttr('disabled');
+                            $("#recname").val("");
+                            $("#recdesc").val("");
+                            $('#recommlist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Save PMV follow up and planned actions
+    $(function () {
+
+        var $buttons = $("#saveFp");
+        var $form = $("#followPlanForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#fpResponse").empty();
+            $("#fnderror").empty();
+            $("#raerror").empty();
+            $("#bwhomerror").empty();
+            $("#bwhenerror").empty();
+
+            var fnds = $.trim($("#findings").val());
+            var ra = $.trim($("#recact").val());
+            var bwhom = $.trim($("#by_whom").val());
+            var bwhen = $.trim($("#by_when").val());
+
+
+            if(fnds.length == 0){
+
+                $("#fnderror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(ra.length == 0){
+
+                $("#raerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(bwhom.length == 0){
+
+                $("#bwhomerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(bwhen.length == 0){
+
+                $("#bwhenerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            if(fnds.length != 0 && ra.length != 0 && bwhom.length != 0 && bwhen.length != 0){
+
+                $("#saveFp").attr("disabled", "disabled");
+                $("#fp_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#fpResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveFollowAction.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#fpResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Follow up/Planned Actions Failed To Save.</span></div><br>").hide().fadeIn(1000);
+                            $("#fp_wait").css("display","none");
+                            $("#saveFp").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#fpResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Follow up/Planned Actions Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#fp_wait").css("display","none");
+                            $("#saveFp").removeAttr('disabled');
+
+                        }else{
+                            $('#fpResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Follow up/Planned Actions Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+
+                            $("#fp_wait").css("display","none");
+                            $("#saveFp").removeAttr('disabled');
+                            $("#findings").val("");
+                            $("#recact").val("");
+                            $("#by_whom").val("");
+                            $("#by_when").val("");
+                            $('#fplist').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
+    //Submit pmv
+    $(function () {
+
+        var $buttons = $("#submitPmv");
+        var $action = "submitThisForm";
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#submitResponse").empty();
+
+
+                $("#submitPmv").attr("disabled", "disabled");
+                $("#submit_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#submitResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/saveSubmission.php",
+                    data: {whatToDo:$action},
+                    success: function(e) {
+
+                        if(e=="fail"){
+
+                            $('#submitResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV submission failed.</span></div><br>").hide().fadeIn(1000);
+                            $("#submit_wait").css("display","none");
+                            $("#submitPmv").removeAttr('disabled');
+
+                        }else if(e=="zero"){
+
+                            $('#submitResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV submission failed. Fill out PMV before submitting.</span></div><br>").hide().fadeIn(1000);
+                            $("#submit_wait").css("display","none");
+                            $("#submitPmv").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#submitResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Submitted Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#submit_wait").css("display","none");
+                            $("#submitPmv").removeAttr('disabled');
+
+                        }
+                    }
+                });
+                return false;
+
+        });
+
+    });
+
+
+    //colour row of access to services pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #aserv:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #aserv:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of quality to services pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #qserv:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #qserv:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of utilisation to services pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #userv:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #userv:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of enabling pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #enab:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #enab:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
+        });
+
+    });
+
+    //colour row of enabling pink after check is selected
+    $("input[type='checkbox']").click(function(){
+
+
+
+        $('tr #statRec:checked').each(function(){
+
+            $(this).closest('tr').css("background-color","pink");
+
+        });
+
+        $('tr #statRec:not(:checked)').each(function(){
+
+            $(this).closest('tr').css("background-color","");
+
         });
 
     });

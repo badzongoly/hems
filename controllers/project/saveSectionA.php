@@ -49,7 +49,7 @@ if(isset($_POST['intervention_value']) && isset($_POST['ip'])){
     $valuesArray['updated_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
     $valuesArray['updated_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
 
-    $whereArray = $_SESSION['hems_active_pmv'];
+    $whereArray['id'] = $_SESSION['hems_active_pmv'];
     $sql = MySQL::BuildSQLUpdate("pmv", $valuesArray,$whereArray);
 
     $result = $update->Query($sql);
