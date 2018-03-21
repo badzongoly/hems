@@ -14,18 +14,18 @@ if(isset($_POST['partner_id']) && !empty($_POST['partner_id'])){
 
     $parterId = $_POST['partner_id'];
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
     $qury = "SELECT a.id, a.name AS proj_name, implementing_partners.name AS part_name, programmes.name AS prog_name,a.spot_check,a.pmv,
                            a.audit,a.start_date,a.duration,a.status
                            FROM activities a LEFT JOIN implementing_partners ON implementing_partners.ip_code = a.partner_id
               
                            WHERE a.partner_id = $parterId";
-=======
+//=======>>*/
     $qury = "SELECT activities.id, activities.partner_id, implementing_partners.name AS part_name,activities.spot_check,activities.pmv,
                            activities.audit,activities.status
                            FROM activities LEFT JOIN implementing_partners ON implementing_partners.ip_code = activities.partner_id
                            WHERE activities.partner_id = '$parterId'";
->>>>>>> 5ac85658c825f9d069a1fe2af36b3eb5bbed749f
+//>>>>>>> 5ac85658c825f9d069a1fe2af36b3eb5bbed749f
 
     $fetchProjects->Query($qury);
     $thecount = $fetchProjects->RowCount();
