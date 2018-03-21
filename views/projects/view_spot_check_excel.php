@@ -7,7 +7,7 @@
  */
 require_once('../../classes/projects.class.php');
 $page = "spot";
-$sub_page_name = "excel";
+$sub_page_name = "view_import";
 $pull_ucat = new Project();
 $pull_ucat->checkLogin();
 //$pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");

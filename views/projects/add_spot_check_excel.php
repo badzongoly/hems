@@ -7,7 +7,7 @@
  */
 require_once('../../classes/mysql.class.php');
 $page = "spot";
-$sub_page_name = "excel";
+$sub_page_name = "spot_check";
 $pull_ucat = new MySQL();
 $pull_ucat->checkLogin();
 $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
