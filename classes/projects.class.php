@@ -102,12 +102,12 @@ class Project extends MySQL
         return $return;
     }
     public function getConfirmationPMV(){
-        $this->Query('Select * from pmv_sheet');
+        $this->Query('Select p.name,s.risk_rating,s.amount,s.pmv,s.date,o.name AS outcome_area from pmv_sheet s INNER JOIN implementing_partners p ON p.ip_code = s.vendor LEFT JOIN outcomes o ON o.code = s.outcome_area');
         $output = '<table class="table table-striped table-hover table-email table-bordered" style="" align="center">
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th> VENDOR CODE</th>
+                                    <th> VENDOR </th>
                                     <th> RISK RATING</th>
                                     <th>OUTCOME AREA</th>
                                     <th>AMOUNT</th>
@@ -120,7 +120,7 @@ class Project extends MySQL
             $row = $this->Row();
             $output.='<tr>
                                         <td>'.$counter.'</td>
-                                        <td>'.$row->vendor.'</td>
+                                        <td>'.$row->name.'</td>
                                         <td>'.$row->risk_rating.'</td>
                                         <td>'.$row->outcome_area.'</td>
                                         <td>'.number_format($row->amount,2).'</td> 
