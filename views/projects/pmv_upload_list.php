@@ -1,12 +1,15 @@
 <?php
 require_once('../../classes/mysql.class.php');
 $page = "pmv";
-$sub_page_name = "appr_pmv";
+$sub_page_name = "val_pmv";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-$dbConnect = new MySQL();
-$dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_partners.risk_rating FROM pmv_light LEFT JOIN implementing_partners ON pmv_light.ip_code = implementing_partners.ip_code WHERE pmv_light.status = 'submitted'");
+$getVendor = new MySQL();
+$getVendor->Query("SELECT * FROM implementing_partners WHERE status = 'Active' ORDER BY name ASC");
+
+$getOutcomes = new MySQL();
+$getOutcomes->Query("SELECT * FROM outcomes");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -17,7 +20,7 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Approve PMV</title>
+    <title>HEMS | Find PMV Uploads</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -72,11 +75,11 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
             <li><a href="javascript:;">PMV</a></li>
-            <li class="active">Approve PMV</li>
+            <li class="active">Find PMV Upload</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">PMV <small>approve pmv...</small></h1>
+        <h1 class="page-header">PMV <small>find pmv upload...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -92,40 +95,52 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Approve PMV</h4>
+                        <h4 class="panel-title">Find PMV Upload</h4>
                     </div>
                     <div class="panel-body">
+                        <div>
+                            <p align="center" style="display: none; color: limegreen;" id="f_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                        </div>
                         <div class="row">
-
-                                <table class="table table-responsive table-striped table-bordered" id="data-table">
-                                    <thead>
+                            <form method="POST" action="" id="findForm">
+                                <table class="table table-responsive table-striped table-bordered" align="center">
+                                    <tbody>
                                         <tr>
-                                            <td>Start Date</td>
-                                            <td>End Date</td>
-                                            <td>Objectives</td>
-                                            <td>Partner Name</td>
-                                            <td>Risk Rating</td>
-                                            <td>Total Cash Contribution</td>
+                                            <td>Vendor</td>
+                                            <td>Outcome Area</td>
+                                            <td>Year</td>
                                             <td>&nbsp;</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php while(!$dbConnect->EndOfSeek()){ $pmvRow = $dbConnect->Row();?>
                                     <tr>
-                                        <td><?php echo $pmvRow->start_date;?></td>
-                                        <td><?php echo $pmvRow->end_date;?></td>
-                                        <td><?php echo $pmvRow->objectives;?></td>
-                                        <td><?php echo $pmvRow->name;?></td>
-                                        <td><?php echo $pmvRow->risk_rating;?></td>
-                                        <td><?php echo $pmvRow->total_cash_contrib;?></td>
-                                        <td><a href="processPmvApproval.php?pmvid=<?php echo base64_encode($pmvRow->id);?>" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> Process PMV Approval</a></td>
+                                        <td><select id="vendor" name="vendor" class="form-control">
+                                                <option disabled selected>--SELECT VENDOR--</option>
+                                                <?php while(!$getVendor->EndOfSeek()){$vrow = $getVendor->Row();?>
+                                                    <option value="<?php echo $vrow->ip_code;?>"><?php echo $vrow->name;?></option>
+                                                <?php } ?>
+                                        </select><span id="venderror"></span></td>
+                                        <td><select id="outcome" name="outcome" class="form-control">
+                                                <option disabled selected>--SELECT OUTCOME--</option>
+                                                <?php while(!$getOutcomes->EndOfSeek()){$orow = $getOutcomes->Row();?>
+                                                    <option value="<?php echo $orow->code;?>"><?php echo $orow->name;?></option>
+                                                <?php } ?>
+                                            </select><span id="incerror"></span></td>
+                                        <td>
+                                            <select id="year" name="year" class="form-control">
+                                                <option disabled selected>--YEAR--</option>
+                                                <?php for(($i=date('Y')); $i<=date('Y')+20; $i++){?>
+                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                <?php }?>
+                                            </select><span id="yerror"></span>
+                                        </td>
+                                        <td>
+                                            <input type="submit" name="find" id="find" value="Find" class="btn btn-primary">
+                                        </td>
                                     </tr>
-                                    <?php } ?>
                                     </tbody>
-
                                 </table>
-
+                            </form>
                         </div>
+                        <div id="findResponse"></div>
 
                     </div>
                 </div>
@@ -187,6 +202,83 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
         TableManageDefault.init();
         FormPlugins.init();
     });
+
+    //Save PMV follow up and planned actions
+    $(function () {
+
+        var $buttons = $("#find");
+        var $form = $("#findForm");
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#findResponse").empty();
+            $("#venderror").empty();
+            $("#incerror").empty();
+            $("#yerror").empty();
+
+            var vend = $.trim($("#vendor").val());
+            var inc = $.trim($("#outcome").val());
+            var year = $.trim($("#year").val());
+
+
+            if(vend.length == 0){
+
+                $("#venderror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+            if(inc.length == 0){
+
+                $("#incerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+            if(year.length == 0){
+
+                $("#yerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+
+            if(vend.length != 0 && inc.length != 0 && year.length != 0){
+
+                $("#find").attr("disabled", "disabled");
+                $("#f_wait").css("display","block");
+                $("html, body").animate({ scrollTop: $("#findResponse").position().top }, "slow");
+
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/fetchUploads.php",
+                    data: $form.serialize(),
+                    success: function(e) {
+
+                        if(e=="zero"){
+
+                            $('#findResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>No Records Found.</span></div><br>").hide().fadeIn(1000);
+                            $("#f_wait").css("display","none");
+                            $("#find").removeAttr('disabled');
+
+                        }else if(e=="ok"){
+
+                            $('#findResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Found Saved Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#f_wait").css("display","none");
+                            $("#find").removeAttr('disabled');
+
+                        }else{
+
+                            $("#f_wait").css("display","none");
+                            $("#find").removeAttr('disabled');
+                            $('#findResponse').html(e);
+
+                        }
+
+                    }
+                });
+                return false;
+            }
+        });
+
+    });
+
 </script>
 
 <script>

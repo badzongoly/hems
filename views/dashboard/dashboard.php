@@ -7,34 +7,29 @@
     $object->checkLogin();
 
     $getSections = new MySQL();
-    $getSections->Query("SELECT * FROM programmes WHERE status = 'Active'");
+    $getSections->Query("SELECT * FROM outcomes");
 
-    $getMaxDate = new MySQL();
-    $getMaxDate->Query("SELECT MAX(created_on) AS mdate FROM pmv");
-    $mdate = $getMaxDate->Row();
-    $md = $mdate->mdate;
-    $md = substr($md,0,10);
+    $todaysMonthYear = trim(date('M-Y'));
 
-    $expMd = explode('-',$md);
-    $wordMonth = $monthName = date('F', mktime(0, 0, 0, $expMd[1], 10));
-    $wordYear = $expMd[0];
-    $fdstring = 'Y-'.$expMd[1].'-01';
-
-    $monthFirstDate = date($fdstring).' 00:00:00';
-    $monthLastDate = date('Y-m-t').' 23:59:59';
 
     $countSubmitted = new MySQL();
-    $countSubmitted->Query("SELECT IFNULL(COUNT(id),0) as submitted FROM pmv WHERE status = 'submitted' AND (created_on BETWEEN '$monthFirstDate' AND '$monthLastDate')");
+    $countSubmitted->Query("SELECT IFNULL(COUNT(pmv_light.id),0) as submitted FROM pmv_light
+                            LEFT JOIN pmv_sheet ON pmv_light.pmv_sheet_id = pmv_sheet.id
+                            WHERE pmv_light.status = 'submitted' AND pmv_sheet.date = '$todaysMonthYear'");
     $subRow = $countSubmitted->Row();
     $allsubbed = $subRow->submitted;
 
     $countAppr = new MySQL();
-    $countAppr->Query("SELECT IFNULL(COUNT(id),0) as approved FROM pmv WHERE status = 'approved' AND (created_on BETWEEN '$monthFirstDate' AND '$monthLastDate')");
+    $countAppr->Query("SELECT IFNULL(COUNT(pmv_light.id),0) as approved FROM pmv_light
+                       LEFT JOIN pmv_sheet ON pmv_light.pmv_sheet_id = pmv_sheet.id
+                       WHERE  pmv_light.status = 'approved' AND pmv_sheet.date = '$todaysMonthYear'");
     $apprRow = $countAppr->Row();
     $allappr = $apprRow->approved;
 
     $countValid = new MySQL();
-    $countValid->Query("SELECT IFNULL(COUNT(id),0) as validated FROM pmv WHERE status = 'validated' AND (created_on BETWEEN '$monthFirstDate' AND '$monthLastDate')");
+    $countValid->Query("SELECT IFNULL(COUNT(pmv_light.id),0) as validated FROM pmv_light
+                        LEFT JOIN pmv_sheet ON pmv_light.pmv_sheet_id = pmv_sheet.id
+                        WHERE status = 'validated' AND pmv_sheet.date = '$todaysMonthYear'");
     $valRow = $countValid->Row();
     $allval = $valRow->validated;
 ?>
@@ -140,11 +135,34 @@
                                             <td><select class="form-control" name="section" id="section">
                                                     <option value="" selected disabled>--SELECT SECTION--</option>
                                                     <?php while(!$getSections->EndOfSeek()){ $secRow = $getSections->Row();?>
-                                                    <option value="<?php echo $secRow->id;?>"><?php echo $secRow->name;?></option>
+                                                    <option value="<?php echo $secRow->code;?>"><?php echo $secRow->name;?></option>
                                                     <?php } ?>
                                                 </select></td>
                                         </tr>
                                     </table>
+                                </div>
+                                <div id="dateList" style="display: none">
+                                    <form id="dateSelForm" method="POST" action="">
+                                    <table class="table table-responsive">
+                                        <tr>
+                                            <td>
+                                                <select id="mon" name="mon" class="form-control form-inline" style="height: 35px;">
+
+                                                    <?php for($m=1; $m<=12; $m++){ $month = date('M',mktime(0,0,0,$m,1,date('Y')))?>
+
+                                                        <option value="<?php echo $month; ?>"><?php echo $month;?></option>
+                                                    <?php }?>
+                                                </select>
+                                            </td>
+                                            <td><select id="year" name="year" class="form-control form-inline" style="height: 35px;">
+                                                    <?php for(($i=date('Y')); $i<=date('Y')+20; $i++){?>
+                                                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                    <?php }?>
+                                                </select></td>
+                                            <td><input type="submit" name="findDateReport" id="findDateReport" value="Show" class="btn btn-primary btn-sm"></td>
+                                        </tr>
+                                    </table>
+                                        </form>
                                 </div>
                             </div>
                             <div class="row">
@@ -175,7 +193,7 @@
                             <table class="table table-responsive">
                                 <tbody>
                                 <tr>
-                                    <td colspan="2" style="text-align: center"><h4>Country Office PMV Reports Status (<?php echo $wordMonth.', '.$wordYear?>)</h4></td>
+                                    <td colspan="2" style="text-align: center"><h4>Country Office PMV Reports Status (<?php $splitMonthYear = explode('-',$todaysMonthYear); echo $splitMonthYear[0].', '.$splitMonthYear[1];?>)</h4></td>
                                 </tr>
                                 <tr>
                                     <td>Submitted: <?php echo $allsubbed;?></td>
@@ -187,7 +205,7 @@
                                     <td>Validated : <?php echo $allval;?></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="../../views/projects/add_pmv.php" class="btn btn-primary btn-sm btn-block">Fill PMV</a></td>
+                                    <td><a href="../../views/projects/pmv_upload_list.php" class="btn btn-primary btn-sm btn-block">Fill PMV</a></td>
                                 </tr>
                                 <tr>
                                     <td><a href="../../views/projects/approve_pmv.php" class="btn btn-success btn-sm btn-block">Approve PMV</a></td>
@@ -331,14 +349,13 @@
     <script src="../../assets/plugins/jquery-jvectormap/jquery-jvectormap-world-merc-en.js"></script>
     <script src="../../assets/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
 	<script src="../../assets/plugins/gritter/js/jquery.gritter.js"></script>
-	<script src="../../assets/js/dashboard-v2.min.js"></script>
+
 	<script src="../../assets/js/apps.min.js"></script>
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	
 	<script>
 		$(document).ready(function() {
 			App.init();
-			DashboardV2.init();
 		});
 	</script>
     <script type="text/javascript">
@@ -350,6 +367,12 @@
                 $("#sectionList").css("display","block");
             }else{
                 $("#sectionList").css("display","none");
+            }
+
+            if(filtop=="date"){
+                $("#dateList").css("display","block");
+            }else{
+                $("#dateList").css("display","none");
             }
 
             if(filtop=="coffice"){
@@ -392,13 +415,51 @@
             });
 
         });
+
+
+        $(function () {
+
+            var $buttons = $("#findDateReport");
+            var $form = $("#dateSelForm");
+            $buttons.click(function (e) {
+
+                e.preventDefault();
+                $("#statlist").empty();
+
+                var mon = $("#mon").prop("value");
+                var year = $("#year").prop("value");
+
+                    $("#findDateReport").attr("disabled", "disabled");
+                    $("#load_wait").css("display","block");
+
+                    $.ajax({
+                        type: "POST",
+                        url: "../../controllers/dashboard/reportDate.php",
+                        data: $form.serialize(),
+                        success: function(e) {
+
+
+                                $('#statlist').html(e);
+                                $("#load_wait").css("display","none");
+                                $("#findDateReport").removeAttr('disabled');
+
+
+                        }
+                    });
+                    return false;
+
+            });
+
+        });
+
+
     </script>
 	<script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','../../../../www.google-analytics.com/analytics.js','ga');
-    
+
       ga('create', 'UA-53034621-1', 'auto');
       ga('send', 'pageview');
     </script>

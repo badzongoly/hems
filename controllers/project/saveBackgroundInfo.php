@@ -5,42 +5,32 @@
 
     $insert = new MySQL();
 
-    if(isset($_POST['section']) && isset($_POST['region'])){
+    if(isset($_POST['objectives']) && isset($_POST['vendor'])){
 
-        $officerArray = array();
-        $officerArray = $_POST['officers'];
-
-        $valuesArray['section'] = MySQL::SQLValue($_POST['section']);
-        $valuesArray['project_id'] = MySQL::SQLValue($_POST['pid']);
-        $valuesArray['visit_startdate'] = MySQL::SQLValue($_POST['start']);
-        $valuesArray['visit_enddate'] = MySQL::SQLValue($_POST['end']);
-        $valuesArray['region'] = MySQL::SQLValue($_POST['region']);
-        $valuesArray['district'] = MySQL::SQLValue($_POST['district']);
-        $valuesArray['sub_district'] = MySQL::SQLValue($_POST['subdistrict']);
-        $valuesArray['community'] = MySQL::SQLValue($_POST['community']);
+        $valuesArray['objectives'] = MySQL::SQLValue($_POST['objectives']);
+        $valuesArray['ip_code'] = MySQL::SQLValue($_POST['vendor']);
+        $valuesArray['start_date'] = MySQL::SQLValue($_POST['start']);
+        $valuesArray['end_date'] = MySQL::SQLValue($_POST['end']);
+        $valuesArray['total_cash_contrib'] = MySQL::SQLValue($_POST['cash_contri']);
+        $valuesArray['supplies'] = MySQL::SQLValue($_POST['supplies']);
+        $valuesArray['access_serv'] = MySQL::SQLValue($_POST['access_input_serv']);
+        $valuesArray['quality_serv'] = MySQL::SQLValue($_POST['qual_input_serv']);
+        $valuesArray['util_serv'] = MySQL::SQLValue($_POST['uti_input_serv']);
+        $valuesArray['enabling_environ'] = MySQL::SQLValue($_POST['enab_environ']);
+        $valuesArray['overall_assess'] = MySQL::SQLValue($_POST['assessment']);
+        $valuesArray['outstand_related'] = MySQL::SQLValue($_POST['outstanding']);
+        $valuesArray['other_issues'] = MySQL::SQLValue($_POST['issues_concerns']);
         $valuesArray['status'] = MySQL::SQLValue('active');
+        $valuesArray['pmv_sheet_id'] = MySQL::SQLValue($_POST['sheet_id']);
         $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
         $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
 
-        $sql = MySQL::BuildSQLInsert("pmv", $valuesArray);
+        $sql = MySQL::BuildSQLInsert("pmv_light", $valuesArray);
 
         $result = $insert->Query($sql);
 
         if($result){
             $_SESSION['hems_active_pmv'] = $insert->GetLastInsertID();
-
-            foreach($officerArray as $officer){
-
-                $offArray['pmv_id'] = MySQL::SQLValue($_SESSION['hems_active_pmv']);
-                $offArray['staff_id'] = MySQL::SQLValue($officer);
-                $offArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
-                $offArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
-
-                $offsql = MySQL::BuildSQLInsert("pmv_officers", $offArray);
-                $insert->Query($offsql);
-
-            }
-
             echo "ok";exit;
 
         }else{

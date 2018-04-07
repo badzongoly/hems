@@ -1,15 +1,18 @@
 <?php
     require_once('../../classes/mysql.class.php');
 
-    if(isset($_POST['filter']) && $_POST['filter']=='FetchCountryOffice'){
+    if(isset($_POST['mon']) && isset($_POST['year'])){
 
+        $date = $_POST['mon'].'-'.$_POST['year'];
         $getPmvComp = new MySQL();
-        $getPmvComp->Query("SELECT IFNULL(COUNT(pmv_light.id),0) AS completed FROM pmv_light WHERE status = 'validated'");
+        $getPmvComp->Query("SELECT IFNULL(COUNT(pmv_light.id),0) AS completed FROM pmv_light
+                            LEFT JOIN pmv_sheet ON pmv_light.pmv_sheet_id = pmv_sheet.id
+                            WHERE pmv_sheet.date = '$date' AND pmv_light.status = 'validated'");
         $compRow = $getPmvComp->Row();
         $pmvComp = $compRow->completed;
 
         $getPmvReq = new MySQL();
-        $getPmvReq->Query("SELECT IFNULL(SUM(pmv_sheet.pmv),0) AS required FROM pmv_sheet");
+        $getPmvReq->Query("SELECT IFNULL(SUM(pmv_sheet.pmv),0) AS required FROM pmv_sheet WHERE pmv_sheet.date = '$date'");
         $reqRow = $getPmvReq->Row();
         $pmvReq = $reqRow->required;
 

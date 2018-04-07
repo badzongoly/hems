@@ -1,12 +1,40 @@
 <?php
 require_once('../../classes/mysql.class.php');
+require_once('../../classes/Pmv.class.php');
 $page = "pmv";
 $sub_page_name = "appr_pmv";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-$dbConnect = new MySQL();
-$dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_partners.risk_rating FROM pmv_light LEFT JOIN implementing_partners ON pmv_light.ip_code = implementing_partners.ip_code WHERE pmv_light.status = 'submitted'");
+if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
+
+    $pmvid = base64_decode($_GET['pmvid']);
+    $dbConnect = new MySQL();
+    $dbConnect->Query("SELECT programmes.name as progname,pmv.visit_startdate, pmv.visit_enddate, regions.region_name,
+                       district.name as dname, pmv.sub_district, pmv.community,pmv.purpose,pmv.related_workplan_act,
+                       pmv.related_workplan_output,pmv.prog_document_out,pmv.prog_document_ref,pmv.baseline,pmv.target,
+                        pmv.verification,pmv.intervention_period_start,pmv.intervention_period_end,pmv.imp_partner,
+                         pmv.persons_to_meet, pmv.last_field_visit, pmv.intervention_value FROM pmv
+                       LEFT JOIN programmes ON pmv.section = programmes.id
+                       LEFT JOIN regions ON pmv.region = regions.id
+                       LEFT JOIN district ON pmv.district = district.name
+                        WHERE pmv.id = $pmvid");
+    $pmvRecRow = $dbConnect->Row();
+}
+
+$pmvObj = new Pmv();
+
+$getPrevRecomm = new MySQL();
+$getPrevRecomm->Query("SELECT * FROM pmv_prev_recomm WHERE pmv_id = $pmvid");
+
+$getUtilServices = new MySQL();
+$getUtilServices->Query("SELECT * FROM pmv_util_services LEFT JOIN utilisation_of_services ON pmv_util_services.util_service_id = utilisation_of_services.id WHERE pmv_id = $pmvid");
+
+$getAccessServices = new MySQL();
+$getAccessServices->Query("SELECT * FROM pmv_access_services LEFT JOIN access_to_services ON  pmv_access_services.access_service_id = access_to_services.id WHERE pmv_id = $pmvid");
+
+$getQualityServices = new MySQL();
+$getQualityServices->Query("SELECT * FROM pmv_quality_services LEFT JOIN quality_of_services ON pmv_quality_services.quality_service_id = quality_of_services.id WHERE pmv_id = $pmvid");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -72,11 +100,11 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
             <li><a href="javascript:;">PMV</a></li>
-            <li class="active">Approve PMV</li>
+            <li class="active">Process PMV Approval</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">PMV <small>approve pmv...</small></h1>
+        <h1 class="page-header">PMV <small>process approval pmv...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -92,38 +120,55 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Approve PMV</h4>
+                        <h4 class="panel-title">Process PMV Approval</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
+                            <div><div id="apprResponse"></div>
+                                <div>
+                                    <p align="center" style="display: none; color: limegreen;" id="appr_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                                </div></div>
+                            <form method="post" action="" id="approvePmvForm">
+                            <table class="table table-responsive">
+                                <tbody>
+                                <tr>
+                                    <td colspan="6"><input style="float: right;" type="submit" name="approve" id="approve" value="Approve PMV" class="btn btn-sm btn-success"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><label>Person(s) Undertaking Visit:</label></td>
+                                    <td colspan="4"><?php echo $pmvObj->fetchOfficers($pmvid);?></td>
+                                </tr>
+                                <tr>
+                                    <td class="col-lg-1"><label>Section:</label></td>
+                                    <td class="col-lg-3"><?php echo $pmvRecRow->progname;?></td>
 
-                                <table class="table table-responsive table-striped table-bordered" id="data-table">
-                                    <thead>
-                                        <tr>
-                                            <td>Start Date</td>
-                                            <td>End Date</td>
-                                            <td>Objectives</td>
-                                            <td>Partner Name</td>
-                                            <td>Risk Rating</td>
-                                            <td>Total Cash Contribution</td>
-                                            <td>&nbsp;</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php while(!$dbConnect->EndOfSeek()){ $pmvRow = $dbConnect->Row();?>
-                                    <tr>
-                                        <td><?php echo $pmvRow->start_date;?></td>
-                                        <td><?php echo $pmvRow->end_date;?></td>
-                                        <td><?php echo $pmvRow->objectives;?></td>
-                                        <td><?php echo $pmvRow->name;?></td>
-                                        <td><?php echo $pmvRow->risk_rating;?></td>
-                                        <td><?php echo $pmvRow->total_cash_contrib;?></td>
-                                        <td><a href="processPmvApproval.php?pmvid=<?php echo base64_encode($pmvRow->id);?>" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> Process PMV Approval</a></td>
-                                    </tr>
-                                    <?php } ?>
-                                    </tbody>
+                                    <td class="col-lg-1"><label>Date of Visit:</label></td>
+                                    <td class="col-lg-3">
+                                        <div>
+                                            <div class="input-group input-daterange">
+                                                <?php echo $pmvRecRow->visit_startdate.' To '.$pmvRecRow->visit_enddate;?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="col-lg-1"><label>Region:</label></td>
+                                    <td class="col-lg-3"><?php echo $pmvRecRow->region_name;?></td>
+                                </tr>
+                                <tr>
 
-                                </table>
+                                    <td><label>District:</label></td>
+                                    <td><?php echo $pmvRecRow->region_name;?></td>
+
+                                    <td><label>Sub-district:</label></td>
+                                    <td><?php echo $pmvRecRow->sub_district;?></td>
+
+                                    <td><label>Community:</label></td>
+                                    <td><?php echo $pmvRecRow->community;?></td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                                <input type="hidden" name="pmvid" id="pmvid" value="<?php echo $pmvid;?>">
+                            </form>
 
                         </div>
 
@@ -187,6 +232,52 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
         TableManageDefault.init();
         FormPlugins.init();
     });
+</script>
+<script type="text/javascript">
+    //Submit pmv
+    $(function () {
+
+        var $buttons = $("#approve");
+        var $pmvid = $("#pmvid").val();
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#apprResponse").empty();
+
+
+            $("#approve").attr("disabled", "disabled");
+            $("#appr_wait").css("display","block");
+            $("html, body").animate({ scrollTop: $("#apprResponse").position().top }, "slow");
+
+            $.ajax({
+                type: "POST",
+                url: "../../controllers/project/savePmvApproval.php",
+                data: {pmvid:$pmvid},
+                success: function(e) {
+
+                    if(e=="fail"){
+
+                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV approval failed.</span></div><br>").hide().fadeIn(1000);
+                        $("#appr_wait").css("display","none");
+                        $("#approve").removeAttr('disabled');
+
+                    }else if(e=="ok"){
+
+                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Approved Successfully.</span></div><br>").hide().fadeIn(1000);
+                        $("#appr_wait").css("display","none");
+                        $("#approve").removeAttr('disabled');
+
+                    }
+                }
+            });
+            return false;
+
+        });
+
+    });
+
+
 </script>
 
 <script>
