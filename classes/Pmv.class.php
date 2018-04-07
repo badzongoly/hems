@@ -31,9 +31,9 @@ class Pmv extends  MySQL{
      * @param $projectID is the project id
      * @return number of PMVs under a particular project
      * */
-    function countAddedPMVs($projectID){
+    function countAddedPMVs($pmvSheetId){
 
-        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM pmv WHERE project_id = $projectID AND status = 'validated'");
+        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM pmv_light WHERE pmv_sheet_id = $pmvSheetId AND status = 'validated'");
         $pmvRow = $this->Row();
         $finalCount = $pmvRow->pmvCount;
 
@@ -96,22 +96,23 @@ class Pmv extends  MySQL{
     * @param $projectID is the project id
     * @return open when there is room to add more and close when its reached its limit
     * */
-    function checkPMVAdded($projectId){
+    function checkPMVAdded($pmvSheetId){
 
-        $this->Query("SELECT * FROM pmv WHERE project_id = $projectId");
+        $this->Query("SELECT * FROM pmv_light WHERE pmv_sheet_id = $pmvSheetId AND status = 'validated'");
         $resultCount = $this->RowCount();
+
         if($resultCount==false){
             $resultCount = 0;
         }
 
-        $this->Query("SELECT pmv FROM activities WHERE id = $projectId");
+        $this->Query("SELECT pmv FROM pmv_sheet WHERE id = $pmvSheetId");
         $pmvRow = $this->Row();
         $pmvVal = $pmvRow->pmv;
 
         $diff = $pmvVal - $resultCount;
 
 
-        if($diff >= 0){
+        if($diff > 0){
             return "open";
         }else{
             return "close";

@@ -5,15 +5,14 @@
 
         $secid = $_POST['section'];
         $getPmvComp = new MySQL();
-        $getPmvComp->Query("SELECT IFNULL(COUNT(id),0) AS completed FROM pmv WHERE section = $secid AND status = 'validated'");
+        $getPmvComp->Query("SELECT IFNULL(COUNT(pmv_light.id),0) AS completed FROM pmv_light
+                            LEFT JOIN pmv_sheet ON pmv_light.pmv_sheet_id = pmv_sheet.id
+                            WHERE pmv_sheet.outcome_area = $secid AND pmv_light.status = 'validated'");
         $compRow = $getPmvComp->Row();
         $pmvComp = $compRow->completed;
 
         $getPmvReq = new MySQL();
-        $getPmvReq->Query("SELECT IFNULL(SUM(activities.pmv),0) AS required FROM activities
-                            LEFT JOIN implementing_partners ON activities.partner_id = implementing_partners.ip_code
-                            LEFT JOIN programmes_partners ON implementing_partners.id = programmes_partners.partner_id
-                            WHERE programmes_partners.programme_id = $secid");
+        $getPmvReq->Query("SELECT IFNULL(SUM(pmv_sheet.pmv),0) AS required FROM pmv_sheet WHERE pmv_sheet.outcome_area = $secid");
         $reqRow = $getPmvReq->Row();
         $pmvReq = $reqRow->required;
 

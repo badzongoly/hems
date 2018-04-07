@@ -22,7 +22,7 @@ if(isset($_SESSION['hems_active_pmv']) && !empty($_SESSION['hems_active_pmv']) &
 
 if(isset($_GET['pid']) && !empty($_GET['pid'])){
 
-    $projectid = base64_decode($_GET['pid']);
+    $projectid = $_GET['pid'];
 
     $pmvO = new Pmv();
     $chkres = $pmvO->checkPMVAdded($projectid);

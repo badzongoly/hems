@@ -54,7 +54,7 @@
                 <div id="ack" class="alert-danger" style="font-size: small;"></div>
                 <form action="" method="POST" class="margin-bottom-0" id="loginForm">
                     <div class="form-group m-b-20">
-                        <input type="text" id="username" name="username" class="form-control input-lg" placeholder="Email Address" /><div id="unerror"></div>
+                        <input type="text" id="username" name="username" class="form-control input-lg" placeholder="Email Address" /><div class="text-info" id="unerror"></div>
                     </div>
                     <div class="form-group m-b-20">
                         <input type="password" id="password" name="password" class="form-control input-lg" placeholder="Password" /><div id="perror"></div>
