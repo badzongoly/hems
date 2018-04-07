@@ -6,14 +6,7 @@ $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
 $dbConnect = new MySQL();
-$dbConnect->Query("SELECT pmv.id as pmvid,implementing_partners.name as impname,programmes.name as progname,pmv.visit_startdate, pmv.visit_enddate,
-                    pmv.sub_district,regions.region_name, district.name as  distname FROM pmv
-                   LEFT JOIN activities ON activities.id = pmv.project_id
-                    LEFT JOIN programmes ON programmes.id = pmv.section
-                    LEFT JOIN implementing_partners ON activities.partner_id = implementing_partners.ip_code
-                    LEFT JOIN regions ON regions.id = pmv.region
-                    LEFT JOIN district ON district.id = pmv.district
-                    WHERE pmv.status= 'approved'");
+$dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_partners.risk_rating FROM pmv_light LEFT JOIN implementing_partners ON pmv_light.ip_code = implementing_partners.ip_code WHERE pmv_light.status = 'approved'");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -106,26 +99,26 @@ $dbConnect->Query("SELECT pmv.id as pmvid,implementing_partners.name as impname,
 
                                 <table class="table table-responsive table-striped table-bordered" id="data-table">
                                     <thead>
-                                        <tr>
-                                            <td>Implementing Partner</td>
-                                            <td>Program</td>
-                                            <td>Visit Date</td>
-                                            <td>Region</td>
-                                            <td>District</td>
-                                            <td>Sub-District</td>
-                                            <td>&nbsp;</td>
-                                        </tr>
+                                    <tr>
+                                        <td>Start Date</td>
+                                        <td>End Date</td>
+                                        <td>Objectives</td>
+                                        <td>Partner Name</td>
+                                        <td>Risk Rating</td>
+                                        <td>Total Cash Contribution</td>
+                                        <td>&nbsp;</td>
+                                    </tr>
                                     </thead>
                                     <tbody>
                                     <?php while(!$dbConnect->EndOfSeek()){ $pmvRow = $dbConnect->Row();?>
-                                    <tr>
-                                        <td><?php echo $pmvRow->impname;?></td>
-                                        <td><?php echo $pmvRow->progname;?></td>
-                                        <td><?php echo $pmvRow->visit_startdate.' to '.$pmvRow->visit_enddate;?></td>
-                                        <td><?php echo $pmvRow->region_name;?></td>
-                                        <td><?php echo $pmvRow->distname;?></td>
-                                        <td><?php echo $pmvRow->sub_district;?></td>
-                                        <td><a href="processPmvValidation.php?pmvid=<?php echo base64_encode($pmvRow->pmvid);?>" class="btn btn-primary btn-sm"><i class="fa fa-cogs"></i> Process PMV Validation</a></td>
+                                        <tr>
+                                            <td><?php echo $pmvRow->start_date;?></td>
+                                            <td><?php echo $pmvRow->end_date;?></td>
+                                            <td><?php echo $pmvRow->objectives;?></td>
+                                            <td><?php echo $pmvRow->name;?></td>
+                                            <td><?php echo $pmvRow->risk_rating;?></td>
+                                            <td><?php echo $pmvRow->total_cash_contrib;?></td>
+                                        <td><a href="processPmvValidation.php?pmvid=<?php echo base64_encode($pmvRow->id);?>" class="btn btn-primary btn-sm"><i class="fa fa-cogs"></i> Process PMV Validation</a></td>
                                     </tr>
                                     <?php } ?>
                                     </tbody>

@@ -10,16 +10,37 @@ if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
 
     $pmvid = base64_decode($_GET['pmvid']);
     $dbConnect = new MySQL();
-    $dbConnect->Query("SELECT programmes.name as progname,pmv.visit_startdate, pmv.visit_enddate, regions.region_name,
-                       district.name as dname, pmv.sub_district, pmv.community FROM pmv
-                       LEFT JOIN programmes ON pmv.section = programmes.id
-                       LEFT JOIN regions ON pmv.region = regions.id
-                       LEFT JOIN district ON pmv.district = district.name
-                        WHERE pmv.id = $pmvid");
+    $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_partners.risk_rating FROM pmv_light LEFT JOIN implementing_partners ON pmv_light.ip_code = implementing_partners.ip_code WHERE pmv_light.id = $pmvid");
     $pmvRecRow = $dbConnect->Row();
 }
 
-$pmvObj = new Pmv();
+$getStaffMet = new MySQL();
+$getStaffMet->Query("SELECT * FROM pmv_staff_met WHERE pmv_id = $pmvid");
+$smcount = $getStaffMet->RowCount();
+
+$getPri = new MySQL();
+$getPri->Query("SELECT * FROM pmv_prog_ref_info WHERE pmv_id = $pmvid");
+$pricount = $getPri->RowCount();
+
+$getList = new MySQL();
+$getList->Query("SELECT * FROM pmv_status_indicators WHERE pmv_id = $pmvid");
+$indicount = $getList->RowCount();
+
+$getHv = new MySQL();
+$getHv->Query("SELECT * FROM pmv_hv_items WHERE pmv_id = $pmvid");
+$itemcount = $getHv->RowCount();
+
+$getListConst = new MySQL();
+$getListConst->Query("SELECT * FROM pmv_constraints WHERE pmv_id = $pmvid");
+$conscount = $getListConst->RowCount();
+
+$getListFp = new MySQL();
+$getListFp->Query("SELECT * FROM pmv_followup_actions WHERE pmv_id = $pmvid");
+$fpcount = $getListFp->RowCount();
+
+$getOffs = new MySQL();
+$getOffs->Query("SELECT * FROM pmv_officers LEFT JOIN staff_pdetail ON pmv_officers.staff_id = staff_pdetail.empID WHERE pmv_id = $pmvid");
+$offcount = $getOffs->RowCount();
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -114,46 +135,223 @@ $pmvObj = new Pmv();
                                     <p align="center" style="display: none; color: limegreen;" id="appr_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
                                 </div></div>
                             <form method="post" action="" id="approvePmvForm">
-                            <table class="table table-responsive">
-                                <tbody>
-                                <tr>
-                                    <td colspan="6"><input style="float: right;" type="submit" name="approve" id="approve" value="Validate PMV" class="btn btn-sm btn-primary"></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2"><label>Person(s) Undertaking Visit:</label></td>
-                                    <td colspan="4"><?php echo $pmvObj->fetchOfficers($pmvid);?></td>
-                                </tr>
-                                <tr>
-                                    <td class="col-lg-1"><label>Section:</label></td>
-                                    <td class="col-lg-3"><?php echo $pmvRecRow->progname;?></td>
+                                <table class="table table-responsive">
+                                    <tbody>
+                                    <tr>
+                                        <td colspan="6"><input style="float: right;" type="submit" name="approve" id="approve" value="Validate PMV" class="btn btn-sm btn-primary"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-lg-1"><label>Start Date:</label></td>
+                                        <td class="col-lg-3"><?php echo $pmvRecRow->start_date;?></td>
 
-                                    <td class="col-lg-1"><label>Date of Visit:</label></td>
-                                    <td class="col-lg-3">
-                                        <div>
-                                            <div class="input-group input-daterange">
-                                                <?php echo $pmvRecRow->visit_startdate.' To '.$pmvRecRow->visit_enddate;?>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="col-lg-1"><label>Region:</label></td>
-                                    <td class="col-lg-3"><?php echo $pmvRecRow->region_name;?></td>
-                                </tr>
-                                <tr>
+                                        <td class="col-lg-1"><label>End Date:</label></td>
+                                        <td class="col-lg-3"><?php echo $pmvRecRow->end_date;?></td>
 
-                                    <td><label>District:</label></td>
-                                    <td><?php echo $pmvRecRow->region_name;?></td>
+                                        <td class="col-lg-1"><label>Objectives:</label></td>
+                                        <td class="col-lg-3"><?php echo $pmvRecRow->objectives;?></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-lg-1"><label>Partner Name:</label></td>
+                                        <td class="col-lg-3"><?php echo $pmvRecRow->name;?></td>
 
-                                    <td><label>Sub-district:</label></td>
-                                    <td><?php echo $pmvRecRow->sub_district;?></td>
 
-                                    <td><label>Community:</label></td>
-                                    <td><?php echo $pmvRecRow->community;?></td>
-                                </tr>
+                                        <td class="col-lg-1"><label>Total Cash Contribution:</label></td>
+                                        <td class="col-lg-3"><?php echo $pmvRecRow->total_cash_contrib;?></td>
 
-                                </tbody>
-                            </table>
+                                        <td><label>Supplies:</label></td>
+                                        <td><?php echo $pmvRecRow->supplies;?></td>
+
+                                    </tr>
+
+                                    </tbody>
+                                </table>
                                 <input type="hidden" name="pmvid" id="pmvid" value="<?php echo $pmvid;?>">
                             </form>
+                            <div id="smetlist">
+                                <?php if($smcount){?>
+                                    <table class="table table-bordered table-responsive table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>Partner Staff Met During Visit</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Name</td>
+                                            <td>Title</td>
+                                            <td>Contact Number</td>
+                                            <td>Email</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php  while(!$getStaffMet->EndOfSeek()){$listItemConst = $getStaffMet->Row();?>
+                                            <tr>
+                                                <td><?php echo $listItemConst->name;?></td>
+                                                <td><?php echo $listItemConst->title;?></td>
+                                                <td><?php echo $listItemConst->contact_number;?></td>
+                                                <td><?php echo $listItemConst->email;?></td>
+                                            </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                <?php } ?>
+                            </div>
+
+                            <div id="prilist">
+                                <?php if($pricount){?>
+                                    <table class="table table-bordered table-responsive table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>Programme Reference Information</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Indicator</td>
+                                            <td>Baseline</td>
+                                            <td>Target</td>
+                                            <td>Method Of Verification</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php  while(!$getPri->EndOfSeek()){$listPri = $getPri->Row();?>
+                                            <tr>
+                                                <td><?php echo $listPri->indicator;?></td>
+                                                <td><?php echo $listPri->baseline;?></td>
+                                                <td><?php echo $listPri->target;?></td>
+                                                <td><?php echo $listPri->mov;?></td>
+                                            </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                <?php } ?>
+                            </div>
+
+                            <div id="indilist">
+                                <?php if($indicount){?>
+                                    <table class="table table-bordered table-responsive table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td colspan="2"><div class="alert alert-info" style="text-align: center;"><h5>B. Status of Indicators</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Indicators</td>
+                                            <td>Progress</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php  while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
+                                            <tr>
+                                                <td><?php echo $listItem->indicators;?></td>
+                                                <td><?php echo $listItem->progress;?></td>
+                                            </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                <?php } ?>
+                            </div>
+                            <div id="hvlist">
+                                <?php if($itemcount){?>
+                                    <table class="table table-bordered table-responsive table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td colspan="5"><div class="alert alert-info" style="text-align: center;"><h5>Status Of High Value Items</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Item Description</td>
+                                            <td>Quantity</td>
+                                            <td>Location</td>
+                                            <td>Condition</td>
+                                            <td>Remarks</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php  while(!$getHv->EndOfSeek()){$listHv = $getHv->Row();?>
+                                            <tr>
+                                                <td><?php echo $listHv->item_desc;?></td>
+                                                <td><?php echo $listHv->quantity;?></td>
+                                                <td><?php echo $listHv->location;?></td>
+                                                <td><?php echo $listHv->condition;?></td>
+                                                <td><?php echo $listHv->remarks;?></td>
+                                            </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                <?php } ?>
+                            </div>
+
+                            <div id="conslist">
+                                <?php if($conscount){?>
+                                    <table class="table table-bordered table-responsive table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td colspan="3"><div class="alert alert-info" style="text-align: center;"><h5> Constraints/Challenges/Opportunities- (Related to this Project/intervention implementation and achievement of results)</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Constraints</td>
+                                            <td>Lessons Learned</td>
+                                            <td>Opportunity</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php  while(!$getListConst->EndOfSeek()){$listItemConst = $getListConst->Row();?>
+                                            <tr>
+                                                <td><?php echo $listItemConst->constraint;?></td>
+                                                <td><?php echo $listItemConst->lesson_learned;?></td>
+                                                <td><?php echo $listItemConst->opportunity;?></td>
+                                            </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                <?php } ?>
+                            </div>
+                            <div id="fplist">
+                                <?php if($fpcount){?>
+                                    <table class="table table-bordered table-responsive table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td colspan="4"><div class="alert alert-info" style="text-align: center;"><h5>Recommendations</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Findings</td>
+                                            <td>Recommended Action</td>
+                                            <td>By Whom</td>
+                                            <td>By When</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php while(!$getListFp->EndOfSeek()){$listItemFp = $getListFp->Row();?>
+                                            <tr>
+                                                <td><?php echo $listItemFp->findings;?></td>
+                                                <td><?php echo $listItemFp->recomm_action;?></td>
+                                                <td><?php echo $listItemFp->by_whom;?></td>
+                                                <td><?php echo $listItemFp->by_when;?></td>
+                                            </tr>
+                                        <?php } ?>
+                                        </tbody>
+                                    </table>
+                                <?php } ?>
+                            </div>
+
+                            <div id="offlist">
+                                <?php if($offcount){?>
+                                    <table class="table table-bordered table-responsive table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td colspan="2"><div class="alert alert-info" style="text-align: center;"><h5>Staff Member Sign Off</h5></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td>#</td>
+                                            <td>Name</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php $countit = 1; while(!$getOffs->EndOfSeek()){$listOffs = $getOffs->Row();?>
+                                            <tr>
+                                                <td><?php echo $countit;?></td>
+                                                <td><?php echo $listOffs->first_name.' '.$listOffs->last_name;?></td>
+                                            </tr>
+                                            <?php $countit++; } ?>
+                                        </tbody>
+                                    </table>
+                                <?php } ?>
+                            </div>
                         </div>
 
                     </div>

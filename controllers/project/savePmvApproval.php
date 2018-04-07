@@ -20,7 +20,7 @@
 
         $whereArray['id'] = $pmvid;
 
-        $sql = MySQL::BuildSQLUpdate("pmv",$valuesArray,$whereArray);
+        $sql = MySQL::BuildSQLUpdate("pmv_light",$valuesArray,$whereArray);
 
         $resp = $update->Query($sql);
 
