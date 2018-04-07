@@ -6,7 +6,7 @@
  * Time: 06:13 PM
  */
 require_once('../../classes/mysql.class.php');
-$page = "project";
+$page = "pmv";
 $sub_page_name = "excel";
 $pull_ucat = new MySQL();
 $pull_ucat->checkLogin();
@@ -21,7 +21,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | ADD ACTIVITY</title>
+    <title>HEMS | ADD EXCEL PMV</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -78,12 +78,12 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Activity</a></li>
-            <li class="active">Add Activity Excel Upload</li>
+            <li><a href="javascript:;">PMV</a></li>
+            <li class="active">PMV Excel Upload</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Activity <small>add activity excel upload...</small></h1>
+        <h1 class="page-header">Activity <small>pmv excel upload...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -99,7 +99,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Add Activity Excel Upload</h4>
+                        <h4 class="panel-title">PMV Excel Upload</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -160,7 +160,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
                                     </tbody>
 
-                                    <input type="hidden" id="do" name="do" value="excelUpload">
+                                    <input type="hidden" id="do" name="do" value="PMVExcelUpload">
 
                                 </table>
 
@@ -274,18 +274,18 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                 success: function(e) {
                     if(e=="error"){
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save activities.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save PMV.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save activities.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save PMV.</span></div><br>").fadeOut(6000);
 
                     }else if(e=="exists"){
 
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This PMV already exists.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This Activities already exists.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This PMV already exists.</span></div><br>").fadeOut(6000);
 
                     }
                     else if(e ==="success"){
@@ -297,12 +297,12 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                     }
                     else {
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities saved successfully.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV saved successfully.</span></div><br>").hide().fadeIn(1000);
                         $('#uclisted').empty();
                         $('#uclisted').html(e);
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities saved successfully.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV saved successfully.</span></div><br>").fadeOut(6000);
                     }
 
 
@@ -322,18 +322,18 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                 url: "../../controllers/project/projectsController.php",
                 success: function (data) {
                     if (data == "error") {
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to Activities.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to delete PMV.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display", "none");
                         $("#save").removeAttr('disabled');
 
 
                     } else {
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities deleted successfully.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV deleted successfully.</span></div><br>").hide().fadeIn(1000);
 
                         $('#uclisted').html(data);
                         $("#wait").css("display", "none");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities deleted successfully.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV deleted successfully.</span></div><br>").fadeOut(6000);
 
                     }
 

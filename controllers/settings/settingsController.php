@@ -53,7 +53,10 @@ if(isset($_POST['id']) && isset($_POST['do_act']) && $_POST['do_act'] == "delete
     echo $object->deleteProgrammes($_POST['id']);exit;
 }
 if(isset($_POST['id']) && isset($_POST['do_outcomes']) && $_POST['do_outcomes'] == "delete" ){
-    echo $object->deleteProgrammes($_POST['id']);exit;
+    echo $object->deleteOutcome($_POST['id']);exit;
+}
+if(isset($_POST['id']) && isset($_POST['do_output']) && $_POST['do_output'] == "delete" ){
+    echo $object->deleteOutput($_POST['id']);exit;
 }if(isset($_POST['id']) && isset($_POST['do_action']) && $_POST['do_action'] == "delete" ){
     echo $object->deleteImplementingPartners($_POST['id']);exit;
 }

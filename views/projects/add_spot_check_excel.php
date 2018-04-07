@@ -6,8 +6,8 @@
  * Time: 06:13 PM
  */
 require_once('../../classes/mysql.class.php');
-$page = "project";
-$sub_page_name = "excel";
+$page = "spot";
+$sub_page_name = "spot_check";
 $pull_ucat = new MySQL();
 $pull_ucat->checkLogin();
 $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
@@ -21,7 +21,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | ADD ACTIVITY</title>
+    <title>HEMS | ADD SPOT CHECKS</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -78,12 +78,12 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Activity</a></li>
-            <li class="active">Add Activity Excel Upload</li>
+            <li><a href="javascript:;">Spot Check</a></li>
+            <li class="active">Add Spot Check Excel Upload</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Activity <small>add activity excel upload...</small></h1>
+        <h1 class="page-header">Sport Check <small>add spot check excel upload...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -99,7 +99,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Add Activity Excel Upload</h4>
+                        <h4 class="panel-title">Add Sport Check Excel Upload</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -160,7 +160,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
                                     </tbody>
 
-                                    <input type="hidden" id="do" name="do" value="excelUpload">
+                                    <input type="hidden" id="do" name="do" value="excelUploadSpotCheck">
 
                                 </table>
 
@@ -169,7 +169,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 
                             <div>
                                 <hr/>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding activities. Please wait....</p>
+                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding Spot Check. Please wait....</p>
                             </div>
                             <div id="uc_response"></div>
                         </div>
@@ -292,7 +292,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                         $("#wait").css("display","none");
                         $("#save").removeAttr('disabled');
                         $('#uclisted').empty();
-                        $('#uclisted').load("../../controllers/project/projectsController.php",{'do':"getNewList"});
+                        $('#uclisted').load("../../controllers/project/projectsController.php",{'do':"getNewListSpotCheck"});
                         $('#files').val();
                     }
                     else {

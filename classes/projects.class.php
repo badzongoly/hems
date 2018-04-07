@@ -101,7 +101,74 @@ class Project extends MySQL
         }
         return $return;
     }
-    public function getConfirmation(){
+    public function getConfirmationPMV(){
+        $this->Query('Select * from pmv_sheet');
+        $output = '<table class="table table-striped table-hover table-email table-bordered" style="" align="center">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th> VENDOR CODE</th>
+                                    <th> RISK RATING</th>
+                                    <th>OUTCOME AREA</th>
+                                    <th>AMOUNT</th>
+                                    <th> REQUIRED PMV</th>
+                                    <th>DATE</th>
+                                </tr>
+                                </thead>
+                                <tbody>';
+        $counter = 1;while(!$this->EndOfSeek()){
+            $row = $this->Row();
+            $output.='<tr>
+                                        <td>'.$counter.'</td>
+                                        <td>'.$row->vendor.'</td>
+                                        <td>'.$row->risk_rating.'</td>
+                                        <td>'.$row->outcome_area.'</td>
+                                        <td>'.number_format($row->amount,2).'</td> 
+                                        <td>'.$row->pmv .'</td>
+                                        <td>'.$row->date.'</td> 
+                                     
+                                    </tr>';
+       $counter++; }
+        $output.='<!--<tr>
+                                    <td colspan="2"><a href="#" id="confirm" class="btn btn-success"><i class="fa fa-check"></i>Confirm </a></td>
+                                    <td colspan="2"><a href="#" id="cancel" class="btn btn-danger"><i class="fa fa-times"></i> Cancel </td>
+                                    </tr>--></tbody></table>';
+        echo $output;
+
+    }
+    public function getConfirmationSPOTCHECK(){
+        $this->Query('Select * from spot_checks');
+        $output = '<table class="table table-striped table-hover table-email table-bordered" style="" align="center">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th> VENDOR CODE</th>
+                                    <th> RISK RATING</th>
+                                    <th>AMOUNT</th>
+                                    <th> REQUIRED SPOT CHECK</th>
+                                    <th>DATE</th>
+                                </tr>
+                                </thead>
+                                <tbody>';
+        $counter = 1;while(!$this->EndOfSeek()){
+            $row = $this->Row();
+            $output.='<tr>
+                                        <td>'.$counter.'</td>
+                                        <td>'.$row->vendor.'</td>
+                                        <td>'.$row->risk_rating.'</td>
+                                        <td>'.number_format($row->amount,2).'</td> 
+                                        <td>'.$row->spot_checks .'</td>
+                                        <td>'.$row->date.'</td> 
+                                     
+                                    </tr>';
+       $counter++; }
+        $output.='<!--<tr>
+                                    <td colspan="2"><a href="#" id="confirm" class="btn btn-success"><i class="fa fa-check"></i>Confirm </a></td>
+                                    <td colspan="2"><a href="#" id="cancel" class="btn btn-danger"><i class="fa fa-times"></i> Cancel </td>
+                                    </tr>--></tbody></table>';
+        echo $output;
+
+    } public function getConfirmation(){
         $this->Query('Select * from activities_trans WHERE  status = "New"');
         $output = '<table class="table table-striped table-hover table-email table-bordered" style="width: 700px;" align="center">
                                 <thead>
@@ -123,10 +190,10 @@ class Project extends MySQL
                                      
                                     </tr>';
         }
-        $output.='<tr>
+        $output.='<!--<tr>
                                     <td colspan="2"><a href="#" id="confirm" class="btn btn-success"><i class="fa fa-check"></i>Confirm </a></td>
                                     <td colspan="2"><a href="#" id="cancel" class="btn btn-danger"><i class="fa fa-times"></i> Cancel </td>
-                                    </tr></tbody></table>';
+                                    </tr></tbody></table>-->';
         echo $output;
 
     }
@@ -139,11 +206,11 @@ class Project extends MySQL
         }
     }
   public function moveActivities(){
+        $object = new MySQL();
         $check = $this->Query("Select * From activities_trans WHERE status ='New'");
         $table = 'activities';
         $sql = '';
-        if($this->RowCount() >0){
-
+        if($check){
             while (!$this->EndOfSeek()){
                 $row = $this->Row();
 
@@ -151,14 +218,17 @@ class Project extends MySQL
                 $valuesArray['pmv'] = MySQL::SQLValue($row->pmv);
                 $valuesArray['spot_check'] =MySQL::SQLValue($row->spot_check);
                 $valuesArray['audit'] = MySQL::SQLValue($row->audit);
+                $valuesArray['value_month'] = MySQL::SQLValue($row->value_month);
+                $valuesArray['value_year'] = MySQL::SQLValue($row->value_year);
                 $valuesArray['status'] = MySQL::SQLValue('Active');
                 $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
                 if(empty($sql)) {
                     $sql = MySQL::BuildSQLInsert($table, $valuesArray);
                 }else{
-                    $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),100);
+                    $sql.=",".substr(MySQL::BuildSQLInsert($table, $valuesArray),129);
                 }
             }
+
             $check = $this->Query($sql);
             if($check){
                 $this->Query("Delete  From activities_trans WHERE status ='New'");
@@ -170,6 +240,47 @@ class Project extends MySQL
         }else{
             return 'empty';
         }
+    }
+    function getPMVCalculation($cash, $risk){
+        $pmv = 0;
+        if($cash<= 50000){
+            $pmv = 1;
+        }elseif( $cash <= 100000){
+            $pmv = 1;
+        }elseif ($cash<=350000 && ($risk=="Low" || $risk =="Moderate")){
+            $pmv = 1;
+        }elseif ($cash<=350000 && ($risk=="Significant" || $risk =="High")){
+            $pmv = 2;
+        }elseif ($cash<=500000 && ($risk=="Low" || $risk =="Moderate")){
+            $pmv = 2;
+        }elseif ($cash<=500000 && ($risk=="Significant" || $risk =="High")){
+            $pmv = 4;
+        }elseif ($cash >500000 && ($risk=="Low" || $risk =="Moderate")){
+            $pmv = 2;
+        }elseif ($cash >500000 && ($risk=="Significant" || $risk =="High")){
+            $pmv = 4;
+        }
+        return $pmv;
+    }    function getSpotCheckCalculation($cash, $risk){
+        $pmv = 0;
+        if($cash<= 50000){
+            $pmv = 0;
+        }elseif( $cash <= 100000){
+            $pmv = 1;
+        }elseif ($cash<=350000 && ($risk=="Low" || $risk =="Moderate")){
+            $pmv = 1;
+        }elseif ($cash<=350000 && ($risk=="Significant" || $risk =="High")){
+            $pmv = 2;
+        }elseif ($cash<=500000 && ($risk=="Low" || $risk =="Moderate")){
+            $pmv = 2;
+        }elseif ($cash<=500000 && ($risk=="Significant" || $risk =="High")){
+            $pmv = 4;
+        }elseif ($cash >500000 && ($risk=="Low" || $risk =="Moderate")){
+            $pmv = 2;
+        }elseif ($cash >500000 && ($risk=="Significant" || $risk =="High")){
+            $pmv = 4;
+        }
+        return $pmv;
     }
 
 }
