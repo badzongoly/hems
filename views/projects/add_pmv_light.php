@@ -30,7 +30,7 @@ if(isset($_SESSION['hems_active_pmv']) && !empty($_SESSION['hems_active_pmv']) &
 
 $getStaffMet = new MySQL();
 $getStaffMet->Query("SELECT * FROM pmv_staff_met WHERE pmv_id = $pmvid");
-$conscount = $getStaffMet->RowCount();
+$smcount = $getStaffMet->RowCount();
 
 $getPri = new MySQL();
 $getPri->Query("SELECT * FROM pmv_prog_ref_info WHERE pmv_id = $pmvid");
@@ -298,7 +298,7 @@ $offcount = $getOffs->RowCount();
                                             </table>
                                         </form>
                                         <div id="smetlist">
-                                            <?php if($conscount){?>
+                                            <?php if($smcount){?>
                                                 <table class="table table-bordered table-responsive table-striped">
                                                     <thead>
                                                     <tr>
