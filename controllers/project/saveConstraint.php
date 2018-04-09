@@ -38,21 +38,23 @@
 
 ?>
 
-    <table class="table table-bordered table-responsive table-striped">
-        <thead>
-            <tr>
-                <td>Constraints</td>
-                <td>Lessons Learned</td>
-                <td>Opportunity</td>
-            </tr>
-        </thead>
-        <tbody>
-        <?php while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
-            <tr>
-                <td><?php echo $listItem->constraint;?></td>
-                <td><?php echo $listItem->lesson_learned;?></td>
-                <td><?php echo $listItem->opportunity;?></td>
-            </tr>
-        <?php } ?>
-        </tbody>
-    </table>
+<table class="table table-bordered table-responsive table-striped">
+    <thead>
+    <tr>
+        <td>Constraints</td>
+        <td>Lessons Learned</td>
+        <td>Opportunity</td>
+        <td>&nbsp;</td>
+    </tr>
+    </thead>
+    <tbody>
+    <?php while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
+        <tr>
+            <td><?php echo $listItem->constraint;?></td>
+            <td><?php echo $listItem->lesson_learned;?></td>
+            <td><?php echo $listItem->opportunity;?></td>
+            <td><a id="del_cons" href="" name="<?php echo $listItem->id;?>" class="btn btn-danger btn-sm">Delete</a></td>
+        </tr>
+    <?php } ?>
+    </tbody>
+</table>

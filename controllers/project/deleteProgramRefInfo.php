@@ -5,18 +5,10 @@ require_once('../../classes/mysql.class.php');
 
 $update = new MySQL();
 
-if(isset($_POST['indic']) && isset($_POST['baseline'])){
+if(isset($_POST['pri'])){
 
-    $valuesArray['indicator'] = MySQL::SQLValue($_POST['indic']);
-    $valuesArray['baseline'] = MySQL::SQLValue($_POST['baseline']);
-    $valuesArray['target'] = MySQL::SQLValue($_POST['target']);
-    $valuesArray['mov'] = MySQL::SQLValue($_POST['mov']);
-    $valuesArray['status'] = MySQL::SQLValue("active");
-    $valuesArray['pmv_id'] = MySQL::SQLValue($_SESSION['hems_active_pmv']);
-    $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
-    $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
-
-    $sql = MySQL::BuildSQLInsert("pmv_prog_ref_info", $valuesArray);
+    $sid = $_POST['pri'];
+    $sql = "DELETE FROM pmv_prog_ref_info WHERE id = $sid";
 
     $result = $update->Query($sql);
 

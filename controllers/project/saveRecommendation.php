@@ -39,19 +39,22 @@
 
 ?>
 
-    <table class="table table-bordered table-responsive table-striped">
-        <thead>
-            <tr>
-                <td>Recommendation Name</td>
-                <td>Description</td>
-            </tr>
-        </thead>
-        <tbody>
-        <?php while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
-            <tr>
-                <td><?php echo $listItem->rec_name;?></td>
-                <td><?php echo $listItem->rec_desc;?></td>
-            </tr>
-        <?php } ?>
-        </tbody>
-    </table>
+
+<table class="table table-bordered table-responsive table-striped">
+    <thead>
+    <tr>
+        <td>Recommendation Name</td>
+        <td>Description</td>
+        <td>&nbsp;</td>
+    </tr>
+    </thead>
+    <tbody>
+    <?php while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
+        <tr>
+            <td><?php echo $listItem->rec_name;?></td>
+            <td><?php echo $listItem->rec_desc;?></td>
+            <td><a id="del_rec" href="" name="<?php echo $listItem->id;?>" class="btn btn-danger btn-sm">Delete</a></td>
+        </tr>
+    <?php } ?>
+    </tbody>
+</table>

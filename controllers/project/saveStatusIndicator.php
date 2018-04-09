@@ -39,19 +39,21 @@
 
 ?>
 
-    <table class="table table-bordered table-responsive table-striped">
-        <thead>
-            <tr>
-                <td>Indicators</td>
-                <td>Progress</td>
-            </tr>
-        </thead>
-        <tbody>
-        <?php while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
-            <tr>
-                <td><?php echo $listItem->indicators;?></td>
-                <td><?php echo $listItem->progress;?></td>
-            </tr>
-        <?php } ?>
-        </tbody>
-    </table>
+<table class="table table-bordered table-responsive table-striped">
+    <thead>
+    <tr>
+        <td>Indicators</td>
+        <td>Progress</td>
+        <td>&nbsp;</td>
+    </tr>
+    </thead>
+    <tbody>
+    <?php while(!$getList->EndOfSeek()){$listItem = $getList->Row();?>
+        <tr>
+            <td><?php echo $listItem->indicators;?></td>
+            <td><?php echo $listItem->progress;?></td>
+            <td><a id="del_si" href="" name="<?php echo $listItem->id;?>" class="btn btn-danger btn-sm">Delete</a></td>
+        </tr>
+    <?php } ?>
+    </tbody>
+</table>

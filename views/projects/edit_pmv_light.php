@@ -2,14 +2,19 @@
 require_once('../../classes/mysql.class.php');
 require_once('../../classes/Pmv.class.php');
 $page = "pmv";
-$sub_page_name = "add_pmv";
+$sub_page_name = "edit_pmv";
 
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-if(isset($_GET['shid']) && !empty($_GET['shid'])){
+$pmvO = new Pmv();
 
-    $sheetid = base64_decode($_GET['shid']);
+if(isset($_GET['pmvid']) && !empty($_GET['pmvid'])){
+
+    $plinkid = base64_decode($_GET['pmvid']);
+    $_SESSION['hems_active_pmv'] = $plinkid;
+
+    $sheetid = $pmvO->getSheetId($plinkid);
     $getVdetails = new MySQL();
     $getVdetails->Query("SELECT implementing_partners.name,implementing_partners.ip_code FROM pmv_sheet LEFT JOIN implementing_partners ON pmv_sheet.vendor = implementing_partners.ip_code WHERE pmv_sheet.id = $sheetid");
     $implprow = $getVdetails->Row();
@@ -80,7 +85,7 @@ $offcount = $getOffs->RowCount();
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Add PMV</title>
+    <title>HEMS | Edit PMV</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -135,11 +140,11 @@ $offcount = $getOffs->RowCount();
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
             <li><a href="javascript:;">PMV</a></li>
-            <li class="active">Add PMV</li>
+            <li class="active">Edit PMV</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">PMV <small>add PMV...</small></h1>
+        <h1 class="page-header">PMV <small>edit PMV...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -156,7 +161,7 @@ $offcount = $getOffs->RowCount();
 <!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>-->
                             <input style="float:right" type="submit" name="submitPmv" id="submitPmv" class="btn btn-primary btn-sm" value="Submit PMV">
                         </div>
-                        <h4 class="panel-title">Add PMV</h4>
+                        <h4 class="panel-title">Edit PMV</h4>
                         <div id="submitResponse"></div>
                         <div>
                             <p align="center" style="display: none; color: limegreen;" id="submit_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>

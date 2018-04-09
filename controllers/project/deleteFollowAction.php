@@ -8,22 +8,17 @@ require_once('../../classes/mysql.class.php');
  * Date: 1/29/2018
  * Time: 6:58 PM
  */
-$insert = new MySQL();
+$update = new MySQL();
 $getList = new MySQL();
 
-if(isset($_POST['findings']) && isset($_POST['findings'])){
+if(isset($_POST['rec'])){
+
+    $sid = $_POST['rec'];
+    $sql = "DELETE FROM pmv_followup_actions WHERE id = $sid";
 
     $pmvid = $_SESSION['hems_active_pmv'];
 
-    $valuesArray['pmv_id'] = MySQL::SQLValue($pmvid);
-    $valuesArray['findings'] = MySQL::SQLValue($_POST['findings']);
-    $valuesArray['recomm_action'] = MySQL::SQLValue($_POST['recact']);
-    $valuesArray['by_whom'] = MySQL::SQLValue($_POST['by_whom']);
-    $valuesArray['by_when'] = MySQL::SQLValue($_POST['by_when']);
-
-    $sql = MySQL::BuildSQLInsert("pmv_followup_actions", $valuesArray);
-
-    $result = $insert->Query($sql);
+    $result = $update->Query($sql);
 
     if($result){
 

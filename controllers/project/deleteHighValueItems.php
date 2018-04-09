@@ -5,19 +5,10 @@ require_once('../../classes/mysql.class.php');
 
 $update = new MySQL();
 
-if(isset($_POST['item_desc']) && isset($_POST['quantity'])){
+if(isset($_POST['hvi'])){
 
-    $valuesArray['item_desc'] = MySQL::SQLValue($_POST['item_desc']);
-    $valuesArray['quantity'] = MySQL::SQLValue($_POST['quantity']);
-    $valuesArray['location'] = MySQL::SQLValue($_POST['location']);
-    $valuesArray['condition'] = MySQL::SQLValue($_POST['condition']);
-    $valuesArray['remarks'] = MySQL::SQLValue($_POST['remarks']);
-    $valuesArray['status'] = MySQL::SQLValue("active");
-    $valuesArray['pmv_id'] = MySQL::SQLValue($_SESSION['hems_active_pmv']);
-    $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
-    $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
-
-    $sql = MySQL::BuildSQLInsert("pmv_hv_items", $valuesArray);
+    $sid = $_POST['hvi'];
+    $sql = "DELETE FROM pmv_hv_items WHERE id = $sid";
 
     $result = $update->Query($sql);
 

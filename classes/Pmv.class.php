@@ -183,5 +183,15 @@ class Pmv extends  MySQL{
 
     }
 
+    function getSheetId($pmvid){
+
+        $this->Query("SELECT pmv_light.pmv_sheet_id FROM pmv_light WHERE id = $pmvid");
+        $proww = $this->Row();
+        $pshid = $proww->pmv_sheet_id;
+
+        return $pshid;
+
+    }
+
 }
 ?>

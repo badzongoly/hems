@@ -5,18 +5,10 @@ require_once('../../classes/mysql.class.php');
 
 $update = new MySQL();
 
-if(isset($_POST['off_name']) && isset($_POST['title'])){
+if(isset($_POST['smet'])){
 
-    $valuesArray['name'] = MySQL::SQLValue($_POST['off_name']);
-    $valuesArray['title'] = MySQL::SQLValue($_POST['title']);
-    $valuesArray['contact_number'] = MySQL::SQLValue($_POST['cnum']);
-    $valuesArray['email'] = MySQL::SQLValue($_POST['email']);
-    $valuesArray['status'] = MySQL::SQLValue("active");
-    $valuesArray['pmv_id'] = MySQL::SQLValue($_SESSION['hems_active_pmv']);
-    $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
-    $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
-
-    $sql = MySQL::BuildSQLInsert("pmv_staff_met", $valuesArray);
+    $sid = $_POST['smet'];
+    $sql = "DELETE FROM pmv_staff_met WHERE id = $sid";
 
     $result = $update->Query($sql);
 
