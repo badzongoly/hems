@@ -5,39 +5,84 @@
 
     $insert = new MySQL();
 
-    if(isset($_POST['objectives']) && isset($_POST['vendor'])){
+    if($_SESSION['hems_active_pmv']==0){
+        if(isset($_POST['objectives']) && isset($_POST['vendor'])){
 
-        $valuesArray['objectives'] = MySQL::SQLValue($_POST['objectives']);
-        $valuesArray['ip_code'] = MySQL::SQLValue($_POST['vendor']);
-        $valuesArray['start_date'] = MySQL::SQLValue($_POST['start']);
-        $valuesArray['end_date'] = MySQL::SQLValue($_POST['end']);
-        $valuesArray['total_cash_contrib'] = MySQL::SQLValue($_POST['cash_contri']);
-        $valuesArray['supplies'] = MySQL::SQLValue($_POST['supplies']);
-        $valuesArray['access_serv'] = MySQL::SQLValue($_POST['access_input_serv']);
-        $valuesArray['quality_serv'] = MySQL::SQLValue($_POST['qual_input_serv']);
-        $valuesArray['util_serv'] = MySQL::SQLValue($_POST['uti_input_serv']);
-        $valuesArray['enabling_environ'] = MySQL::SQLValue($_POST['enab_environ']);
-        $valuesArray['overall_assess'] = MySQL::SQLValue($_POST['assessment']);
-        $valuesArray['outstand_related'] = MySQL::SQLValue($_POST['outstanding']);
-        $valuesArray['other_issues'] = MySQL::SQLValue($_POST['issues_concerns']);
-        $valuesArray['status'] = MySQL::SQLValue('active');
-        $valuesArray['pmv_sheet_id'] = MySQL::SQLValue($_POST['sheet_id']);
-        $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
-        $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
+            $valuesArray['objectives'] = MySQL::SQLValue($_POST['objectives']);
+            $valuesArray['ip_code'] = MySQL::SQLValue($_POST['vendor']);
+            $valuesArray['start_date'] = MySQL::SQLValue($_POST['start']);
+            $valuesArray['end_date'] = MySQL::SQLValue($_POST['end']);
+            $valuesArray['outputs'] = MySQL::SQLValue($_POST['outputs']);
+            $valuesArray['total_cash_contrib'] = MySQL::SQLValue($_POST['cash_contri']);
+            $valuesArray['supplies'] = MySQL::SQLValue($_POST['supplies']);
+            $valuesArray['access_serv'] = MySQL::SQLValue($_POST['access_input_serv']);
+            $valuesArray['quality_serv'] = MySQL::SQLValue($_POST['qual_input_serv']);
+            $valuesArray['util_serv'] = MySQL::SQLValue($_POST['util_input_serv']);
+            $valuesArray['enabling_environ'] = MySQL::SQLValue($_POST['enab_environ']);
+            $valuesArray['overall_assess'] = MySQL::SQLValue($_POST['assessment']);
+            $valuesArray['outstand_related'] = MySQL::SQLValue($_POST['outstanding']);
+            $valuesArray['other_issues'] = MySQL::SQLValue($_POST['issues_concerns']);
+            $valuesArray['status'] = MySQL::SQLValue('active');
+            $valuesArray['pmv_sheet_id'] = MySQL::SQLValue($_POST['sheet_id']);
+            $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+            $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
 
-        $sql = MySQL::BuildSQLInsert("pmv_light", $valuesArray);
+            $sql = MySQL::BuildSQLInsert("pmv_light", $valuesArray);
 
-        $result = $insert->Query($sql);
+            $result = $insert->Query($sql);
 
-        if($result){
-            $_SESSION['hems_active_pmv'] = $insert->GetLastInsertID();
-            echo "ok";exit;
+            if($result){
+                $_SESSION['hems_active_pmv'] = $insert->GetLastInsertID();
+                echo "ok";exit;
 
-        }else{
+            }else{
 
-            echo  "fail";exit;
+                echo  "fail";exit;
+            }
+
+
+        }
+    }elseif($_SESSION['hems_active_pmv'] > 0){
+
+        if(isset($_POST['objectives']) && isset($_POST['vendor'])){
+
+            $valuesArray['objectives'] = MySQL::SQLValue($_POST['objectives']);
+            $valuesArray['ip_code'] = MySQL::SQLValue($_POST['vendor']);
+            $valuesArray['start_date'] = MySQL::SQLValue($_POST['start']);
+            $valuesArray['end_date'] = MySQL::SQLValue($_POST['end']);
+            $valuesArray['outputs'] = MySQL::SQLValue($_POST['outputs']);
+            $valuesArray['total_cash_contrib'] = MySQL::SQLValue($_POST['cash_contri']);
+            $valuesArray['supplies'] = MySQL::SQLValue($_POST['supplies']);
+            $valuesArray['access_serv'] = MySQL::SQLValue($_POST['access_input_serv']);
+            $valuesArray['quality_serv'] = MySQL::SQLValue($_POST['qual_input_serv']);
+            $valuesArray['util_serv'] = MySQL::SQLValue($_POST['util_input_serv']);
+            $valuesArray['enabling_environ'] = MySQL::SQLValue($_POST['enab_environ']);
+            $valuesArray['overall_assess'] = MySQL::SQLValue($_POST['assessment']);
+            $valuesArray['outstand_related'] = MySQL::SQLValue($_POST['outstanding']);
+            $valuesArray['other_issues'] = MySQL::SQLValue($_POST['issues_concerns']);
+            $valuesArray['status'] = MySQL::SQLValue('active');
+            $valuesArray['pmv_sheet_id'] = MySQL::SQLValue($_POST['sheet_id']);
+            $valuesArray['created_by'] =  MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+            $valuesArray['created_on'] = MySQL::SQLValue(date('Y-m-d h:i:s'));
+
+            $whereArray['id'] = $_SESSION['hems_active_pmv'];
+            $sql = MySQL::BuildSQLUpdate("pmv_light",$valuesArray,$whereArray);
+
+            $result = $insert->Query($sql);
+
+            if($result){
+
+                echo "ok";exit;
+
+            }else{
+
+                echo  "fail";exit;
+            }
+
+
         }
 
-
     }
+
+
 ?>

@@ -1,5 +1,6 @@
 <?php
 require_once('../../classes/mysql.class.php');
+require_once('../../classes/Pmv.class.php');
 $page = "pmv";
 $sub_page_name = "val_pmv";
 $chekLogin = new MySQL();
@@ -10,6 +11,16 @@ $getVendor->Query("SELECT * FROM implementing_partners WHERE status = 'Active' O
 
 $getOutcomes = new MySQL();
 $getOutcomes->Query("SELECT * FROM outcomes");
+
+$fetchAllProjects = new MySQL();
+$qury = "SELECT pmv_sheet.id,outcomes.name AS oname, implementing_partners.name AS iname,implementing_partners.ip_code,pmv_sheet.date,pmv_sheet.pmv
+            FROM pmv_sheet
+            LEFT JOIN implementing_partners ON pmv_sheet.vendor = implementing_partners.ip_code
+            LEFT JOIN outcomes ON pmv_sheet.outcome_area = outcomes.code";
+
+$fetchAllProjects->Query($qury);
+
+$pmvObj =  new Pmv();
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -102,45 +113,93 @@ $getOutcomes->Query("SELECT * FROM outcomes");
                             <p align="center" style="display: none; color: limegreen;" id="f_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
                         </div>
                         <div class="row">
-                            <form method="POST" action="" id="findForm">
-                                <table class="table table-responsive table-striped table-bordered" align="center">
-                                    <tbody>
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#default-tab-1" data-toggle="tab"><h4>Uploaded PMVs</h4></a></li>
+                                <li class=""><a href="#default-tab-2" data-toggle="tab"><h4>PMV Upload Search</h4></a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade active in" id="default-tab-1">
+                                    <table id="data-table" class="table table-striped table-hover table-email table-bordered">
+                                        <thead>
                                         <tr>
-                                            <td>Vendor</td>
-                                            <td>Outcome Area</td>
-                                            <td>Year</td>
-                                            <td>&nbsp;</td>
+                                            <th>#</th>
+                                            <th>Partner Name</th>
+                                            <th>Partner Code</th>
+                                            <th>Outcome Area</th>
+                                            <th>Required PMVs</th>
+                                            <th>Submitted PMVs</th>
+                                            <th>Date</th>
+                                            <th></th>
                                         </tr>
-                                    <tr>
-                                        <td><select id="vendor" name="vendor" class="form-control">
-                                                <option disabled selected>--SELECT VENDOR--</option>
-                                                <?php while(!$getVendor->EndOfSeek()){$vrow = $getVendor->Row();?>
-                                                    <option value="<?php echo $vrow->ip_code;?>"><?php echo $vrow->name;?></option>
-                                                <?php } ?>
-                                        </select><span id="venderror"></span></td>
-                                        <td><select id="outcome" name="outcome" class="form-control">
-                                                <option disabled selected>--SELECT OUTCOME--</option>
-                                                <?php while(!$getOutcomes->EndOfSeek()){$orow = $getOutcomes->Row();?>
-                                                    <option value="<?php echo $orow->code;?>"><?php echo $orow->name;?></option>
-                                                <?php } ?>
-                                            </select><span id="incerror"></span></td>
-                                        <td>
-                                            <select id="year" name="year" class="form-control">
-                                                <option disabled selected>--YEAR--</option>
-                                                <?php for(($i=date('Y')); $i<=date('Y')+20; $i++){?>
-                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                                <?php }?>
-                                            </select><span id="yerror"></span>
-                                        </td>
-                                        <td>
-                                            <input type="submit" name="find" id="find" value="Find" class="btn btn-primary">
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </form>
-                        </div>
-                        <div id="findResponse"></div>
+                                        </thead>
+                                        <tbody>
+                                        <?php $ucount = 1; while(!$fetchAllProjects->EndOfSeek()){ $ucrow = $fetchAllProjects->Row();?>
+                                            <tr>
+                                                <td><?php echo $ucount;?></td>
+                                                <td><?php echo $ucrow->iname;?></td>
+                                                <td><?php echo $ucrow->ip_code;?></td>
+                                                <td><?php echo $ucrow->oname;?></td>
+                                                <td style="text-align: center"><?php echo $ucrow->pmv;?></td>
+                                                <td style="text-align: center"><?php echo $pmvObj->countAddedPMVs($ucrow->id);?></td>
+                                                <td><?php echo $ucrow->date;?></td>
+                                                <td><div class="btn-group m-r-5 m-b-5">
+                                                        <?php if($pmvObj->checkPMVAdded($ucrow->id)=='open'){?>
+                                                        <a href="javascript:;" data-toggle="dropdown" class="btn btn-success btn-sm dropdown-toggle"><i class="fa fa-file-pdf-o"></i> Field Reports <span class="caret"></span></a>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="add_pmv_light.php?shid=<?php echo base64_encode($ucrow->id);?>">Add PMV</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <?php } ?></td>
+                                            </tr>
+                                            <?php $ucount++; } ?>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade in" id="default-tab-2">
+                                    <form method="POST" action="" id="findForm">
+                                        <table class="table table-responsive table-striped table-bordered" align="center">
+                                            <tbody>
+                                            <tr>
+                                                <td>Vendor</td>
+                                                <td>Outcome Area</td>
+                                                <td>Year</td>
+                                                <td>&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td><select id="vendor" name="vendor" class="form-control">
+                                                        <option disabled selected>--SELECT VENDOR--</option>
+                                                        <?php while(!$getVendor->EndOfSeek()){$vrow = $getVendor->Row();?>
+                                                            <option value="<?php echo $vrow->ip_code;?>"><?php echo $vrow->name;?></option>
+                                                        <?php } ?>
+                                                    </select><span id="venderror"></span></td>
+                                                <td><select id="outcome" name="outcome" class="form-control">
+                                                        <option disabled selected>--SELECT OUTCOME--</option>
+                                                        <?php while(!$getOutcomes->EndOfSeek()){$orow = $getOutcomes->Row();?>
+                                                            <option value="<?php echo $orow->code;?>"><?php echo $orow->name;?></option>
+                                                        <?php } ?>
+                                                    </select><span id="incerror"></span></td>
+                                                <td>
+                                                    <select id="year" name="year" class="form-control">
+                                                        <option disabled selected>--YEAR--</option>
+                                                        <?php for(($i=date('Y')); $i<=date('Y')+20; $i++){?>
+                                                            <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                        <?php }?>
+                                                    </select><span id="yerror"></span>
+                                                </td>
+                                                <td>
+                                                    <input type="submit" name="find" id="find" value="Find" class="btn btn-primary">
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </form>
+                                </div>
+                                <div id="findResponse"></div>
+                                </div>
+                            </div><!-- tabs end -->
+
+
 
                     </div>
                 </div>

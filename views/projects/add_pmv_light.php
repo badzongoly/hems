@@ -1,7 +1,7 @@
 <?php
 require_once('../../classes/mysql.class.php');
 require_once('../../classes/Pmv.class.php');
-$page = "project";
+$page = "pmv";
 $sub_page_name = "add_pmv";
 
 $chekLogin = new MySQL();
@@ -10,6 +10,9 @@ $chekLogin->checkLogin();
 if(isset($_GET['shid']) && !empty($_GET['shid'])){
 
     $sheetid = base64_decode($_GET['shid']);
+    $getVdetails = new MySQL();
+    $getVdetails->Query("SELECT implementing_partners.name,implementing_partners.ip_code FROM pmv_sheet LEFT JOIN implementing_partners ON pmv_sheet.vendor = implementing_partners.ip_code WHERE pmv_sheet.id = $sheetid");
+    $implprow = $getVdetails->Row();
 
 }else{
 
@@ -20,6 +23,8 @@ if(isset($_GET['shid']) && !empty($_GET['shid'])){
 if(isset($_SESSION['hems_active_pmv']) && !empty($_SESSION['hems_active_pmv']) && $_SESSION['hems_active_pmv'] > 0){
 
     $pmvid = $_SESSION['hems_active_pmv'];
+    $getBackInfo = new MySQL();
+    $getBackInfo->Query("SELECT * FROM pmv_light WHERE id = $pmvid");
 
 }else{
 
@@ -27,6 +32,10 @@ if(isset($_SESSION['hems_active_pmv']) && !empty($_SESSION['hems_active_pmv']) &
     $pmvid = $_SESSION['hems_active_pmv'];
 
 }
+
+$getPmvRecordset = new MySQL();
+$getPmvRecordset->Query("SELECT * FROM pmv_light WHERE id = $pmvid");
+$pmvRecordset = $getPmvRecordset->Row();
 
 $getStaffMet = new MySQL();
 $getStaffMet->Query("SELECT * FROM pmv_staff_met WHERE pmv_id = $pmvid");
@@ -145,7 +154,7 @@ $offcount = $getOffs->RowCount();
 <!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-repeat"></i></a>-->
 <!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>-->
 <!--                            <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>-->
-                            <input style="float:right" type="text" name="submitPmv" id="submitPmv" class="btn btn-primary btn-sm" value="Submit PMV">
+                            <input style="float:right" type="submit" name="submitPmv" id="submitPmv" class="btn btn-primary btn-sm" value="Submit PMV">
                         </div>
                         <h4 class="panel-title">Add PMV</h4>
                         <div id="submitResponse"></div>
@@ -179,9 +188,9 @@ $offcount = $getOffs->RowCount();
                                                     <td  colspan="3" class="col-lg-3">
                                                         <div>
                                                             <div class="input-group input-daterange">
-                                                                <input type="text" class="form-control" name="start" id="start" placeholder="Date Start" /><span id="starterror"></span>
+                                                                <input type="text" class="form-control" name="start" id="start" placeholder="Date Start" value="<?php if(is_object($pmvRecordset)){echo $pmvRecordset->start_date;}?>"/><span id="starterror"></span>
                                                                 <span class="input-group-addon">to</span>
-                                                                <input type="text" class="form-control" name="end" id="end" placeholder="Date End" />
+                                                                <input type="text" class="form-control" name="end" id="end" placeholder="Date End" value="<?php if(is_object($pmvRecordset)){echo $pmvRecordset->end_date;}?>"/>
                                                                 <span id="enderror"></span>
                                                             </div>
                                                         </div>
@@ -189,27 +198,22 @@ $offcount = $getOffs->RowCount();
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Objectives<font style="color: red">*</font>:</label></td>
-                                                    <td class="col-lg-4"><textarea class="form-control" name="objectives" id="objectives"></textarea><span id="objerror"></span></td>
+                                                    <td class="col-lg-4"><textarea class="form-control" name="objectives" id="objectives"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->objectives;}?></textarea><span id="objerror"></span></td>
 
-                                                    <td class="col-lg-2"><label>Partner Name<font style="color: red">*</font>:</label></td>
-                                                    <td class="col-lg-4"><select id="vendor" name="vendor" class="form-control">
-                                                            <option disabled selected>--SELECT VENDOR--</option>
-                                                            <?php while(!$getVendor->EndOfSeek()){$vrow = $getVendor->Row();?>
-                                                                <option value="<?php echo $vrow->ip_code;?>"><?php echo $vrow->name;?></option>
-                                                            <?php } ?>
-                                                        </select><span id="pnerror"></span></td>
+                                                    <td class="col-lg-2"><label>Partner Name:</label></td>
+                                                    <td class="col-lg-4"><strong><?php echo $implprow->name;?></strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Outputs<font style="color: red">*</font>:</label></td>
-                                                    <td class="col-lg-4"><textarea class="form-control" name="outputs" id="outputs"></textarea><span id="outerror"></span></td>
+                                                    <td class="col-lg-4"><textarea class="form-control" name="outputs" id="outputs"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->outputs;}?></textarea><span id="outerror"></span></td>
 
                                                     <td class="col-lg-2"><label>Total Cash Contribution Of Programmes<font style="color: red">*</font>:</label></td>
-                                                    <td class="col-lg-4"><input type="text" class="form-control" name="cash_contri" id="cash_contri"></td>
+                                                    <td class="col-lg-4"><input type="text" class="form-control" name="cash_contri" id="cash_contri" onkeypress="return isNumberKey(event)" value="<?php if(is_object($pmvRecordset)){echo $pmvRecordset->total_cash_contrib;}?>"><span id="contrierror"></span></td>
 
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Supplies Already Provided As Part Of Program<font style="color: red">*</font>:</label></td>
-                                                    <td class="col-lg-4"><input type="text" class="form-control" name="supplies" id="supplies"></td>
+                                                    <td class="col-lg-4"><input type="text" class="form-control" name="supplies" id="supplies" value="<?php if(is_object($pmvRecordset)){echo $pmvRecordset->supplies;}?>"><span id="suplerror"></span></td>
 
                                                     <td colspan="2"></td>
                                                 </tr>
@@ -218,37 +222,38 @@ $offcount = $getOffs->RowCount();
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Access To Inputs/Services<font style="color: red">*</font>:</label></td>
-                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="access_input_serv" id="access_input_serv"></textarea></td>
+                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="access_input_serv" id="access_input_serv"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->access_serv;}?></textarea><span id="aiserror"></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Quality To Inputs/Services<font style="color: red">*</font>:</label></td>
-                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="qual_input_serv" id="qual_input_serv"></textarea></td>
+                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="qual_input_serv" id="qual_input_serv"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->quality_serv;}?></textarea><span id="qiserror"></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Utilisation To Inputs/Services<font style="color: red">*</font>:</label></td>
-                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="uti_input_serv" id="uti_input_serv"></textarea></td>
+                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="util_input_serv" id="util_input_serv"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->util_serv;}?></textarea><span id="uiserror"></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Enabling Environment<font style="color: red">*</font>:</label></td>
-                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="enab_environ" id="enab_environ"></textarea></td>
+                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="enab_environ" id="enab_environ"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->enabling_environ;}?></textarea><span id="eeerror"></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Overall assessment of the extent to which the programme is progressing in relation to the expected results for the year<font style="color: red">*</font>:</label></td>
-                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="assessment" id="assessment"></textarea></td>
+                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="assessment" id="assessment"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->overall_assess;}?></textarea><span id="asserror"></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Outstanding related concerns from the tracking sheet or previous PMV <font style="color: red">*</font>:</label></td>
-                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="outstanding" id="outstanding"></textarea></td>
+                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="outstanding" id="outstanding"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->outstand_related;}?></textarea><span id="outerror"></span></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Other issues/concerns <font style="color: red">*</font>:</label></td>
-                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="issues_concerns" id="issues_concerns"></textarea></td>
+                                                    <td colspan="3" class="col-lg-10"><textarea class="form-control" name="issues_concerns" id="issues_concerns"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->other_issues;}?></textarea><span id="icerror"></span></td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="12"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveBackground" id="saveBackground" value="Save Background Information"></td>
+                                                    <td colspan="12"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveBackground" id="saveBackground" value="Save Section A"></td>
                                                 </tr>
                                             </table>
                                             <input type="hidden" name="sheet_id" value="<?php echo $sheetid;?>">
+                                            <input type="hidden" name="vendor" value="<?php echo $implprow->ip_code;?>">
                                         </form>
                                     </div>
                                 </div>
@@ -738,15 +743,31 @@ $(function () {
         $("#backgroundResponse").empty();
         $("#starterror").empty();
         $("#enderror").empty();
-        $("#pnerror").empty();
         $("#outerror").empty();
         $("#objerror").empty();
+        $("#contrierror").empty();
+        $("#suplerror").empty();
+        $("#aiserror").empty();
+        $("#qiserror").empty();
+        $("#uiserror").empty();
+        $("#eeerror").empty();
+        $("#asserror").empty();
+        $("#icerror").empty();
+        $("#outerror").empty();
 
         var obj = $.trim($("#objectives").val());
         var vstart = $.trim($("#start").val());
         var vend = $.trim($("#end").val());
-        var pname = $.trim($("#vendor").val());
         var output = $.trim($("#outputs").val());
+        var contri = $.trim($("#cash_contri").val());
+        var supl = $.trim($("#supplies").val());
+        var ais = $.trim($("#access_input_serv").val());
+        var qis = $.trim($("#qual_input_serv").val());
+        var uis = $.trim($("#util_input_serv").val());
+        var ee = $.trim($("#enab_environ").val());
+        var ass = $.trim($("#assessment").val());
+        var out = $.trim($("#outstanding").val());
+        var ic = $.trim($("#issues_concerns").val());
 
         if(obj.length == 0){
 
@@ -761,12 +782,48 @@ $(function () {
             $("#enderror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
             $("html, body").animate({ scrollTop: 0 }, "slow");
         }
-        if(pname.length == 0){
-            $("#pnerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+        if(output.length == 0){
+            $("#outerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(contri.length == 0){
+            $("#contrierror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(supl.length == 0){
+            $("#suplerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(ais.length == 0){
+            $("#aiserror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(qis.length == 0){
+            $("#qiserror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(uis.length == 0){
+            $("#uiserror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(ee.length == 0){
+            $("#eeerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(ass.length == 0){
+            $("#asserror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(ic.length == 0){
+            $("#icerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+        }
+        if(out.length == 0){
+            $("#outerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
             $("html, body").animate({ scrollTop: 0 }, "slow");
         }
 
-        if(obj.length != 0 && vstart.length != 0 && vend.length != 0 && output.length != 0){
+        if(obj.length != 0 && vstart.length != 0 && vend.length != 0 && output.length != 0 && contri.length != 0 && supl.length != 0 && ais.length != 0 && qis.length != 0 && uis.length != 0 && ee.length != 0 && ass.length != 0 && ic.length != 0 && out.length != 0){
 
             $("#saveBackground").attr("disabled", "disabled");
             $("#bg_wait").css("display","block");
@@ -1492,7 +1549,9 @@ $(function () {
             e.preventDefault();
             $("#submitResponse").empty();
 
+            var conf = confirm("Are you sure you want to finally submit this PMV form?")
 
+            if(conf){
                 $("#submitPmv").attr("disabled", "disabled");
                 $("#submit_wait").css("display","block");
                 $("html, body").animate({ scrollTop: $("#submitResponse").position().top }, "slow");
@@ -1525,7 +1584,7 @@ $(function () {
                     }
                 });
                 return false;
-
+            }
         });
 
     });

@@ -428,6 +428,9 @@ $offcount = $getOffs->RowCount();
             e.preventDefault();
             $("#apprResponse").empty();
 
+            var conf = confirm("Are you sure you want to approve this PMV?");
+
+            if(conf){
 
             $("#approve").attr("disabled", "disabled");
             $("#appr_wait").css("display","block");
@@ -456,6 +459,7 @@ $offcount = $getOffs->RowCount();
             });
             return false;
 
+            }
         });
 
     });

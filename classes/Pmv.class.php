@@ -175,7 +175,7 @@ class Pmv extends  MySQL{
 
     function getProgramName($programId){
 
-        $this->Query("SELECT name FROM programmes WHERE id = $programId");
+        $this->Query("SELECT name FROM outcomes WHERE code = $programId");
         $proww = $this->Row();
         $proname = $proww->name;
 

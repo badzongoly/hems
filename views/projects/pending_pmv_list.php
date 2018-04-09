@@ -1,28 +1,18 @@
 <?php
+session_start();
 require_once('../../classes/mysql.class.php');
-require_once('../../classes/Pmv.class.php');
-
-$page = "reports";
-$sub_page_name = "detail_reports";
+$page = "pmv";
+$sub_page_name = "pending_pmv";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-$programArray = array();
+$userid = $_SESSION['hems_User']['user_id'];
 
-$fetchProjects =  new MySQL();
-$pmvObj =  new Pmv();
-
-$getProgs = new MySQL();
-$getProgs->Query("SELECT * FROM outcomes");
-
-while(!$getProgs->EndOfSeek()){
-
-    $progrow = $getProgs->Row();
-    $programArray[] = $progrow->code;
-
-}
-
-
+$dbConnect = new MySQL();
+$dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_partners.risk_rating,usr_users.first_name,usr_users.last_name FROM pmv_light
+                  LEFT JOIN implementing_partners ON pmv_light.ip_code = implementing_partners.ip_code
+                   LEFT JOIN usr_users ON pmv_light.created_by = usr_users.user_id
+                  WHERE pmv_light.status = 'active' AND pmv_light.created_by = $userid");
 
 ?>
 <!DOCTYPE html>
@@ -34,7 +24,7 @@ while(!$getProgs->EndOfSeek()){
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Document Details</title>
+    <title>HEMS | My Pending PMVs</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -88,12 +78,12 @@ while(!$getProgs->EndOfSeek()){
         <!-- begin breadcrumb -->
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
-            <li><a href="javascript:;">Reports</a></li>
-            <li class="active">Document Details</li>
+            <li><a href="javascript:;">PMV</a></li>
+            <li class="active">Validate PMV</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Reports <small>document details...</small></h1>
+        <h1 class="page-header">PMV <small>my pending pmvs...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -109,60 +99,39 @@ while(!$getProgs->EndOfSeek()){
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Document Details</h4>
+                        <h4 class="panel-title">My Pending PMVs</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
 
-                                <table class="table table-responsive table-striped table-bordered">
+                                <table class="table table-responsive table-striped table-bordered" id="data-table">
                                     <thead>
                                     <tr>
-                                        <th>Vendor</th>
-                                        <th>Risk Rating</th>
-                                        <th>Total</th>
-                                        <th>PMVs Required</th>
-                                        <th>Spot Check Required</th>
-                                        <th>Audit Required</th>
-                                        <th>PMVs Completed</th>
-                                        <th>Spot Check Completed</th>
-                                        <th>Audit Completed</th>
+                                        <td>Start Date</td>
+                                        <td>End Date</td>
+                                        <td>Objectives</td>
+                                        <td>Partner Name</td>
+                                        <td>Risk Rating</td>
+                                        <td>Total Cash Contribution</td>
+                                        <td>Created By</td>
+                                        <td>Date Created</td>
+                                        <td>&nbsp;</td>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach($programArray as $pro){?>
+                                    <?php while(!$dbConnect->EndOfSeek()){ $pmvRow = $dbConnect->Row();?>
                                         <tr>
-                                            <td>&nbsp;</td>
-                                            <td><h5><?php echo $pmvObj->getProgramName($pro);?></h5></td>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
-                                            <td>&nbsp;</td>
-                                        </tr>
-
-                                        <?php
-                                        $qury = "SELECT pmv_sheet.*,implementing_partners.name
-                           FROM pmv_sheet LEFT JOIN implementing_partners ON implementing_partners.ip_code = pmv_sheet.vendor
-                           WHERE pmv_sheet.outcome_area = $pro";
-
-                                        $fetchProjects->Query($qury);
-                                        while(!$fetchProjects->EndOfSeek()){ $ucrow = $fetchProjects->Row();?>
-                                            <tr>
-                                                <td><?php echo $ucrow->name.' - '.$ucrow->vendor;?></td>
-                                                <td><?php echo $ucrow->risk_rating;?></td>
-                                                <td><?php echo $ucrow->amount;?></td>
-                                                <td><?php echo $ucrow->pmv;?></td>
-                                                <td><?php echo 0;?></td>
-                                                <td><?php echo 0;?></td>
-                                                <td><?php echo $pmvObj->countAddedPMVs($ucrow->id);?></td>
-                                                <td><?php echo 0;?></td>
-                                                <td><?php echo 0;?></td>
-                                            </tr>
-                                        <?php } ?>
+                                            <td><?php echo $pmvRow->start_date;?></td>
+                                            <td><?php echo $pmvRow->end_date;?></td>
+                                            <td><?php echo $pmvRow->objectives;?></td>
+                                            <td><?php echo $pmvRow->name;?></td>
+                                            <td><?php echo $pmvRow->risk_rating;?></td>
+                                            <td><?php echo $pmvRow->total_cash_contrib;?></td>
+                                            <td><?php echo $pmvRow->first_name.' '.$pmvRow->last_name;?></td>
+                                            <td><?php echo $pmvRow->created_on;?></td>
+                                        <td><a href="edit_pmv_light.php?pmvid=<?php echo base64_encode($pmvRow->id);?>" class="btn btn-primary btn-sm"><i class="fa fa-cogs"></i> Edit PMV</a></td>
+                                    </tr>
                                     <?php } ?>
-
                                     </tbody>
 
                                 </table>

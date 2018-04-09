@@ -28,6 +28,7 @@
         $resp = $update->Query($sql);
 
         if($resp){
+            $_SESSION['hems_active_pmv'] = 0;
             echo "ok";exit;
         }else{
             echo "fail";exit;

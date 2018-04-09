@@ -427,33 +427,37 @@ $offcount = $getOffs->RowCount();
             e.preventDefault();
             $("#apprResponse").empty();
 
+            var conf = confirm("Are you sure you want to validate this PMV?");
 
-            $("#approve").attr("disabled", "disabled");
-            $("#appr_wait").css("display","block");
-            $("html, body").animate({ scrollTop: $("#apprResponse").position().top }, "slow");
+            if(conf) {
 
-            $.ajax({
-                type: "POST",
-                url: "../../controllers/project/savePmvValidation.php",
-                data: {pmvid:$pmvid},
-                success: function(e) {
+                $("#approve").attr("disabled", "disabled");
+                $("#appr_wait").css("display", "block");
+                $("html, body").animate({scrollTop: $("#apprResponse").position().top}, "slow");
 
-                    if(e=="fail"){
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/savePmvValidation.php",
+                    data: {pmvid: $pmvid},
+                    success: function (e) {
 
-                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV validation failed.</span></div><br>").hide().fadeIn(1000);
-                        $("#appr_wait").css("display","none");
-                        $("#approve").removeAttr('disabled');
+                        if (e == "fail") {
 
-                    }else if(e=="ok"){
+                            $('#apprResponse').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV validation failed.</span></div><br>").hide().fadeIn(1000);
+                            $("#appr_wait").css("display", "none");
+                            $("#approve").removeAttr('disabled');
 
-                        $('#apprResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Validated Successfully.</span></div><br>").hide().fadeIn(1000);
-                        $("#appr_wait").css("display","none");
-                        $("#approve").removeAttr('disabled');
+                        } else if (e == "ok") {
 
+                            $('#apprResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Validated Successfully.</span></div><br>").hide().fadeIn(1000);
+                            $("#appr_wait").css("display", "none");
+                            $("#approve").removeAttr('disabled');
+
+                        }
                     }
-                }
-            });
-            return false;
+                });
+                return false;
+            }
 
         });
 

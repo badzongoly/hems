@@ -10,9 +10,8 @@ $chekLogin->checkLogin();
 $fetchProjects =  new MySQL();
 $pmvObj =  new Pmv();
 
-$qury = "SELECT activities.id, activities.partner_id, implementing_partners.name AS part_name,activities.spot_check,activities.pmv,
-                           activities.audit,activities.status, implementing_partners.risk_rating,implementing_partners.ip_code
-                           FROM activities LEFT JOIN implementing_partners ON implementing_partners.ip_code = activities.partner_id";
+$qury = "SELECT pmv_sheet.*,implementing_partners.name
+                           FROM pmv_sheet LEFT JOIN implementing_partners ON implementing_partners.ip_code = pmv_sheet.vendor";
 
 $fetchProjects->Query($qury);
 
@@ -119,9 +118,9 @@ $fetchProjects->Query($qury);
                                     <tbody>
                                     <?php while(!$fetchProjects->EndOfSeek()){ $ucrow = $fetchProjects->Row();?>
                                         <tr>
-                                            <td><?php echo $ucrow->part_name.' - '.$ucrow->ip_code;?></td>
+                                            <td><?php echo $ucrow->name.' - '.$ucrow->vendor;?></td>
                                             <td><?php echo $ucrow->risk_rating;?></td>
-                                            <td><?php echo $ucrow->pmv + $pmvObj->countAddedPMVs($ucrow->id);?></td>
+                                            <td><?php echo $ucrow->amount;?></td>
                                             <td><?php echo $ucrow->pmv;?></td>
                                             <td><?php echo $pmvObj->countAddedPMVs($ucrow->id);?></td>
                                         </tr>
