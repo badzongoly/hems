@@ -174,12 +174,12 @@ if(isset($_FILES["file"]["type"]) && isset($_POST['do']) && $_POST['do'] == "PMV
     //var_dump($excelRows);
     for($x = 6 ;$x<sizeof($excelRows['A'])+6;$x++){
         $vendorID = explode('-',$excelRows['A'][$x]);
-        $valuesArray['vendor'] = MySQL::SQLValue($vendorID[sizeof($vendorID)-1]);
-        $valuesArray['risk_rating'] = MySQL::SQLValue($excelRows['B'][$x]);
-        $valuesArray['amount'] = MySQL::SQLValue($excelRows['D'][$x]);
+        $valuesArray['vendor'] = MySQL::SQLValue(trim($vendorID[sizeof($vendorID)-1]));
+        $valuesArray['risk_rating'] = MySQL::SQLValue(trim($excelRows['B'][$x]));
+        $valuesArray['amount'] = MySQL::SQLValue(trim($excelRows['D'][$x]));
         $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
         $valuesArray['outcome_area'] = MySQL::SQLValue(substr($excelRows['C'][$x],0,2));
-        $valuesArray['pmv'] = MySQL::SQLValue($object->getPMVCalculaiton($excelRows['D'][$x],$excelRows['B'][$x]));
+        $valuesArray['pmv'] = MySQL::SQLValue($object->getPMVCalculation($excelRows['D'][$x],$excelRows['B'][$x]));
         $valuesArray['date'] = MySQL::SQLValue($_POST['month']."-".$_POST['year']);
         if(empty($sql)) {
             $sql = MySQL::BuildSQLInsert($table, $valuesArray);
@@ -246,11 +246,11 @@ if(isset($_FILES["file"]["type"]) && isset($_POST['do']) && $_POST['do'] == "exc
     $rowCount = $object->RowCount();
     while (!$object->EndOfSeek()){
         $row = $object->Row();
-        $vsArray['vendor'] = MySQL::SQLValue($row->vendor);
-        $vsArray['risk_rating'] = MySQL::SQLValue($row->risk_rating);
-        $vsArray['amount'] = MySQL::SQLValue($row->amount);
+        $vsArray['vendor'] = MySQL::SQLValue(trim($row->vendor));
+        $vsArray['risk_rating'] = MySQL::SQLValue(trim($row->risk_rating));
+        $vsArray['amount'] = MySQL::SQLValue(trim($row->amount));
         $vsArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
-        $vsArray['spot_checks'] = MySQL::SQLValue($row->spot_checks);
+        $vsArray['spot_checks'] = MySQL::SQLValue(trim($row->spot_checks));
         $vsArray['date'] = MySQL::SQLValue($row->date);
         if(empty($sql)) {
             $sql = MySQL::BuildSQLInsert("spot_checks_trans", $vsArray);
