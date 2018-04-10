@@ -271,7 +271,7 @@ if(isset($_FILES["file"]["type"]) && isset($_POST['do']) && $_POST['do'] == "exc
     //var_dump($excelRows);
     for($x = 6 ;$x<sizeof($excelRows['A'])+6;$x++){
         $vendorID = explode('-',$excelRows['A'][$x]);
-        $valuesArray['vendor'] = MySQL::SQLValue($vendorID[sizeof($vendorID)-1]);
+        $valuesArray['vendor'] = MySQL::SQLValue(trim($vendorID[sizeof($vendorID)-1]));
         $valuesArray['risk_rating'] = MySQL::SQLValue($excelRows['B'][$x]);
         $valuesArray['amount'] = MySQL::SQLValue($excelRows['C'][$x]);
         $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);

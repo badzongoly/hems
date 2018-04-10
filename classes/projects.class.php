@@ -137,12 +137,12 @@ class Project extends MySQL
 
     }
     public function getConfirmationSPOTCHECK(){
-        $this->Query('Select * from spot_checks');
+        $this->Query('Select  p.name,s.risk_rating,s.amount,s.spot_checks,s.date from spot_checks s INNER JOIN implementing_partners p ON p.ip_code = s.vendor');
         $output = '<table class="table table-striped table-hover table-email table-bordered" style="" align="center">
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th> VENDOR CODE</th>
+                                    <th> VENDOR </th>
                                     <th> RISK RATING</th>
                                     <th>AMOUNT</th>
                                     <th> REQUIRED SPOT CHECK</th>
@@ -154,7 +154,7 @@ class Project extends MySQL
             $row = $this->Row();
             $output.='<tr>
                                         <td>'.$counter.'</td>
-                                        <td>'.$row->vendor.'</td>
+                                        <td>'.$row->name.'</td>
                                         <td>'.$row->risk_rating.'</td>
                                         <td>'.number_format($row->amount,2).'</td> 
                                         <td>'.$row->spot_checks .'</td>
