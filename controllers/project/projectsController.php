@@ -302,3 +302,27 @@ if(isset($_POST['do']) && $_POST['do'] == "cancel"){
 }if(isset($_POST['do']) && $_POST['do'] == "confirm"){
         echo $object->moveActivities();exit;
 }
+if(isset($_POST['do']) && $_POST['do'] == "CreateSpotCheckForm"){
+    $path = $file->FileUpload(
+        ['file'=>$_FILES['files'],'target'=>'../../upload/excel/'.$_POST['date'],'filetype'=>$_FILES['files']['type']]
+    );
+    $valuesArray['partner_id'] = MySQL::SQLValue($_POST['partner_id']);
+    $valuesArray['outcome_area'] =MySQL::SQLValue($_POST['outcome_id']);
+    $valuesArray['date'] = MySQL::SQLValue($_POST['date']);
+    $valuesArray['form_url'] = MySQL::SQLValue($path);
+    if(isset($_POST['comment'])){
+        $valuesArray['comment'] = MySQL::SQLValue($_POST['comment']);
+    }
+    $valuesArray['status'] = MySQL::SQLValue($_POST['status']);
+    $valuesArray['created_by'] = MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+    $sql = MySQL::BuildSQLInsert('spotcheck_light',$valuesArray);
+    $check = $object->Query($sql);
+    if($check){
+        echo "ok";
+    }
+    else{
+        echo "error";
+    }
+
+
+}
