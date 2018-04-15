@@ -40,6 +40,48 @@ class Pmv extends  MySQL{
         return $finalCount;
 
     }
+    function countSpotCheck($pmvSheetId){
+
+        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM spotcheck_light WHERE id = $pmvSheetId AND status = 'validated'");
+        $pmvRow = $this->Row();
+        $finalCount = $pmvRow->pmvCount;
+
+        return $finalCount;
+
+    }
+    function countSpotCheckByVendor($pmvSheetId){
+
+        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM spotcheck_light WHERE partner_id = $pmvSheetId AND status = 'validated'");
+        $pmvRow = $this->Row();
+        $finalCount = $pmvRow->pmvCount;
+
+        return $finalCount;
+
+    }
+    function countSpotCheckByLocation($location){
+
+        $this->Query("SELECT SUM(spot_checks)AS required_spotchecks FROM `spot_checks` s INNER JOIN implementing_partners i ON i.ip_code = s.vendor WHERE i.location ='$location'");
+        $pmvRow = $this->Row();
+        $finalCount = $pmvRow->required_spotchecks;
+
+        return $finalCount;
+
+    }  function countSpotCheckBycompletedLocation($location){
+
+        $this->Query("SELECT COUNT(s.id)AS required_spotchecks FROM `spotcheck_light` s INNER JOIN implementing_partners i ON i.ip_code = s.partner_id WHERE i.location ='$location'");
+        $pmvRow = $this->Row();
+        $finalCount = $pmvRow->required_spotchecks;
+
+        return $finalCount;
+
+    }
+   function countAmountByLocation($location){
+        $this->Query("SELECT SUM(amount)AS required_spotchecks FROM `spot_checks` s INNER JOIN implementing_partners i ON i.ip_code = s.vendor WHERE i.location ='$location'");
+
+        $pmvRow = $this->Row();
+        $finalCount = $pmvRow->required_spotchecks;
+        return $finalCount;
+    }
 
     function getAccessServiceComment($pmvid,$accessServId){
 
