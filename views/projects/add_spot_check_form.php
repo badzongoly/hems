@@ -7,7 +7,7 @@
  */
 require_once('../../classes/mysql.class.php');
 $page = "spot";
-$sub_page_name = "spot_check";
+$sub_page_name = "spotcheck_form";
 $pull_ucat = new MySQL();
 $pull_ucat->checkLogin();
 $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
@@ -21,7 +21,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | ADD SPOT CHECKS</title>
+    <title>HEMS | ADD SPOTCHECK FORM</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -51,7 +51,6 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
     <link href="../../assets/plugins/jquery-file-upload/blueimp-gallery/blueimp-gallery.min.css" rel="stylesheet" />
     <link href="../../assets/plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" />
     <link href="../../assets/plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" />
-    <!-- ================== END PAGE LEVEL CSS STYLE ================== -->
     <!-- ================== END BASE CSS STYLE ================== -->
 
     <!-- ================== BEGIN BASE JS ================== -->
@@ -79,11 +78,11 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
             <li><a href="javascript:;">Spot Check</a></li>
-            <li class="active">Add Spot Check Excel Upload</li>
+            <li class="active">Add Spotcheck Form</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">Sport Check <small>add spot check excel upload...</small></h1>
+        <h1 class="page-header">Spot Check <small>add spotcheck form...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -99,79 +98,95 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Add Sport Check Excel Upload</h4>
+                        <h4 class="panel-title">Add Spot Check Form</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row">
+                            <div>
+                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding SpotCheck Form. Please wait....</p>
+                            </div>
+                            <div id="uc_response"></div>
                             <form id="createUserCatForm" method="post" action="">
-                               <div class="container-fluid" align="center">
-                                   <p id="confirmation" style="text-align:center"></p>
-                                <table class="table table-responsive table-email" style="width: 560px;" align="center">
+
+                                <table class="table table-responsive table-striped table-bordered" align="center">
 
                                     <thead>
-                                    <tr>
-                                        <td colspan="4" align="center"><strong>Upload Excel File</strong></td>
-                                    </tr>
 
+                                    <tr>
+                                        <td colspan="5"><p id="confirmation" style="text-align:center"></p></td>
+                                    </tr>
 
                                     </thead>
                                     <tbody>
 
-
                                     <tr>
+                                        <td><label>Implementing Partner:</label></td>
                                         <td>
-                                            <select id="month" name="month" class="form-control">
-                                                <?php for($m=1; $m<=12; $m++){ $month = date('M',mktime(0,0,0,$m,1,date('Y')))?>
-                                                    <option value="<?php echo $month; ?>"><?php echo $month; ?></option>
+                                            <select class="default-select2 form-control" id="partner_id" name="partner_id" style="height: 35px;">
+                                                <?php while(!$pull_ucat->EndOfSeek()){ $ucrow = $pull_ucat->Row();?>
+                                                    <option value="<?php echo $ucrow->ip_code;?>"><?php echo $ucrow->name;?></option>
                                                 <?php }?>
                                             </select>
                                         </td>
+                                        <td><label>Outcome:</label></td>
                                         <td>
-                                            <select id="year" name="year" class="form-control">
-                                                <?php for($i=date('Y'); $i>=date('Y')-100; $i--){?>
-                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                            <select class="default-select2 form-control" id="outcome_id" name="outcome_id" style="height: 35px;">
+                                                <?php
+                                                $pull_ucat->Query('Select * from outcomes');
+                                                while(!$pull_ucat->EndOfSeek()){ $ucrow = $pull_ucat->Row();?>
+                                                    <option value="<?php echo $ucrow->id;?>"><?php echo $ucrow->name;?></option>
                                                 <?php }?>
                                             </select>
                                         </td>
-                                        <td nowrap="">
+                                    </tr>
+                                    <tr>
+                                        <td><label>Comment:</label></td>
+                                        <td><textarea class="form-control" id="comment" name="comment" rows="4" ></textarea><p id="comment_error"></p></td>
+                                        <td><label>Date:</label></td>
+                                        <td>
+                                            <input type="text" name="date" class="form-control" id="datepicker-default" placeholder="Select Date" /> <span id="startdate_error"></span>
+
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" nowrap="" align="center">
                                             <div class="form-group">
                                                 <div class="col-lg-12 col-xs-12">
                                      <span class="btn btn-success fileinput-button">
-                                    <i class="fa fa-file-excel-o"></i>
-                                    <span>Add files...</span>
+                                    <i class="fa fa-file-pdf-o"></i>
+                                    <span>Upload Form...</span>
                                     <input type="file" name="files" id="files" >
                                 </span>
-                                            </div>
+                                                </div>
                                                 <br/>
                                                 <p id="activity_error" class="pull-left"></p>
                                             </div>
-
-                                        </td>
-                                        <td colspan="4">
-                                            <input  type="submit" name="save" id="save" class="btn btn-primary" value="Upload Excel"></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4">
                                             <div class="col-lg-12 col-xs-12" >
                                                 <div class="alert alert-danger" id="fileerror" style="display: none;"></div><div class="alert alert-success" id="filesuccess" style="display: none;"></div>
                                             </div>
                                         </td>
+                                        <td><label>Status:</label></td>
+                                        <td>
+                                            <select class="default-select2 form-control" id="status" name="status" style="height: 35px;">
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+
+                                        <td colspan="4"><input  type="submit" name="save" id="save" class="btn btn-primary" value="Save"></td>
                                     </tr>
 
                                     </tbody>
 
-                                    <input type="hidden" id="do" name="do" value="excelUploadSpotCheck">
+                                    <input type="hidden" name="do" value="CreateSpotCheckForm">
 
                                 </table>
-
-                               </div>
+                                <hr>
                             </form>
-
-                            <div>
-                                <hr/>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding Spot Check. Please wait....</p>
-                            </div>
-                            <div id="uc_response"></div>
                         </div>
 
                         <div id="uclisted">
@@ -222,13 +237,6 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
 <script src="../../assets/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
 <script src="../../assets/plugins/select2/dist/js/select2.min.js"></script>
 <script src="../../assets/js/form-plugins.demo.min.js"></script>
-<script src="../../assets/plugins/jquery-file-upload/js/jquery.fileupload.js"></script>
-<script src="../../assets/plugins/jquery-file-upload/js/jquery.fileupload-process.js"></script>
-<script src="../../assets/plugins/jquery-file-upload/js/jquery.fileupload-image.js"></script>
-<script src="../../assets/plugins/jquery-file-upload/js/jquery.fileupload-audio.js"></script>
-<script src="../../assets/plugins/jquery-file-upload/js/jquery.fileupload-video.js"></script>
-<script src="../../assets/plugins/jquery-file-upload/js/jquery.fileupload-validate.js"></script>
-<script src="../../assets/plugins/jquery-file-upload/js/jquery.fileupload-ui.js"></script>
 <!-- ================== END BASE JS ================== -->
 
 <!-- ================== BEGIN PAGE LEVEL JS ================== -->
@@ -239,175 +247,142 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
     $(document).ready(function() {
         App.init();
         FormPlugins.init();
-        FormMultipleUpload.init();
     });
 </script>
 <script>
+    $(function () {
 
-    $(document).on('click','#save',function (e) {
-        e.preventDefault();
-        $("#activity_error").empty();
+        var $buttons = $("#save");
+        var $form = $("form#createUserCatForm");
 
-        var file = $.trim($("#files").val());
+        $form.submit(function (e) {
 
-        if(file.length == 0){
-            $("#activity_error").html('<p><small style="color:red;">Please select a file to upload </small><p/>');
-            $("html, body").animate({ scrollTop: 0 }, "slow");
-        }
+            e.preventDefault();
+            $("#uc_response").empty();
+            $("#cname_error").empty();
+            $("#description_error").empty();
+            $('#pmv_error').empty();
+            $("#spotcheck_error").empty();
+            $("#startdate_error").empty();
+            $("#duration_error").empty();
+            var cname = $.trim($("#name").val());
+            var location = $.trim($("#description").val());
+            var file = $.trim($("#files").val());
+            var spotcheck = $.trim($("#spotcheck").val());
+            var audit = $.trim($("#audit").val());
+            var startdate = $.trim($("#datepicker-default").val());
+            var duration = $.trim($("#duration").val());
 
-        if( file.length != 0){
-            var formdata = new FormData;
-            formdata.append('file',$('#files')[0].files[0]);
-            formdata.append('month',$("#month").val());
-            formdata.append('year',$("#year").val());
-            formdata.append('do',$('#do').val());
-            $("#save").attr("disabled", "disabled");
-            $("#wait").css("display","block");
-            $("html, body").animate({ scrollTop: 0 }, "slow");
-
-            $.ajax({
-                type: "POST",
-                url: "../../controllers/project/projectsController.php",
-                processData: false,
-                contentType: false,
-                data: formdata,
-                success: function(e) {
-                    if(e=="error"){
-
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save activities.</span></div><br>").hide().fadeIn(1000);
-                        $("#wait").css("display","none");
-                        $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save activities.</span></div><br>").fadeOut(6000);
-
-                    }else if(e=="exists"){
+            if(file.length == 0){
+                $("#activity_error").html('<p><small style="color:red;">Please select a file to upload </small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+            if(startdate.length == 0){
+                $("#startdate_error").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
 
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").hide().fadeIn(1000);
-                        $("#wait").css("display","none");
-                        $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This Activities already exists.</span></div><br>").fadeOut(6000);
+            if(startdate.length != 0 &&   file.length != 0){
 
-                    }
-                    else if(e ==="success"){
-                        $("#wait").css("display","none");
-                        $("#save").removeAttr('disabled');
-                        $('#uclisted').empty();
-                        $('#uclisted').load("../../controllers/project/projectsController.php",{'do':"getNewListSpotCheck"});
-                        $('#files').val();
-                    }
-                    else {
+                $("#save").attr("disabled", "disabled");
+                $("#wait").css("display","block");
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                var formdata = new FormData($(this)[0]);
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities saved successfully.</span></div><br>").hide().fadeIn(1000);
-                        $('#uclisted').empty();
-                        $('#uclisted').html(e);
-                        $("#wait").css("display","none");
-                        $("#save").removeAttr('disabled');
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities saved successfully.</span></div><br>").fadeOut(6000);
-                    }
+                $.ajax({
+                    type: "POST",
+                    url: "../../controllers/project/projectsController.php",
+                    data: formdata,
+                    async: false,
+                    success: function(e) {
 
 
-                }
-            });
-            return false;
-        }
-    });
+                        if(e=="error"){
 
-        $(document).on('click', '#delete', function (e) {
+
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save Spot check.</span></div><br>").hide().fadeIn(1000);
+                            $("#wait").css("display","none");
+                            $("#save").removeAttr('disabled');
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save spot check.</span></div><br>").fadeOut(6000);
+
+                        }else if(e=="exists"){
+
+
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This Spot check already exists.</span></div><br>").hide().fadeIn(1000);
+                            $("#wait").css("display","none");
+                            $("#save").removeAttr('disabled');
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This Spot check already exists.</span></div><br>").fadeOut(6000);
+
+                        }else if(e == "ok"){
+
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Spot check saved successfully.</span></div><br>").hide().fadeIn(1000);
+                            $('#uclisted').empty();
+                            $("#wait").css("display","none");
+                            $("#datepicker-default").val("");
+                            $("#location").val("");
+                            $("#contact_person").val("");
+                            $("#phone").val("");
+                            $("#email").val("");
+                            $("#save").removeAttr('disabled');
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Spot check form saved successfully.</span></div><br>").fadeOut(6000);
+                        }
+
+
+                    },
+                    processData: false,
+                    contentType: false,
+                    cache:false
+                });
+                return false;
+            }
+        });
+
+        $(document).on('click','#delete',function (e) {
             e.preventDefault();
             var id = $(this).data('id');
             var action = "delete";
             $.ajax({
-                type: "POST",
-                data: {id: id, do_action: action},
-                url: "../../controllers/project/projectsController.php",
-                success: function (data) {
-                    if (data == "error") {
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to Activities.</span></div><br>").hide().fadeIn(1000);
-                        $("#wait").css("display", "none");
-                        $("#save").removeAttr('disabled');
-
-
-                    } else {
-
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities deleted successfully.</span></div><br>").hide().fadeIn(1000);
-
-                        $('#uclisted').html(data);
-                        $("#wait").css("display", "none");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities deleted successfully.</span></div><br>").fadeOut(6000);
-
-                    }
-
-                }
-
-            })
-        });
-        $(document).on('click', '#cancel', function (e) {
-            e.preventDefault();
-            var action = "cancel";
-            $.ajax({
-                type: "POST",
-                data: {'do': action},
-                url: "../../controllers/project/projectsController.php",
-                success: function (data) {
-                    if (data == "error") {
-                        $("html, body").animate({ scrollTop: 0 }, "slow");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to clear activities.</span></div><br>").hide().fadeIn(1000);
-                        $("#wait").css("display", "none");
-                        $("#save").removeAttr('disabled');
-
-
-                    } else {
-                        $("html, body").animate({ scrollTop: 0 }, "slow");
-
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities cancelled successfully.</span></div><br>").hide().fadeIn(1000);
-                        $('#files').val();
-                        $("#filesuccess").css("display","none");
-                        $('#uclisted').empty();
-                        $("#wait").css("display", "none");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities cancelled successfully.</span></div><br>").fadeOut(6000);
-
-                    }
-
-                }
-
-            })
-        });
-
-
-        $(document).on('click','#confirm',function (e) {
-            e.preventDefault();
-            $("#wait").css("display","block");
-            var action = "confirm";
-            $.ajax({
                 type:"POST",
-                data:{'do':action},
+                data:{id:id,do_action:action},
                 url:"../../controllers/project/projectsController.php",
                 success:function (data) {
-                    if(data=="error"){
-                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                    if(e=="error"){
                         $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to project.</span></div><br>").hide().fadeIn(1000);
                         $("#wait").css("display","none");
-                        $("#confirm").removeAttr('disabled');
+                        $("#save").removeAttr('disabled');
+
+
                     }else {
-                        $("html, body").animate({ scrollTop: 0 }, "slow");
 
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities confirmed successfully.</span></div><br>").hide().fadeIn(1000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project deleted successfully.</span></div><br>").hide().fadeIn(1000);
 
-                        $('#uclisted').empty();
-                        $("#filesuccess").css("display","none");
+                        $('#uclisted').html(data);
                         $("#wait").css("display","none");
-                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Activities confirmed successfully.</span></div><br>").fadeOut(6000);
+                        $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project deleted successfully.</span></div><br>").fadeOut(6000);
 
                     }
 
                 }
 
             })
-        });
+        })
+
+    });
+    function validateEmail(sEmail) {
+        var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+        if (filter.test(sEmail)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     $(document).on("change","#files",function(e){
         e.preventDefault();
-
         $("#activity_error").empty();
+        $("#filesuccess").empty();
+        $("#fileerror").empty();
         $("#filesuccess").css("display","none");
         $("#fileerror").css("display","none");
         $("#pdf").css("display","none");
@@ -415,14 +390,13 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         var filename = $(this).val();
         var type =  filename.split('.').pop();
         filename = filename.split(/[\\/]/g).pop().split('.')[0];
-
-        if(type === "xlsx" || type === "xls"){
-           $("#filesuccess").html('<p class=" note text-justify"><i class="fa fa-check"></i> '+ filename +'.'+type+'</p>');
+        if(type === "pdf" ){
+            $("#filesuccess").html('<p class=" note text-justify"><i class="fa fa-check"></i> '+ filename +'.'+type+'</p>');
             $("#filesuccess").css("display","block");
         }
         else
         {
-            $("#fileerror").html(' <p class=" note text-justify"><i class="fa fa-times"></i> Please select a <strong>microsoft office excel file(xlsx)</strong></p>');
+            $("#fileerror").html(' <p class=" note text-justify"><i class="fa fa-times"></i> Please select a <strong>PDF file(pdf)</strong></p>');
             $("#fileerror").css("display","block");
             $("#files").val("");
         }

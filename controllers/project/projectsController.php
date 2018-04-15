@@ -271,7 +271,7 @@ if(isset($_FILES["file"]["type"]) && isset($_POST['do']) && $_POST['do'] == "exc
     //var_dump($excelRows);
     for($x = 6 ;$x<sizeof($excelRows['A'])+6;$x++){
         $vendorID = explode('-',$excelRows['A'][$x]);
-        $valuesArray['vendor'] = MySQL::SQLValue($vendorID[sizeof($vendorID)-1]);
+        $valuesArray['vendor'] = MySQL::SQLValue(trim($vendorID[sizeof($vendorID)-1]));
         $valuesArray['risk_rating'] = MySQL::SQLValue($excelRows['B'][$x]);
         $valuesArray['amount'] = MySQL::SQLValue($excelRows['C'][$x]);
         $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
@@ -301,4 +301,90 @@ if(isset($_POST['do']) && $_POST['do'] == "cancel"){
         echo $object->deleteActivities();exit;
 }if(isset($_POST['do']) && $_POST['do'] == "confirm"){
         echo $object->moveActivities();exit;
+}
+if(isset($_POST['do']) && $_POST['do'] == "CreateSpotCheckForm"){
+    $path = $file->FileUpload(
+        ['file'=>$_FILES['files'],'target'=>'../../upload/excel/'.$_POST['date'],'filetype'=>$_FILES['files']['type']]
+    );
+    $valuesArray['partner_id'] = MySQL::SQLValue($_POST['partner_id']);
+    $valuesArray['outcome_area'] =MySQL::SQLValue($_POST['outcome_id']);
+    $valuesArray['date'] = MySQL::SQLValue(date('Y-m-d',strtotime($_POST['date'])));
+    $valuesArray['form_url'] = MySQL::SQLValue($path);
+    if(isset($_POST['comment'])){
+        $valuesArray['comment'] = MySQL::SQLValue($_POST['comment']);
+    }
+    $valuesArray['status'] = MySQL::SQLValue($_POST['status']);
+    $valuesArray['created_by'] = MySQL::SQLValue($_SESSION['hems_User']['user_id']);
+    $sql = MySQL::BuildSQLInsert('spotcheck_light',$valuesArray);
+    $check = $object->Query($sql);
+    if($check){
+        echo "ok";
+    }
+    else{
+        echo "error";
+    }
+
+
+}
+if(isset($_POST['do'])&& $_POST['do'] == "updateSpotCheck"){
+    $purpose = '';
+    if(isset($_POST['purpose'])) {
+        $purpose = $_POST['purpose'];
+    }
+    $status  = $_POST['status'];
+    echo $object->updateSpotCheck($_POST['id'],$status,$purpose);
+}if(isset($_POST['do'])&& $_POST['do'] == "declineSpotCheck"){
+    $purpose = '';
+    $purpose = $_POST['comment'];
+    $status  = $_POST['status'];
+    echo $object->updateSpotCheck($_POST['id'],$status,$purpose);
+}
+
+if(isset($_POST['do'])&& $_POST['do'] == "updateSpotDecline"){
+    $id =$_POST['id'];
+    $mission = $_POST['mission'];
+   $output = '<p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Declining SpotCheck Form. Please wait....</p><form id="ap_dc"> <table class="table table-bordered"> <tr><td><textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Enter Reason"></textarea><p id="comment_error"></p></td></tr><tr>
+<td><input  type="submit" name="save" id="save" class="btn btn-primary" value="Save"></td>
+</tr></table><input type="hidden" name="id" value="'. $id.'"><input type="hidden" name="do" value="declineSpotCheck">
+<input type="hidden" name="status" value="'.$mission.'"/>
+</form>';
+   echo $output;
+}
+if(isset($_POST['do'])&& $_POST['do'] == "fetchSpotChecks"){
+    $action = $_POST['spec'];
+   $object->Query("SELECT spotcheck_light.id,spotcheck_light.comment,implementing_partners.name,outcomes.name AS outcome,spotcheck_light.form_url FROM spotcheck_light 
+LEFT JOIN implementing_partners ON spotcheck_light.partner_id = implementing_partners.ip_code 
+LEFT JOIN outcomes ON outcomes.id = spotcheck_light.outcome_area
+WHERE spotcheck_light.status = '$action'");
+   $output = '<table class="table table-responsive table-striped table-bordered" id="data-table">
+                                    <thead>
+                                    <tr>
+                                        <td>Implementing Partner</td>
+                                        <td>Outcome Area</td>
+                                        <td>Comment</td>
+                                        <td>Form</td>
+                                        <td>&nbsp;</td>
+                                        <td></td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>';
+                                    while(!$object->EndOfSeek()){ $pmvRow = $object->Row();
+                                        $output .='<tr><td>'.$pmvRow->name.'</td>
+                                            <td>'.$pmvRow->outcome.'</td>
+                                            <td>'.$pmvRow->comment.'</td>
+                                        <td><a href="'.$pmvRow->form_url.'" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-street-view"></i> View Form</a></td>
+                                            <td><a href="#"  class="btn btn-primary btn-sm" data-id="'.$pmvRow->id.'"  id="approve"><i class="fa fa-check"></i> Approve</a></td>
+                                            <td><a href="#" class="btn btn-primary btn-sm" data-id="'.$pmvRow->id.'" id="decline"><i class="fa fa-times" ></i> Decline</a></td>
+                                    </tr>';
+                                     }
+                                     $output .='</tbody></table>
+<script src="../../assets/plugins/DataTables/js/jquery.dataTables.js"></script>
+<script>
+    $(document).ready(function() {
+        App.init();
+        TableManageDefault.init();
+        FormPlugins.init();
+    });
+';
+   echo $output;
 }

@@ -234,6 +234,8 @@ class Files
 				$allowerd_ext = ['zip','tar','7zip','rar'];
 			}elseif($params['filetype'] === 'docs'){
 				$allowerd_ext = ['pdf','docs','docx','xlsx','xls'];
+			}elseif($params['filetype'] === 'application/pdf'){
+				$allowerd_ext = ['pdf','docs','docx','xlsx','xls'];
 			}elseif($params['filetype'] === 'media'){
 				$allowerd_ext = ['mp4','mp3','wav','3gp'];
 			}

@@ -137,12 +137,12 @@ class Project extends MySQL
 
     }
     public function getConfirmationSPOTCHECK(){
-        $this->Query('Select * from spot_checks');
+        $this->Query('Select  p.name,s.risk_rating,s.amount,s.spot_checks,s.date from spot_checks s INNER JOIN implementing_partners p ON p.ip_code = s.vendor');
         $output = '<table class="table table-striped table-hover table-email table-bordered" style="" align="center">
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th> VENDOR CODE</th>
+                                    <th> VENDOR </th>
                                     <th> RISK RATING</th>
                                     <th>AMOUNT</th>
                                     <th> REQUIRED SPOT CHECK</th>
@@ -154,7 +154,7 @@ class Project extends MySQL
             $row = $this->Row();
             $output.='<tr>
                                         <td>'.$counter.'</td>
-                                        <td>'.$row->vendor.'</td>
+                                        <td>'.$row->name.'</td>
                                         <td>'.$row->risk_rating.'</td>
                                         <td>'.number_format($row->amount,2).'</td> 
                                         <td>'.$row->spot_checks .'</td>
@@ -281,6 +281,22 @@ class Project extends MySQL
             $pmv = 4;
         }
         return $pmv;
+    }
+    function updateSpotCheck($id,$status,$purpose){
+        $valuesArray['status'] = MySQL::SQLValue($status);
+        if(!empty($purpose)){
+            $valuesArray['reason'] = MySQL::SQLValue($purpose);
+        }
+        $whereArray['id'] = MySQL::SQLValue($id);
+        $table = "spotcheck_light";
+        $sql = MySQL::BuildSQLUpdate($table,$valuesArray,$whereArray);
+        $check = $this->Query($sql);
+        if($check){
+            return 'ok';
+        }else{
+            return 'error';
+        }
+
     }
 
 }
