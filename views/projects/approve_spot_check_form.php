@@ -9,7 +9,7 @@ $dbConnect = new MySQL();
 $dbConnect->Query("SELECT spotcheck_light.id,spotcheck_light.comment,implementing_partners.name,outcomes.name AS outcome,spotcheck_light.form_url FROM spotcheck_light 
 LEFT JOIN implementing_partners ON spotcheck_light.partner_id = implementing_partners.ip_code 
 LEFT JOIN outcomes ON outcomes.id = spotcheck_light.outcome_area
-WHERE spotcheck_light.status = 'approved'");
+WHERE spotcheck_light.status = 'active'");
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -20,7 +20,7 @@ WHERE spotcheck_light.status = 'approved'");
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Validate Spot Check</title>
+    <title>HEMS | Approve Spot Check</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -76,11 +76,11 @@ WHERE spotcheck_light.status = 'approved'");
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
             <li><a href="javascript:;">Spot Check</a></li>
-            <li class="active">Validate Spot Check</li>
+            <li class="active">approve spotcheck</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">SPOT CHECK <small>validate spot checks...</small></h1>
+        <h1 class="page-header">Spot Check <small>approve spotcheck...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -96,7 +96,7 @@ WHERE spotcheck_light.status = 'approved'");
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Validate SPOT CHECKS</h4>
+                        <h4 class="panel-title">Approve Spot Check Form</h4>
                     </div>
                     <div class="panel-body">
                         <div class="row" id="list">
@@ -118,10 +118,10 @@ WHERE spotcheck_light.status = 'approved'");
                                             <td><?php echo $pmvRow->name;?></td>
                                             <td><?php echo $pmvRow->outcome;?></td>
                                             <td><?php echo $pmvRow->comment;?></td>
-                                            <td><a href="<?php echo $pmvRow->form_url;?>" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-street-view"></i> View Form</a></td>
-                                            <td><a href="#"  class="btn btn-primary btn-sm" data-id="<?php echo $pmvRow->id;?>"  id="approve"><i class="fa fa-check"></i> Validate</a></td>
+                                        <td><a href="<?php echo $pmvRow->form_url;?>" target="_blank" class="btn btn-primary btn-sm"><i class="fa fa-street-view"></i> View Form</a></td>
+                                            <td><a href="#"  class="btn btn-primary btn-sm" data-id="<?php echo $pmvRow->id;?>"  id="approve"><i class="fa fa-check"></i> Approve</a></td>
                                             <td><a href="#" class="btn btn-primary btn-sm" data-id="<?php echo $pmvRow->id;?>" id="decline"><i class="fa fa-times" ></i> Decline</a></td>
-                                        </tr>
+                                    </tr>
                                     <?php } ?>
                                     </tbody>
 
@@ -202,15 +202,14 @@ WHERE spotcheck_light.status = 'approved'");
         TableManageDefault.init();
         FormPlugins.init();
     });
-
     $(document).on("click","#approve",function (e) {
         e.preventDefault();
         var id = $(this).data('id');
         var action = "updateSpotCheck";
-        var status = 'Validated';
+        var status = 'Approved';
         $.confirm({
             title: 'Confirm!',
-            content: 'Please do you want to validate this spot check?',
+            content: 'Please do you want to approve this spot check?',
             buttons: {
                 confirm: function () {
                     $.ajax({
@@ -220,7 +219,7 @@ WHERE spotcheck_light.status = 'approved'");
                         success:function (e) {
                             if(e === 'ok'){
                                 action = "fetchSpotChecks";
-                                id = "approved";
+                                id = "active";
                                 $("#list").load("../../controllers/project/projectsController.php",{"do":action,spec:id});
                             }else{
 
@@ -237,6 +236,25 @@ WHERE spotcheck_light.status = 'approved'");
     $(document).on("click","#decline",function (e) {
         var id = $(this).data('id');
         var action = "updateSpotDecline";
+        var mission = 'declineApproval';
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/project/projectsController.php",
+            data:{id:id,"do":action,mission:mission},
+            success:function (e) {
+                if(e === 'ok'){
+                    $("#modal-body").html(e);
+                    $("#modal-dialog").modal('show');
+                }else{
+
+                }
+            }
+        })
+    });
+
+    $(document).on("click","#decline",function (e) {
+        var id = $(this).data('id');
+        var action = "updateSpotDecline";
         var mission = 'Decline';
 
 
@@ -250,9 +268,9 @@ WHERE spotcheck_light.status = 'approved'");
                         url: "../../controllers/project/projectsController.php",
                         data:{id:id,"do":action,mission:mission},
                         success:function (e) {
-                                $("#modalTitle").html("<lable>Reason:</lable>")
-                                $("#modal-dialog").modal('toggle');
-                                $("#modal-body").html(e);
+                            $("#modalTitle").html("<lable>Reason:</lable>");
+                            $("#modal-dialog").modal('toggle');
+                            $("#modal-body").html(e);
 
                         }
                     })
@@ -263,6 +281,7 @@ WHERE spotcheck_light.status = 'approved'");
             }
         });
     });
+
 
     $(document).on('submit','#ap_dc',function(e){
         e.preventDefault();
@@ -287,7 +306,7 @@ WHERE spotcheck_light.status = 'approved'");
 
                     if(e === 'ok'){
                         var action = "fetchSpotChecks";
-                        var id = "approved";
+                        var id = "active";
                         $("#list").load("../../controllers/project/projectsController.php",{"do":action,spec:id});
                         $("#comment").empty();
                         $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project saved successfully.</span></div><br>").hide().fadeIn(1000);
@@ -306,8 +325,7 @@ WHERE spotcheck_light.status = 'approved'");
             })
         }
 
-        });
-
+    });
 </script>
 
 <script>

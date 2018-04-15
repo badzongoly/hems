@@ -102,6 +102,10 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                     </div>
                     <div class="panel-body">
                         <div class="row">
+                            <div>
+                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding SpotCheck Form. Please wait....</p>
+                            </div>
+                            <div id="uc_response"></div>
                             <form id="createUserCatForm" method="post" action="">
 
                                 <table class="table table-responsive table-striped table-bordered" align="center">
@@ -120,7 +124,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                                         <td>
                                             <select class="default-select2 form-control" id="partner_id" name="partner_id" style="height: 35px;">
                                                 <?php while(!$pull_ucat->EndOfSeek()){ $ucrow = $pull_ucat->Row();?>
-                                                    <option value="<?php echo $ucrow->id;?>"><?php echo $ucrow->name;?></option>
+                                                    <option value="<?php echo $ucrow->ip_code;?>"><?php echo $ucrow->name;?></option>
                                                 <?php }?>
                                             </select>
                                         </td>
@@ -183,10 +187,6 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                                 </table>
                                 <hr>
                             </form>
-                            <div>
-                                <p align="center" style="display: none; color: limegreen;" id="wait"><img src="../../images/495.gif" > Adding SpotCheck Form. Please wait....</p>
-                            </div>
-                            <div id="uc_response"></div>
                         </div>
 
                         <div id="uclisted">
@@ -301,7 +301,7 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                         if(e=="error"){
 
 
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save project.</span></div><br>").hide().fadeIn(1000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save Spot check.</span></div><br>").hide().fadeIn(1000);
                             $("#wait").css("display","none");
                             $("#save").removeAttr('disabled');
                             $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>Failed to save spot check.</span></div><br>").fadeOut(6000);
@@ -309,14 +309,14 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
                         }else if(e=="exists"){
 
 
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").hide().fadeIn(1000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This Spot check already exists.</span></div><br>").hide().fadeIn(1000);
                             $("#wait").css("display","none");
                             $("#save").removeAttr('disabled');
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This project already exists.</span></div><br>").fadeOut(6000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>This Spot check already exists.</span></div><br>").fadeOut(6000);
 
                         }else if(e == "ok"){
 
-                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Project saved successfully.</span></div><br>").hide().fadeIn(1000);
+                            $('#uc_response').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>Spot check saved successfully.</span></div><br>").hide().fadeIn(1000);
                             $('#uclisted').empty();
                             $("#wait").css("display","none");
                             $("#datepicker-default").val("");
