@@ -1,7 +1,7 @@
 <?php
 require_once('../../classes/mysql.class.php');
 $page = "spot";
-$sub_page_name = "val_spotchack";
+$sub_page_name = "list_spotchack";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
