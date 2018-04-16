@@ -42,7 +42,7 @@ class Pmv extends  MySQL{
     }
     function countSpotCheck($pmvSheetId){
 
-        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM spotcheck_light WHERE id = $pmvSheetId AND status = 'validated'");
+        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM spotcheck_light WHERE partner_id = $pmvSheetId AND status = 'validated'");
         $pmvRow = $this->Row();
         $finalCount = $pmvRow->pmvCount;
 
