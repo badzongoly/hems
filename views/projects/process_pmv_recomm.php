@@ -1,12 +1,18 @@
 <?php
 require_once('../../classes/mysql.class.php');
+require_once('../../classes/Pmv.class.php');
 $page = "pmv";
-$sub_page_name = "appr_pmv";
+$sub_page_name = "proc_pmv_recomm";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
-$dbConnect = new MySQL();
-$dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_partners.risk_rating FROM pmv_light LEFT JOIN implementing_partners ON pmv_light.ip_code = implementing_partners.ip_code WHERE pmv_light.status = 'submitted'");
+
+$fetchAllReccs = new MySQL();
+$qury = "SELECT * FROM pmv_followup_actions WHERE proc_status = 'open'";
+
+$fetchAllReccs->Query($qury);
+
+$pmvObj =  new Pmv();
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -17,7 +23,7 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
 <!-- Mirrored from seantheme.com/color-admin-v1.7/admin/html/form_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 24 Apr 2015 10:56:44 GMT -->
 <head>
     <meta charset="utf-8" />
-    <title>HEMS | Approve PMV</title>
+    <title>HEMS | Process PMV Recommendations</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
@@ -72,11 +78,11 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
         <ol class="breadcrumb pull-right">
             <li><a href="javascript:;">Home</a></li>
             <li><a href="javascript:;">PMV</a></li>
-            <li class="active">Approve PMV</li>
+            <li class="active">Process Recommendations</li>
         </ol>
         <!-- end breadcrumb -->
         <!-- begin page-header -->
-        <h1 class="page-header">PMV <small>approve pmv...</small></h1>
+        <h1 class="page-header">PMV <small>process recommendations...</small></h1>
         <!-- end page-header -->
 
         <!-- begin row -->
@@ -92,46 +98,76 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                             <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                         </div>
-                        <h4 class="panel-title">Approve PMV</h4>
+                        <h4 class="panel-title">Process Recommendations</h4>
                     </div>
                     <div class="panel-body">
+                        <div>
+                            <p align="center" style="display: none; color: limegreen;" id="f_wait"><img src="../../images/495.gif" > Loading... Please wait....</p>
+                        </div>
                         <div class="row">
-
-                                <table class="table table-responsive table-striped table-bordered" id="data-table">
-                                    <thead>
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#default-tab-1" data-toggle="tab"><h4>PMV Recommendations</h4></a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade active in" id="default-tab-1">
+                                    <div id="rlist">
+                                    <table id="data-table" class="table table-striped table-hover table-email table-bordered">
+                                        <thead>
                                         <tr>
-                                            <td>Start Date</td>
-                                            <td>End Date</td>
-                                            <td>Objectives</td>
-                                            <td>Partner Name</td>
-                                            <td>Risk Rating</td>
-                                            <td>Total Cash Contribution</td>
-                                            <td>&nbsp;</td>
+                                            <th>#</th>
+                                            <th>Findings</th>
+                                            <th>Recommended Action</th>
+                                            <th>By Whom</th>
+                                            <th>By When</th>
+                                            <th></th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php while(!$dbConnect->EndOfSeek()){ $pmvRow = $dbConnect->Row();?>
-                                    <tr>
-                                        <td><?php echo $pmvRow->start_date;?></td>
-                                        <td><?php echo $pmvRow->end_date;?></td>
-                                        <td><?php echo $pmvRow->objectives;?></td>
-                                        <td><?php echo $pmvRow->name;?></td>
-                                        <td><?php echo $pmvRow->risk_rating;?></td>
-                                        <td><?php echo $pmvRow->total_cash_contrib;?></td>
-                                        <td><a href="processPmvApproval.php?pmvid=<?php echo base64_encode($pmvRow->id);?>" class="btn btn-success btn-sm"><i class="fa fa-cogs"></i> Process PMV Approval</a></td>
-                                    </tr>
-                                    <?php } ?>
-                                    </tbody>
+                                        </thead>
+                                        <tbody>
+                                        <?php $ucount = 1; while(!$fetchAllReccs->EndOfSeek()){ $ucrow = $fetchAllReccs->Row();?>
+                                            <tr>
+                                                <td><?php echo $ucount;?></td>
+                                                <td><?php echo $ucrow->findings;?></td>
+                                                <td><?php echo $ucrow->recomm_action;?></td>
+                                                <td><?php echo $ucrow->by_whom;?></td>
+                                                <td><?php echo $ucrow->by_when;?></td>
+                                                <td><a href="#closureModal"  id="procClosure" data-toggle="modal" class="btn btn-primary btn-sm" name="<?php echo base64_encode($ucrow->id);?>">Process Closure</a></td>
+                                            </tr>
+                                            <?php $ucount++; } ?>
 
-                                </table>
+                                        </tbody>
+                                    </table>
+                                    </div>
+                                </div>
 
+                                </div>
+                            </div><!-- tabs end -->
+
+                        <div class="modal fade" id="closureModal" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content" style="width: 700px;">
+
+                                    <div class="modal-header" style="text-align: center;">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <div><h5><strong><i class="icon icon-edit"></i>Process Recommendation Closure</strong></h5></div>
+
+                                    </div>
+                                    <div class="modal-body">
+                                        <div style="display:none; text-align: center; color: limegreen;" id="r_wait"><img src="../../images/495.gif" > processing. Please wait....</div>
+
+                                        <div id="v_result"></div>
+
+                                        <div id="v_record"></div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
                         </div>
 
                     </div>
                 </div>
                 <!-- end panel -->
-
-
             </div>
             <!-- end col-12 -->
         </div>
@@ -189,7 +225,34 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
         TableManageDefault.init();
         FormPlugins.init();
     });
+
 </script>
+<script type="text/javascript">
+
+    $(document).on("click","#procClosure",function(){
+        var dropvalue = $(this).attr("name");
+        var action = "closureTrxn";
+
+        $("#v_result").empty();
+        $("#v_record").empty();
+        $("#r_wait").css("display", "block");
+
+        $.ajax({
+            type: "POST",
+            url: "../../controllers/project/recommModalForm.php",
+            data: {cid : dropvalue, do: action},
+            success:function(c) {
+
+                $("#r_wait").css("display", "none");
+                $("#v_record").html(c);
+
+            }
+
+        });
+    });
+
+</script>
+
 
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

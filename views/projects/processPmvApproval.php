@@ -41,6 +41,7 @@ $fpcount = $getListFp->RowCount();
 $getOffs = new MySQL();
 $getOffs->Query("SELECT * FROM pmv_officers LEFT JOIN staff_pdetail ON pmv_officers.staff_id = staff_pdetail.empID WHERE pmv_id = $pmvid");
 $offcount = $getOffs->RowCount();
+
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -137,9 +138,13 @@ $offcount = $getOffs->RowCount();
                             <form method="post" action="" id="approvePmvForm">
                             <table class="table table-responsive">
                                 <tbody>
-                                <tr>
-                                    <td colspan="6"><input style="float: right;" type="submit" name="approve" id="approve" value="Approve PMV" class="btn btn-sm btn-success"></td>
+                                <?php if($pmvRecRow->status == "submitted"){?>
+                                <tr id="aprblock">
+                                    <td><input type="submit" name="approve" id="approve" value="Approve PMV" class="btn btn-sm btn-success"></td>
+                                    <td colspan="4">&nbsp;</td>
+                                        <td><a style="float: right;" href="#declineModal" class="btn btn-sm btn-danger" data-toggle="modal">Decline PMV</a></td>
                                 </tr>
+                                <?php } ?>
                                 <tr>
                                     <td class="col-lg-1"><label>Start Date:</label></td>
                                     <td class="col-lg-3"><?php echo $pmvRecRow->start_date;?></td>
@@ -162,7 +167,34 @@ $offcount = $getOffs->RowCount();
                                     <td><?php echo $pmvRecRow->supplies;?></td>
 
                                 </tr>
-
+                                <tr>
+                                    <td colspan="2" class="col-lg-3"><label>Access To Input/Services:</label></td>
+                                    <td colspan="4" class="col-lg-9"><?php echo $pmvRecRow->access_serv;?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="col-lg-3"><label>Quality To Input/Services:</label></td>
+                                    <td colspan="4" class="col-lg-9"><?php echo $pmvRecRow->quality_serv;?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="col-lg-3"><label>Utilisation To Input/Services:</label></td>
+                                    <td colspan="4" class="col-lg-9"><?php echo $pmvRecRow->util_serv;?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="col-lg-3"><label>Enabling Environment:</label></td>
+                                    <td colspan="4" class="col-lg-9"><?php echo $pmvRecRow->enabling_environ;?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="col-lg-3"><label>Overall assessment of the extent to which the programme is progressing in relation to the expected results for the year:</label></td>
+                                    <td colspan="4" class="col-lg-9"><?php echo $pmvRecRow->overall_assess;?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="col-lg-3"><label>Outstanding related concerns from the tracking sheet or previous PMV:</label></td>
+                                    <td colspan="4" class="col-lg-9"><?php echo $pmvRecRow->outstand_related;?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="col-lg-3"><label>Other issues/concerns:</label></td>
+                                    <td colspan="4" class="col-lg-9"><?php echo $pmvRecRow->other_issues;?></td>
+                                </tr>
                                 </tbody>
                             </table>
                                 <input type="hidden" name="pmvid" id="pmvid" value="<?php echo $pmvid;?>">
@@ -358,6 +390,41 @@ $offcount = $getOffs->RowCount();
                     </div>
                 </div>
                 <!-- end panel -->
+
+                <div class="modal fade" id="declineModal" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="width: 700px;">
+
+                            <div class="modal-header" style="text-align: center;">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <div><h5><strong><i class="icon icon-edit"></i>Decline PMV</strong></h5></div>
+
+                            </div>
+                            <div class="modal-body">
+                                <div style="display:none; text-align: center; color: limegreen;" id="r_wait"><img src="../../images/495.gif" > processing. Please wait....</div>
+
+                                <div id="v_result"></div>
+
+                                <div id="v_record">
+                                    <form method="POST" action="" id="decReasonForm">
+                                        <table class="table table-responsive">
+                                            <tbody>
+                                                <tr>
+                                                    <td><textarea id="decreason" name="decreason" id="decreason" placeholder="Enter a reason for declining this PMV" style="width: 400px;"></textarea><span id="reasrerror"></span></td>
+                                                    <td><input type="submit" name="savedec" id="savedec" value="Decline This PMV Form" class="btn btn-primary btn-sm btn-block"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </form>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+                </div>
             </div>
             <!-- end col-12 -->
         </div>
@@ -417,7 +484,7 @@ $offcount = $getOffs->RowCount();
     });
 </script>
 <script type="text/javascript">
-    //Submit pmv
+    //Submit pmv approval
     $(function () {
 
         var $buttons = $("#approve");
@@ -453,12 +520,75 @@ $offcount = $getOffs->RowCount();
                         $('#apprResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Approved Successfully.</span></div><br>").hide().fadeIn(1000);
                         $("#appr_wait").css("display","none");
                         $("#approve").removeAttr('disabled');
+                        $("#aprblock").css("display","none");
 
                     }
                 }
             });
             return false;
 
+            }
+        });
+
+    });
+
+
+    //Submit pmv decline
+    $(function () {
+
+        var $buttons = $("#savedec");
+        var $pmvid = $("#pmvid").val();
+
+        $buttons.click(function (e) {
+
+            e.preventDefault();
+            $("#v_result").empty();
+            $("#reasrerror").empty();
+
+            var reas = $.trim($("#decreason").val());
+
+            if(reas.length == 0){
+
+                $("#reasrerror").html('<p><small style="color:red;">field cannot be left empty.</small><p/>');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+
+            if(reas.length != 0) {
+
+                var conf = confirm("Are you sure you want to decline this PMV?");
+
+                if (conf) {
+
+                    $("#savedec").attr("disabled", "disabled");
+                    $("#r_wait").css("display", "block");
+                    $("html, body").animate({scrollTop: $("#v_result").position().top}, "slow");
+
+                    $.ajax({
+                        type: "POST",
+                        url: "../../controllers/project/savePmvApprovalDecline.php",
+                        data: {pmvid: $pmvid,reason:reas},
+                        success: function (e) {
+
+                            if (e == "fail") {
+
+                                $('#v_result').html("<br><div align='center'><span class='alert alert-danger' style='text-align: center;'>PMV decline failed.</span></div><br>").hide().fadeIn(1000);
+                                $("#r_wait").css("display", "none");
+                                $("#savedec").removeAttr('disabled');
+
+                            } else if (e == "ok") {
+
+                                $('#v_result').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Declined Successfully.</span></div><br>").hide().fadeIn(1000);
+                                $("#r_wait").css("display", "none");
+                                $("#savedec").removeAttr('disabled');
+                                $("#aprblock").css("display", "none");
+
+                            }
+                        }
+                    });
+                    return false;
+
+                }
             }
         });
 

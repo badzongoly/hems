@@ -44,7 +44,7 @@ if(isset($_POST['vendor']) && isset($_POST['outcome'])){
         <th>Required PMVs</th>
         <th>Submitted PMVs</th>
         <th>Date</th>
-        <th></th>
+<!--        <th></th>-->
     </tr>
     </thead>
     <tbody>
@@ -57,14 +57,14 @@ if(isset($_POST['vendor']) && isset($_POST['outcome'])){
             <td style="text-align: center"><?php echo $ucrow->pmv;?></td>
             <td style="text-align: center"><?php echo $pmvObj->countAddedPMVs($ucrow->id);?></td>
             <td><?php echo $ucrow->date;?></td>
-            <td><div class="btn-group m-r-5 m-b-5">
-                    <?php if($pmvObj->checkPMVAdded($ucrow->id)=='open'){?>
-                <a href="javascript:;" data-toggle="dropdown" class="btn btn-success btn-sm dropdown-toggle"><i class="fa fa-file-pdf-o"></i> Field Reports <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <li><a href="add_pmv_light.php?shid=<?php echo base64_encode($ucrow->id);?>">Add PMV</a></li>
-                </ul>
-                </div>
-                <?php } ?></td>
+<!--            <td><div class="btn-group m-r-5 m-b-5">-->
+<!--                    --><?php //if($pmvObj->checkPMVAdded($ucrow->id)=='open'){?>
+<!--                <a href="javascript:;" data-toggle="dropdown" class="btn btn-success btn-sm dropdown-toggle"><i class="fa fa-file-pdf-o"></i> Field Reports <span class="caret"></span></a>-->
+<!--                <ul class="dropdown-menu">-->
+<!--                    <li><a href="add_pmv_light.php?shid=--><?php //echo base64_encode($ucrow->id);?><!--">Add PMV</a></li>-->
+<!--                </ul>-->
+<!--                </div>-->
+<!--                --><?php //} ?><!--</td>-->
         </tr>
     <?php $ucount++; } ?>
 
