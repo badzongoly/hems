@@ -211,7 +211,12 @@ $offcount = $getOffs->RowCount();
                                                     <td class="col-lg-4"><textarea class="form-control" name="objectives" id="objectives"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->objectives;}?></textarea><span id="objerror"></span></td>
 
                                                     <td class="col-lg-2"><label>Partner Name:</label></td>
-                                                    <td class="col-lg-4"><strong><?php echo $implprow->name;?></strong></td>
+                                                    <td class="col-lg-4"><select name="vendor" id="vendor" class="form-control">
+                                                            <option disabled selected>--SELECT OPTION--</option>
+                                                            <?php while(!$getVendor->EndOfSeek()){ $vrow = $getVendor->Row();?>
+                                                                <option value="<?php echo $vrow->ip_code;?>" <?php if(is_object($pmvRecordset)){if($pmvRecordset->ip_code==$vrow->ip_code){echo "selected";}}?>><?php echo $vrow->name;?></option>
+                                                            <?php } ?>
+                                                        </select></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Outputs<font style="color: red">*</font>:</label></td>
@@ -262,8 +267,7 @@ $offcount = $getOffs->RowCount();
                                                     <td colspan="12"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveBackground" id="saveBackground" value="Save Section A"></td>
                                                 </tr>
                                             </table>
-                                            <input type="hidden" name="sheet_id" value="<?php echo $sheetid;?>">
-                                            <input type="hidden" name="vendor" value="<?php echo $implprow->ip_code;?>">
+                                            <input type="hidden" name="sheet_id" value="0">
                                         </form>
                                     </div>
                                 </div>
