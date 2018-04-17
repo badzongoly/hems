@@ -40,13 +40,11 @@ class Pmv extends  MySQL{
         return $finalCount;
 
     }
+<<<<<<< HEAD
+=======
     function countSpotCheck($pmvSheetId){
 
-<<<<<<< HEAD
-        $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM spotcheck_light WHERE partner_id = $pmvSheetId AND status = 'validated'");
-=======
         $this->Query("SELECT IFNULL(COUNT(id),0) AS pmvCount FROM spotcheck_light WHERE id = $pmvSheetId AND status = 'validated'");
->>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
         $pmvRow = $this->Row();
         $finalCount = $pmvRow->pmvCount;
 
@@ -86,6 +84,7 @@ class Pmv extends  MySQL{
         $finalCount = $pmvRow->required_spotchecks;
         return $finalCount;
     }
+>>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
 
     function getAccessServiceComment($pmvid,$accessServId){
 

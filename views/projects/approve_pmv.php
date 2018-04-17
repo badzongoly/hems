@@ -130,8 +130,6 @@ $dbConnect->Query("SELECT pmv_light.*,implementing_partners.name,implementing_pa
                     </div>
                 </div>
                 <!-- end panel -->
-
-
             </div>
             <!-- end col-12 -->
         </div>

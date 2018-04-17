@@ -1,40 +1,18 @@
 <?php
     require_once('../../classes/mysql.class.php');
 
-    if(isset($_POST['secCheck'])){
-        $secArray =  array();
-        $secArray = $_POST['secCheck'];
-        $secArraySize = sizeof($secArray);
+    if(isset($_POST['section'])){
 
-        $queryWhere = '(';
-        $count = 0;
-
-         foreach($secArray as $asect){
-
-             $queryWhere .= " pmv_sheet.outcome_area = $asect ";
-             if($count < ($secArraySize -1)){
-                 $queryWhere .= ' OR ';
-             }
-             $count++;
-
-         }
-
-        $queryWhere .= ' )';
-
-
+        $secid = $_POST['section'];
         $getPmvComp = new MySQL();
-        $compQuery = "SELECT IFNULL(COUNT(pmv_light.id),0) AS completed FROM pmv_light
+        $getPmvComp->Query("SELECT IFNULL(COUNT(pmv_light.id),0) AS completed FROM pmv_light
                             LEFT JOIN pmv_sheet ON pmv_light.pmv_sheet_id = pmv_sheet.id
-                            WHERE pmv_light.status = 'validated' AND $queryWhere";
-
-        $getPmvComp->Query($compQuery);
+                            WHERE pmv_sheet.outcome_area = $secid AND pmv_light.status = 'validated'");
         $compRow = $getPmvComp->Row();
         $pmvComp = $compRow->completed;
 
         $getPmvReq = new MySQL();
-        $reQuery = "SELECT IFNULL(SUM(pmv_sheet.pmv),0) AS required FROM pmv_sheet WHERE $queryWhere";
-
-        $getPmvReq->Query($reQuery);
+        $getPmvReq->Query("SELECT IFNULL(SUM(pmv_sheet.pmv),0) AS required FROM pmv_sheet WHERE pmv_sheet.outcome_area = $secid");
         $reqRow = $getPmvReq->Row();
         $pmvReq = $reqRow->required;
 

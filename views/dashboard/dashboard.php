@@ -118,7 +118,7 @@
 			                <h4 class="panel-title">Dashboard</h4>
 			            </div>
 			            <div class="panel-body bg-white">
-                            <div>
+                            <div data-scrollbar="true" data-height="225px">
                                 <table class="table table-responsive">
                                     <tr>
                                         <td><select class="form-control" name="filter_op" id="filter_op">
@@ -130,18 +130,16 @@
                                     </tr>
                                 </table>
                                 <div id="sectionList" style="display: none">
-                                    <form id="secSelForm" method="POST" action="">
                                     <table class="table table-responsive">
                                         <tr>
-                                            <td><ul style="list-style-type: none;">
+                                            <td><select class="form-control" name="section" id="section">
+                                                    <option value="" selected disabled>--SELECT SECTION--</option>
                                                     <?php while(!$getSections->EndOfSeek()){ $secRow = $getSections->Row();?>
-                                                    <li><input type="checkbox" name="secCheck[]" value="<?php echo $secRow->code;?>">&nbsp;<?php echo $secRow->name;?></li>
+                                                    <option value="<?php echo $secRow->code;?>"><?php echo $secRow->name;?></option>
                                                     <?php } ?>
-                                                </ul></td>
+                                                </select></td>
                                         </tr>
-                                        <tr><td><input style="float: right;" type="submit" name="secFind" id="secFind" value="Show" class="btn btn-primary btn-sm"></td></tr>
                                     </table>
-                                    </form>
                                 </div>
                                 <div id="dateList" style="display: none">
                                     <form id="dateSelForm" method="POST" action="">
@@ -207,7 +205,7 @@
                                     <td>Validated : <?php echo $allval;?></td>
                                 </tr>
                                 <tr>
-                                    <td><a href="../../views/projects/add_pmv_light.php" class="btn btn-primary btn-sm btn-block">Fill PMV</a></td>
+                                    <td><a href="../../views/projects/pmv_upload_list.php" class="btn btn-primary btn-sm btn-block">Fill PMV</a></td>
                                 </tr>
                                 <tr>
                                     <td><a href="../../views/projects/approve_pmv.php" class="btn btn-success btn-sm btn-block">Approve PMV</a></td>
@@ -397,47 +395,32 @@
 
         });
 
+        $(document).on("change","#section",function(){
 
-        $(function () {
+            var sec = $("#section").prop("value");
 
-            var $buttons = $("#secFind");
-            var $form = $("#secSelForm");
+            $("#load_wait").css("display","block");
 
-            $buttons.click(function (e) {
+            $.ajax({
+                type: "POST",
+                url: "../../controllers/dashboard/reportStatFetch.php",
+                data: {section : sec},
+                success: function(e) {
 
-                e.preventDefault();
-                $("#statlist").empty();
-
-                $("#secFind").attr("disabled", "disabled");
-                $("#load_wait").css("display","block");
-
-                $.ajax({
-                    type: "POST",
-                    url: "../../controllers/dashboard/reportStatFetch.php",
-                    data: $form.serialize(),
-                    success: function(e) {
-
+                        $("#load_wait").css("display","none");
 
                         $('#statlist').html(e);
-                        $("#load_wait").css("display","none");
-                        $("#secFind").removeAttr('disabled');
 
-
-                    }
-                });
-                return false;
-
+                }
             });
 
         });
-
 
 
         $(function () {
 
             var $buttons = $("#findDateReport");
             var $form = $("#dateSelForm");
-
             $buttons.click(function (e) {
 
                 e.preventDefault();

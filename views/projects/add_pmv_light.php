@@ -7,6 +7,18 @@ $sub_page_name = "add_pmv";
 $chekLogin = new MySQL();
 $chekLogin->checkLogin();
 
+if(isset($_GET['shid']) && !empty($_GET['shid'])){
+
+    $sheetid = base64_decode($_GET['shid']);
+    $getVdetails = new MySQL();
+    $getVdetails->Query("SELECT implementing_partners.name,implementing_partners.ip_code FROM pmv_sheet LEFT JOIN implementing_partners ON pmv_sheet.vendor = implementing_partners.ip_code WHERE pmv_sheet.id = $sheetid");
+    $implprow = $getVdetails->Row();
+
+}else{
+
+    header('Location:pmv_upload_list.php');
+
+}
 
 if(isset($_SESSION['hems_active_pmv']) && !empty($_SESSION['hems_active_pmv']) && $_SESSION['hems_active_pmv'] > 0){
 
@@ -58,7 +70,6 @@ $getStaff->Query("SELECT * FROM staff_pdetail WHERE status = 'active'");
 $getOffs = new MySQL();
 $getOffs->Query("SELECT * FROM pmv_officers LEFT JOIN staff_pdetail ON pmv_officers.staff_id = staff_pdetail.empID WHERE pmv_id = $pmvid");
 $offcount = $getOffs->RowCount();
-
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -190,12 +201,7 @@ $offcount = $getOffs->RowCount();
                                                     <td class="col-lg-4"><textarea class="form-control" name="objectives" id="objectives"><?php if(is_object($pmvRecordset)){echo $pmvRecordset->objectives;}?></textarea><span id="objerror"></span></td>
 
                                                     <td class="col-lg-2"><label>Partner Name:</label></td>
-                                                    <td class="col-lg-4"><select name="vendor" id="vendor" class="form-control">
-                                                            <option disabled selected>--SELECT OPTION--</option>
-                                                            <?php while(!$getVendor->EndOfSeek()){ $vrow = $getVendor->Row();?>
-                                                                <option value="<?php echo $vrow->ip_code;?>"><?php echo $vrow->name;?></option>
-                                                            <?php } ?>
-                                                    </select></td>
+                                                    <td class="col-lg-4"><strong><?php echo $implprow->name;?></strong></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="col-lg-2"><label>Outputs<font style="color: red">*</font>:</label></td>
@@ -246,8 +252,8 @@ $offcount = $getOffs->RowCount();
                                                     <td colspan="12"><input style="float:right;" class="btn btn-sm btn-success" type="submit" name="saveBackground" id="saveBackground" value="Save Section A"></td>
                                                 </tr>
                                             </table>
-                                            <input type="hidden" name="sheet_id" value="0">
-
+                                            <input type="hidden" name="sheet_id" value="<?php echo $sheetid;?>">
+                                            <input type="hidden" name="vendor" value="<?php echo $implprow->ip_code;?>">
                                         </form>
                                     </div>
                                 </div>
@@ -720,11 +726,6 @@ $offcount = $getOffs->RowCount();
     $('#end').datepicker({
         format: 'yyyy-mm-dd'
     });
-
-    $('#by_when').datepicker({
-        format: 'yyyy-mm-dd'
-    });
-
 
 </script>
 <script type="text/javascript">
@@ -1595,10 +1596,6 @@ $(document).on("click","#del_rec",function(e){
                             $('#submitResponse').html("<br><div align='center'><span class='alert alert-success' style='text-align: center;'>PMV Submitted Successfully.</span></div><br>").hide().fadeIn(1000);
                             $("#submit_wait").css("display","none");
                             $("#submitPmv").removeAttr('disabled');
-
-                            setTimeout(function () {
-                                window.location.replace("add_pmv_light.php");
-                            }, 3000);
 
                         }
                     }

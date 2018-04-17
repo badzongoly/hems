@@ -20,7 +20,6 @@ if(isset($_POST['findings']) && isset($_POST['findings'])){
     $valuesArray['recomm_action'] = MySQL::SQLValue($_POST['recact']);
     $valuesArray['by_whom'] = MySQL::SQLValue($_POST['by_whom']);
     $valuesArray['by_when'] = MySQL::SQLValue($_POST['by_when']);
-    $valuesArray['proc_status'] = MySQL::SQLValue("open");
 
     $sql = MySQL::BuildSQLInsert("pmv_followup_actions", $valuesArray);
 

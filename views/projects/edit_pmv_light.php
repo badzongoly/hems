@@ -169,11 +169,6 @@ $offcount = $getOffs->RowCount();
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                        <div class="row">
-                            <div class="alert alert-info">
-                                <strong>Decline Reason&nbsp;:&nbsp;</strong><?php echo $pmvRecordset->decline_comment;?>
-                            </div>
-                        </div>
                             <ul class="nav nav-tabs">
                                 <li class="active"><a href="#default-tab-1" data-toggle="tab"><h4>Section A</h4></a></li>
                                 <li class=""><a href="#default-tab-2" data-toggle="tab"><h4>Section B</h4></a></li>

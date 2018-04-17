@@ -137,12 +137,20 @@ class Project extends MySQL
 
     }
     public function getConfirmationSPOTCHECK(){
+<<<<<<< HEAD
         $this->Query('Select * from spot_checks');
+=======
+        $this->Query('Select  p.name,s.risk_rating,s.amount,s.spot_checks,s.date from spot_checks s INNER JOIN implementing_partners p ON p.ip_code = s.vendor');
+>>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
         $output = '<table class="table table-striped table-hover table-email table-bordered" style="" align="center">
                                 <thead>
                                 <tr>
                                     <th>#</th>
+<<<<<<< HEAD
                                     <th> VENDOR CODE</th>
+=======
+                                    <th> VENDOR </th>
+>>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
                                     <th> RISK RATING</th>
                                     <th>AMOUNT</th>
                                     <th> REQUIRED SPOT CHECK</th>
@@ -154,7 +162,11 @@ class Project extends MySQL
             $row = $this->Row();
             $output.='<tr>
                                         <td>'.$counter.'</td>
+<<<<<<< HEAD
                                         <td>'.$row->vendor.'</td>
+=======
+                                        <td>'.$row->name.'</td>
+>>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
                                         <td>'.$row->risk_rating.'</td>
                                         <td>'.number_format($row->amount,2).'</td> 
                                         <td>'.$row->spot_checks .'</td>
@@ -282,6 +294,8 @@ class Project extends MySQL
         }
         return $pmv;
     }
+<<<<<<< HEAD
+=======
     function updateSpotCheck($id,$status,$purpose){
         $valuesArray['status'] = MySQL::SQLValue($status);
         if(!empty($purpose)){
@@ -298,5 +312,6 @@ class Project extends MySQL
         }
 
     }
+>>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
 
 }

@@ -272,10 +272,10 @@ if(isset($_FILES["file"]["type"]) && isset($_POST['do']) && $_POST['do'] == "exc
     for($x = 6 ;$x<sizeof($excelRows['A'])+6;$x++){
         $vendorID = explode('-',$excelRows['A'][$x]);
 <<<<<<< HEAD
-        $valuesArray['vendor'] = MySQL::SQLValue(trim($vendorID[sizeof($vendorID)-1]));
-=======
         $valuesArray['vendor'] = MySQL::SQLValue($vendorID[sizeof($vendorID)-1]);
->>>>>>> parent of 4c734e0... Merge branch 'master' of https://github.com/badzongoly/hems
+=======
+        $valuesArray['vendor'] = MySQL::SQLValue(trim($vendorID[sizeof($vendorID)-1]));
+>>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
         $valuesArray['risk_rating'] = MySQL::SQLValue($excelRows['B'][$x]);
         $valuesArray['amount'] = MySQL::SQLValue($excelRows['C'][$x]);
         $valuesArray['created_by']=MySQL::SQLValue($_SESSION['hems_User']['user_id']);
@@ -306,6 +306,7 @@ if(isset($_POST['do']) && $_POST['do'] == "cancel"){
 }if(isset($_POST['do']) && $_POST['do'] == "confirm"){
         echo $object->moveActivities();exit;
 <<<<<<< HEAD
+=======
 }
 if(isset($_POST['do']) && $_POST['do'] == "CreateSpotCheckForm"){
     $path = $file->FileUpload(
@@ -392,6 +393,5 @@ WHERE spotcheck_light.status = '$action'");
     });
 ';
    echo $output;
-=======
->>>>>>> parent of 4c734e0... Merge branch 'master' of https://github.com/badzongoly/hems
+>>>>>>> c64d8df4a804c55f3b6d74d77015b8d544376635
 }
