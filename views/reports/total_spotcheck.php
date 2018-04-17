@@ -120,8 +120,8 @@ $fetchProjects->Query($qury);
                                     if(!empty($ucrow->region_name)){
                                     ?>
                                         <tr>
-                                            <td><a href="spotcheck_.php?location=<?php echo base64_encode($ucrow->location);?>" target="_blank"> <?php echo $ucrow->region_name;?></a></td>
-                                            <td><?php echo number_format($pmvObj->countAmountByLocation($ucrow->location));?></td>
+                                            <td><a href="spotcheck_.php?location='<?php echo base64_encode($ucrow->location);?>'" target="_blank"> <?php echo $ucrow->region_name;?></a></td>
+                                            <td><?php echo $pmvObj->countAmountByLocation($ucrow->location);?></td>
                                             <td><?php echo $pmvObj->countSpotCheckByLocation($ucrow->location);?></td>
                                             <td><?php echo $pmvObj->countSpotCheckBycompletedLocation($ucrow->location);?></td>
                                         </tr>

@@ -120,7 +120,7 @@ $fetchProjects->Query($qury);
                                         <tr>
                                             <td><?php echo $ucrow->name;?></td>
                                             <td><?php echo $ucrow->risk_rating;?></td>
-                                            <td><?php echo number_format($ucrow->amount);?></td>
+                                            <td><?php echo $ucrow->amount;?></td>
                                             <td><?php echo $ucrow->spot_checks;?></td>
                                             <td><?php echo $pmvObj->countSpotCheck($ucrow->vendor);?></td>
                                         </tr>
