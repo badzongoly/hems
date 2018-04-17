@@ -282,5 +282,21 @@ class Project extends MySQL
         }
         return $pmv;
     }
+    function updateSpotCheck($id,$status,$purpose){
+        $valuesArray['status'] = MySQL::SQLValue($status);
+        if(!empty($purpose)){
+            $valuesArray['reason'] = MySQL::SQLValue($purpose);
+        }
+        $whereArray['id'] = MySQL::SQLValue($id);
+        $table = "spotcheck_light";
+        $sql = MySQL::BuildSQLUpdate($table,$valuesArray,$whereArray);
+        $check = $this->Query($sql);
+        if($check){
+            return 'ok';
+        }else{
+            return 'error';
+        }
+
+    }
 
 }

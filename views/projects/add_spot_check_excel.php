@@ -406,7 +406,6 @@ $pull_ucat->Query("SELECT * FROM implementing_partners WHERE status= 'Active'");
         });
     $(document).on("change","#files",function(e){
         e.preventDefault();
-
         $("#activity_error").empty();
         $("#filesuccess").css("display","none");
         $("#fileerror").css("display","none");
